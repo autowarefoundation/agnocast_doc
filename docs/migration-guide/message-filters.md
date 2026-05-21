@@ -71,8 +71,8 @@ class MySyncNode : public rclcpp::Node
   agnocast::message_filters::Synchronizer<SyncPolicy> sync_;           // (4)
 
   void callback(
-    const agnocast::ipc_shared_ptr<MsgA> & a,                         // (5)
-    const agnocast::ipc_shared_ptr<MsgB> & b)
+    const agnocast::ipc_shared_ptr<const MsgA> & a,                   // (5)
+    const agnocast::ipc_shared_ptr<const MsgB> & b)
   {
     // Process synchronized messages
   }
@@ -113,8 +113,8 @@ class MySyncNode : public agnocast::Node                               // (1)
   agnocast::message_filters::Synchronizer<SyncPolicy> sync_;
 
   void callback(
-    const agnocast::ipc_shared_ptr<MsgA> & a,
-    const agnocast::ipc_shared_ptr<MsgB> & b)
+    const agnocast::ipc_shared_ptr<const MsgA> & a,
+    const agnocast::ipc_shared_ptr<const MsgB> & b)
   {
     // Process synchronized messages
   }
