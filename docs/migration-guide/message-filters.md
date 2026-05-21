@@ -2,15 +2,20 @@
 
 Agnocast provides message synchronization filters compatible with the ROS 2 `message_filters` API. These allow you to synchronize messages from multiple Agnocast topics based on their timestamps.
 
+## Feature Support Status
+
 | Component | Support |
 |-----------|---------|
 | Synchronizer (2–9 inputs) | Supported |
 | ExactTime policy | Supported |
 | ApproximateTime policy | Supported |
+| ApproximateEpsilonTime policy | Not supported |
 | Subscriber filter | Supported |
 | PassThrough filter | Supported |
 | Cache | Not supported |
 | Chain | Not supported |
+
+Synchronizing standard ROS 2 subscriptions (`std::shared_ptr<const M>`) and Agnocast subscriptions (`agnocast::ipc_shared_ptr<const M>`) within the same `Synchronizer` is not supported — all inputs must be Agnocast subscriptions.
 
 ## Migrating a Synchronizer
 
