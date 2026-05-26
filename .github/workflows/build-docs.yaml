@@ -5,7 +5,7 @@ on:
     types: [labeled, closed]
 
 concurrency:
-  group: preview-${{ github.ref }}
+  group: preview-pr-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 permissions:
@@ -15,8 +15,8 @@ permissions:
 jobs:
   build:
     if: >-
-      github.event.action != 'closed' &&
-      contains(github.event.pull_request.labels.*.name, 'check-page')
+      github.event.action == 'labeled' &&
+      github.event.label.name == 'check-page'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
