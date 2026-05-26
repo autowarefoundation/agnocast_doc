@@ -2,15 +2,20 @@
 
 Agnocast provides message synchronization filters compatible with the ROS 2 `message_filters` API. These allow you to synchronize messages from multiple Agnocast topics based on their timestamps.
 
+## Feature Support Status
+
 | Component | Support |
 |-----------|---------|
 | Synchronizer (2–9 inputs) | Supported |
 | ExactTime policy | Supported |
 | ApproximateTime policy | Supported |
+| ApproximateEpsilonTime policy | Not supported |
 | Subscriber filter | Supported |
 | PassThrough filter | Supported |
 | Cache | Not supported |
 | Chain | Not supported |
+
+Synchronizing standard ROS 2 subscriptions (`std::shared_ptr<const M>`) and Agnocast subscriptions (`agnocast::ipc_shared_ptr<const M>`) within the same `Synchronizer` is not supported — all inputs must be Agnocast subscriptions.
 
 ## Migrating a Synchronizer
 
@@ -66,8 +71,8 @@ class MySyncNode : public rclcpp::Node
   agnocast::message_filters::Synchronizer<SyncPolicy> sync_;           // (4)
 
   void callback(
-    const agnocast::ipc_shared_ptr<MsgA> & a,                         // (5)
-    const agnocast::ipc_shared_ptr<MsgB> & b)
+    const agnocast::ipc_shared_ptr<const MsgA> & a,                   // (5)
+    const agnocast::ipc_shared_ptr<const MsgB> & b)
   {
     // Process synchronized messages
   }
@@ -108,8 +113,8 @@ class MySyncNode : public agnocast::Node                               // (1)
   agnocast::message_filters::Synchronizer<SyncPolicy> sync_;
 
   void callback(
-    const agnocast::ipc_shared_ptr<MsgA> & a,
-    const agnocast::ipc_shared_ptr<MsgB> & b)
+    const agnocast::ipc_shared_ptr<const MsgA> & a,
+    const agnocast::ipc_shared_ptr<const MsgB> & b)
   {
     // Process synchronized messages
   }
