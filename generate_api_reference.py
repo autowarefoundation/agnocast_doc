@@ -664,13 +664,13 @@ auto timer = this->create_wall_timer(100ms, [this, sub]() {
     "Service": '''
 ```cpp
 using SrvT = example_interfaces::srv::AddTwoInts;
-using RequestT = agnocast::Service<SrvT>::RequestT;
-using ResponseT = agnocast::Service<SrvT>::ResponseT;
+using Request = SrvT::Request;
+using Response = SrvT::Response;
 
 auto service = agnocast::create_service<SrvT>(
   this, "add_two_ints",
-  [this](const agnocast::ipc_shared_ptr<RequestT> & req,
-         agnocast::ipc_shared_ptr<ResponseT> & res) {
+  [this](const agnocast::ipc_shared_ptr<Request> & req,
+         const agnocast::ipc_shared_ptr<Response> & res) {
     res->sum = req->a + req->b;
   });
 ```
@@ -742,9 +742,9 @@ CLASSES = [
     ("Client", "classagnocast_1_1Client.xml",
      "agnocast::Client<ServiceT>",
      None),
-    ("Service", "classagnocast_1_1Service.xml",
+    ("Service", "classagnocast_1_1BasicService.xml",
      "agnocast::Service<ServiceT>",
-     None),
+     "Service server for zero-copy Agnocast service communication. The service/client API is experimental and may change in future versions."),
     ("TimerBase", "classagnocast_1_1TimerBase.xml",
      "agnocast::TimerBase",
      None),
