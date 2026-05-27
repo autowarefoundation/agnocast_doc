@@ -2,5 +2,4 @@ nav:
     - ... | index.md
     - Running in Containers: containers.md
     - CARET Support: caret.md
-    - CLI Tools: cli-tools.md
     - Troubleshooting: troubleshooting.md
