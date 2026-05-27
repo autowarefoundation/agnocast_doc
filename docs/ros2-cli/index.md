@@ -151,12 +151,12 @@ Component containers can load `agnocast::Node` subclasses; the container itself 
 
 ## How to use ros2 command for Agnocast
 
-Currently, Agnocast supports the following `ros2` commands:
+The following sections show usage examples for the Agnocast-specific verbs:
 
-- `ros2 topic list`
-- `ros2 topic info /topic_name`
-- `ros2 node list`
-- `ros2 node info /node_name`
+- `ros2 topic list_agnocast`
+- `ros2 topic info_agnocast /topic_name`
+- `ros2 node list_agnocast`
+- `ros2 node info_agnocast /node_name`
 
 !!! warning "Local-host scope"
     Each of the Agnocast-specific verbs below (`list_agnocast`, `info_agnocast`) inspects the Agnocast state on **the host where the command runs**: the kernel module, `/dev/agnocast`, and shared-memory segments. To inspect Agnocast endpoints on another host, run the same command on that host. The DDS-side portion of each command's output is still cluster-wide, as usual.
