@@ -58,6 +58,38 @@ Both Humble and Jazzy use Agnocast major version **2**. The major version is fix
 
 ---
 
+## Limitations
+
+Because Agnocast delivers messages by sharing the publisher's in-memory representation directly with subscribers, both ends must agree on that representation exactly. This assumption shapes most of the current limitations.
+
+### Memory layout must match between publisher and subscriber
+
+Agnocast does **not** serialize messages. The publisher and subscriber read and write the same bytes in shared memory, so the in-memory layout of the message type — field order, padding, alignment, and ABI of any nested types — must be byte-for-byte identical on both sides.
+
+In practice this holds automatically when all nodes are built against the same ROS 2 distribution, since the C++ ABI is stable across typical compiler versions. The realistic failure mode — most likely when publisher and subscriber are built in **different containers** — is mismatched `_GLIBCXX_USE_CXX11_ABI` settings, which change the layout of `std::string` and other standard types. Mismatched layouts will not produce a clean error; subscribers will simply read corrupted data.
+
+### Single ECU, single IPC namespace
+
+Agnocast pub/sub only works between processes that share the same Linux IPC namespace on the same machine.
+
+- **Cross-ECU communication:** When an Agnocast publisher and subscriber on the same topic live on different ECUs, the Bridge is **not** automatically started to connect them. Each side will only see local endpoints. Automatic discovery of remote Agnocast endpoints and on-demand Bridge creation is on the roadmap.
+- **Cross-IPC-namespace communication** is not supported. Containers must share an IPC namespace to communicate via Agnocast — see [Running in Containers](tips/containers.md). Native cross-namespace support is on the roadmap.
+
+### No ROS domain isolation or domain bridge
+
+Agnocast does not honor `ROS_DOMAIN_ID`. All Agnocast processes in the same IPC namespace see each other regardless of domain, and there is no domain-to-domain bridge equivalent to the ROS 2 domain bridge. Domain-aware behavior is on the roadmap.
+
+### One message type per topic
+
+A given Agnocast topic name must be used with a single message type across all publishers and subscribers. Publishing or subscribing to the same topic with different types is not supported.
+
+### Other API-level limitations
+
+- **Service / client API** is experimental and may change in future versions — see [Client](api/client.md) and [Service](api/service.md).
+- **`message_filters`** does not support every policy and filter available in upstream ROS 2 — see the [compatibility table](migration-guide/message-filters.md).
+
+---
+
 ## Links
 
 - [Source Code (GitHub)](https://github.com/autowarefoundation/agnocast)
