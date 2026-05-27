@@ -12,16 +12,16 @@ This section enumerates the standard `ros2` CLI commands shipped with `ros2cli` 
 Columns used in the tables below:
 
 - **Works as-is** — whether the unmodified `ros2` command produces useful results for Agnocast endpoints.
-    - ✓ Works without modification (either the command does not depend on Agnocast semantics, or the information it needs is available on DDS).
-    - ⚠ Works partially — typically, DDS-visible aspects (bridged topics, `rclcpp::Node`-based nodes that use Agnocast pub/sub, etc.) are reported correctly, but purely Agnocast-only endpoints are invisible.
-    - ✗ Does not see Agnocast-only endpoints because Agnocast bypasses the RMW/DDS layer.
-    - N/A Not applicable (the command is Agnocast-specific and has no upstream `ros2` counterpart).
+  - ✓ Works without modification (either the command does not depend on Agnocast semantics, or the information it needs is available on DDS).
+  - ⚠ Works partially — typically, DDS-visible aspects (bridged topics, `rclcpp::Node`-based nodes that use Agnocast pub/sub, etc.) are reported correctly, but purely Agnocast-only endpoints are invisible.
+  - ✗ Does not see Agnocast-only endpoints because Agnocast bypasses the RMW/DDS layer.
+  - N/A Not applicable (the command is Agnocast-specific and has no upstream `ros2` counterpart).
 - **Agnocast version** — whether `ros2agnocast` provides a dedicated Agnocast-aware verb (e.g. `ros2 topic list_agnocast`, `ros2 agnocast generate-bridge-plugins`). ✓ means a variant exists; ✗ means no variant exists today. Most Agnocast-aware verbs are **local-scope only** — they inspect shared memory and the Agnocast kernel module on the machine they run on, so they cannot discover Agnocast endpoints living on other hosts. The verb-level tables below mark this explicitly.
 - **Planned** — whether dedicated Agnocast support is intended.
-    - `Yes` Agnocast-specific support is planned.
-    - `No` Explicitly not planned (the command is DDS-only and has no Agnocast counterpart).
-    - `TBD` Not decided.
-    - `-` Not applicable — the command already works as-is (including via the bridge), so no dedicated Agnocast support is needed.
+  - `Yes` Agnocast-specific support is planned.
+  - `No` Explicitly not planned (the command is DDS-only and has no Agnocast counterpart).
+  - `TBD` Not decided.
+  - `-` Not applicable — the command already works as-is (including via the bridge), so no dedicated Agnocast support is needed.
 - **Notes** — short explanation and pointers.
 
 ### 1. Top-level ros2 commands
@@ -204,14 +204,14 @@ If any one of these is missing, the suffix is just `(Agnocast enabled)`. For exa
 
 | pub | sub | bridge | display |
 | :--- | :--- | :--- | :--- |
-| rclcpp::publisher | rclcpp::subscription | off / standard / performance | /my_topic |
-| agnocast::publisher | rclcpp::subscription | off | /my_topic (WARN: Agnocast and ROS 2 endpoints exist but bridge is not active) |
-| agnocast::publisher | rclcpp::subscription | standard / performance | /my_topic (Agnocast enabled, bridged) |
-| rclcpp::publisher | agnocast::subscription | off | /my_topic (WARN: Agnocast and ROS 2 endpoints exist but bridge is not active) |
-| rclcpp::publisher | agnocast::subscription | standard / performance | /my_topic (Agnocast enabled, bridged) |
-| agnocast::publisher | agnocast::subscription | off / standard / performance | /my_topic (Agnocast enabled) |
-| agnocast::publisher | non | off / standard / performance | /my_topic (Agnocast enabled) |
-| non | agnocast::subscription | off / standard / performance | /my_topic (Agnocast enabled) |
+| `rclcpp::publisher` | `rclcpp::subscription` | off / standard / performance | `/my_topic` |
+| `agnocast::publisher` | `rclcpp::subscription` | off | `/my_topic (WARN: Agnocast and ROS 2 endpoints exist but bridge is not active)` |
+| `agnocast::publisher` | `rclcpp::subscription` | standard / performance | `/my_topic (Agnocast enabled, bridged)` |
+| `rclcpp::publisher` | `agnocast::subscription` | off | `/my_topic (WARN: Agnocast and ROS 2 endpoints exist but bridge is not active)` |
+| `rclcpp::publisher` | `agnocast::subscription` | standard / performance | `/my_topic (Agnocast enabled, bridged)` |
+| `agnocast::publisher` | `agnocast::subscription` | off / standard / performance | `/my_topic (Agnocast enabled)` |
+| `agnocast::publisher` | none | off / standard / performance | `/my_topic (Agnocast enabled)` |
+| none | `agnocast::subscription` | off / standard / performance | `/my_topic (Agnocast enabled)` |
 
 #### Notes
 
