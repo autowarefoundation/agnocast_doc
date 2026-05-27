@@ -1,5 +1,9 @@
 /* Agnocast Documentation - Custom Styles */
 
+.md-grid {
+  max-width: 1920px;
+}
+
 /* Diff-style highlighting for migration examples */
 .md-typeset .highlight .hll {
   background-color: rgba(0, 180, 0, 0.15);
