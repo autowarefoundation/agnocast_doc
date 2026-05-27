@@ -3,6 +3,9 @@
 The Bridge enables communication between Agnocast nodes and standard ROS 2 nodes (RMW). It automatically forwards messages bidirectionally, allowing gradual migration — you don't need to migrate all nodes at once.
 The Bridge can be introduced at **either Stage 1 or Stage 2**. It is independent of which node class you use.
 
+!!! note
+    Native Agnocast pub/sub is limited to a single ECU and a single IPC namespace, and does not honor `ROS_DOMAIN_ID`. The Bridge is currently the only way to reach ROS 2 nodes on other machines, in other IPC namespaces, or in other ROS domains. See [Limitations](../index.md#limitations) for the full list.
+
 ```mermaid
 graph LR
     subgraph Agnocast World
@@ -172,11 +175,13 @@ colcon build --packages-select agnocast_bridge_plugins \
 </node>
 ```
 
-### Limitations
+### Performance Mode Limitations
 
 - Only message types included in the generated plugins can be bridged
 - If the bridge process crashes, all Agnocast ↔ ROS 2 communication is lost
 - Requires a separate build step for plugin generation
+
+For Agnocast-wide limitations (memory layout requirements, single-ECU scope, domain isolation), see [Limitations](../index.md#limitations).
 
 ## QoS Behavior
 

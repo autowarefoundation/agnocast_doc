@@ -36,6 +36,9 @@ Agnocast uses POSIX shared memory (`/dev/shm`) and POSIX message queues (`/dev/m
 
 To enable communication, all Agnocast containers must share the same IPC namespace.
 
+!!! warning
+    Sharing an IPC namespace is necessary but not sufficient. Agnocast does not serialize messages, so publisher and subscriber must agree on the exact in-memory layout of every message type. Containers built with different compilers, different `rosidl` generator versions, or different system libraries can produce mismatched layouts that silently corrupt data. Build all communicating containers from the same workspace and toolchain. See [Limitations](../index.md#limitations) for details.
+
 ## IPC Namespace Configuration
 
 ### Option 1: Share the host IPC namespace

@@ -2,6 +2,9 @@
 
 In Stage 1, you keep `rclcpp::Node` as the node base class and rewrite only the publishers, subscriptions, and smart pointers to use Agnocast APIs. This gives you true zero-copy IPC with minimal code changes. Agnocast and rclcpp publishers/subscriptions can coexist within the same node, so you can migrate topic by topic.
 
+!!! note
+    A single Agnocast topic name must use one message type across all publishers and subscribers — multiple types on the same topic are not supported. See [Limitations](../index.md#limitations) for the full list of current constraints.
+
 ## Build Setup
 
 Add `agnocastlib` to your CMake dependencies.
