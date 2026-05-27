@@ -4,7 +4,7 @@ The Bridge enables communication between Agnocast nodes and standard ROS 2 nodes
 The Bridge can be introduced at **either Stage 1 or Stage 2**. It is independent of which node class you use.
 
 !!! note
-    Native Agnocast pub/sub is limited to a single ECU and a single IPC namespace, and does not honor `ROS_DOMAIN_ID`. The Bridge is currently the only way to reach ROS 2 nodes on other machines, in other IPC namespaces, or in other ROS domains. See [Limitations](../index.md#limitations) for the full list.
+    Native Agnocast pub/sub is limited to a single ECU and a single IPC namespace. The Bridge connects Agnocast nodes to ROS 2 (RMW) nodes within the same ECU; it does not provide native Agnocast transport across ECUs or across IPC namespaces. See [Limitations](../index.md#limitations) for the full list.
 
 ```mermaid
 graph LR

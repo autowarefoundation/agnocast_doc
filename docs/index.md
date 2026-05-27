@@ -66,15 +66,13 @@ Because Agnocast delivers messages by sharing the publisher's in-memory represen
 
 Agnocast does **not** serialize messages. The publisher and subscriber read and write the same bytes in shared memory, so the in-memory layout of the message type — field order, padding, alignment, and ABI of any nested types — must be byte-for-byte identical on both sides.
 
-In practice this holds automatically when all nodes are built from the same workspace with the same toolchain. It can silently break when publisher and subscriber are built in different environments — for example, in **different containers** with different compiler versions, different `rosidl` generator versions, or different system libraries. Mismatched layouts will not produce a clean error; subscribers will simply read corrupted data.
-
-Keep the build environment consistent across all processes that share an Agnocast topic.
+In practice this holds automatically when all nodes are built against the same ROS 2 distribution, since the C++ ABI is stable across typical compiler versions. The realistic failure mode — most likely when publisher and subscriber are built in **different containers** — is mismatched `_GLIBCXX_USE_CXX11_ABI` settings, which change the layout of `std::string` and other standard types. Mismatched layouts will not produce a clean error; subscribers will simply read corrupted data.
 
 ### Single ECU, single IPC namespace
 
 Agnocast pub/sub only works between processes that share the same Linux IPC namespace on the same machine.
 
-- **Cross-ECU communication** is not supported. Use the [Bridge](migration-guide/bridge.md) to forward topics over RMW to nodes on other machines. Native cross-ECU Agnocast transport is on the roadmap.
+- **Cross-ECU communication:** When an Agnocast publisher and subscriber on the same topic live on different ECUs, the Bridge is **not** automatically started to connect them. Each side will only see local endpoints. Automatic discovery of remote Agnocast endpoints and on-demand Bridge creation is on the roadmap.
 - **Cross-IPC-namespace communication** is not supported. Containers must share an IPC namespace to communicate via Agnocast — see [Running in Containers](tips/containers.md). Native cross-namespace support is on the roadmap.
 
 ### No ROS domain isolation or domain bridge
