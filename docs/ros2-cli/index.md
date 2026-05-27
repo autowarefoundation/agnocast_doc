@@ -192,7 +192,13 @@ $ ros2 topic list_agnocast
 /topic_name3
 ```
 
-This does not necessarily mean that a bridge process is currently running. If there is only one Agnocast publisher and no ROS 2 subscriber, the topic will be displayed simply as "(Agnocast enabled)" rather than including the "bridged" suffix. The "bridged" status indicates that communication has been successfully established between Agnocast and ROS 2.
+The `(Agnocast enabled, bridged)` suffix means **the topic has both Agnocast endpoints and ROS 2 endpoints, and a bridge process is forwarding between them**. All three conditions are required:
+
+- at least one Agnocast publisher or subscriber on the topic,
+- at least one ROS 2 (DDS-side) endpoint on the other direction (e.g. an Agnocast publisher with a ROS 2 subscriber, or vice versa), and
+- a bridge process (standard or performance) currently running for that topic.
+
+If any one of these is missing, the suffix is just `(Agnocast enabled)`. For example, a topic with only an Agnocast publisher and no ROS 2 subscriber is shown as `(Agnocast enabled)` regardless of whether a bridge process is running — there is simply no DDS-side counterpart to bridge to. Table 1 below enumerates every combination.
 
 #### Table 1: Pub/Sub situations and display names
 
@@ -368,7 +374,7 @@ $ ros2 node list_agnocast -d
 
 #### Notes
 
-Detection of agnocast::Node instances depends on the presence of Agnocast-enabled endpoints. A node without at least one Agnocast publisher or subscriber will be omitted from the output.
+Detection of `agnocast::Node` instances depends on the presence of Agnocast-enabled endpoints. A node without at least one Agnocast publisher or subscriber will be omitted from the output.
 
 ### Node Info
 
