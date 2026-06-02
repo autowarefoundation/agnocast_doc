@@ -59,7 +59,7 @@ As with C++, `thread_name` must be unique among all threads managed by the confi
 
 ### Cargo
 
-The crate lives in the Agnocast repository under `src/agnocast_cie_thread_configurator/rust/` and is built standalone with cargo (it has no `package.xml`, so colcon ignores it). Add it as a git dependency:
+The crate lives in the Agnocast repository under `src/agnocast_cie_thread_configurator/rust/` and is built standalone with Cargo (it has no `package.xml`, so colcon ignores it). Add it as a Git dependency:
 
 ```toml
 [dependencies]
@@ -70,7 +70,7 @@ The crate is dependency-light (only `libc` and `log`) and links against neither 
 
 ### Toggling Agnocast on and off
 
-The crate performs no gating of its own — it always reports when called, and whether to call it at all is decided entirely on the consumer side. The recommended pattern is to make it an optional dependency behind a cargo feature that is **off by default**, so the program can be built either with or without Agnocast (for example, to ship a statically-linked binary in an environment where Agnocast is not installed):
+The crate performs no gating of its own — it always reports when called, and whether to call it at all is decided entirely on the consumer side. The recommended pattern is to make it an optional dependency behind a Cargo feature that is **off by default**, so the program can be built either with or without Agnocast (for example, to ship a statically-linked binary in an environment where Agnocast is not installed):
 
 ```toml
 [dependencies]
