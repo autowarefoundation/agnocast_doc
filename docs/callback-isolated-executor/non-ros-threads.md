@@ -2,7 +2,9 @@
 
 The thread configurator can also manage scheduling for threads that are not part of any ROS 2 executor — for example, sensor driver threads or custom worker threads.
 
-## Usage
+Each non-ROS thread reports its TID and a logical name to the configurator daemon, which then applies the scheduling parameters defined in the YAML configuration. Clients are available for both C++ and Rust.
+
+## C++
 
 Use `agnocast_cie_thread_configurator::spawn_non_ros2_thread` instead of `std::thread` to create the thread. This function automatically reports the thread's ID to the configurator so that scheduling parameters can be applied.
 
@@ -21,7 +23,7 @@ std::thread t = agnocast_cie_thread_configurator::spawn_non_ros2_thread(
 
 The `thread_name` must be unique among all threads managed by the configurator, and must match the `name` field in the YAML configuration.
 
-## CMake
+### CMake
 
 Add `agnocast_cie_thread_configurator` as a dependency:
 
@@ -29,6 +31,42 @@ Add `agnocast_cie_thread_configurator` as a dependency:
 find_package(agnocast_cie_thread_configurator REQUIRED)
 ament_target_dependencies(your_target agnocast_cie_thread_configurator)
 ```
+
+## Rust
+
+A pure-Rust client crate (`agnocast_cie_thread_configurator`) implements the same protocol for Rust programs. It exposes two entry points:
+
+- `spawn_non_ros2_thread(thread_name, closure)` — spawns a thread that reports itself to the configurator, then runs the closure; returns its `JoinHandle<T>`. This is the Rust counterpart of the C++ function.
+- `report_current_thread(thread_name)` — reports the calling thread. Use this for threads that are not created via `spawn_non_ros2_thread`, such as the `main` thread.
+
+```rust
+use agnocast_cie_thread_configurator::{report_current_thread, spawn_non_ros2_thread};
+
+fn main() {
+    // Report a thread created outside spawn_non_ros2_thread (e.g. main).
+    report_current_thread("main_thread");
+
+    // Spawn a managed worker thread.
+    let handle = spawn_non_ros2_thread("my_worker", || {
+        // worker body
+    });
+
+    handle.join().unwrap();
+}
+```
+
+As with C++, `thread_name` must be unique among all threads managed by the configurator, and must match the `name` field in the YAML configuration.
+
+### Cargo
+
+The crate lives in the Agnocast repository under `src/agnocast_cie_thread_configurator/rust/` and is built standalone with cargo (it has no `package.xml`, so colcon ignores it). Add it as a git dependency:
+
+```toml
+[dependencies]
+agnocast_cie_thread_configurator = { git = "https://github.com/autowarefoundation/agnocast.git" }
+```
+
+The crate is dependency-light (only `libc` and `log`) and links against neither Agnocast, ROS 2, nor DDS, so it can be statically linked — for example against `x86_64-unknown-linux-musl`. Reporting is best-effort: if the configurator daemon is not running, the failure is logged through the `log` crate and the thread runs normally. This makes it safe to expose behind an optional cargo feature that is enabled only when Agnocast is in use.
 
 ## YAML Configuration
 
