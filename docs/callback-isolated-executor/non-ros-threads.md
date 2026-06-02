@@ -66,7 +66,43 @@ The crate lives in the Agnocast repository under `src/agnocast_cie_thread_config
 agnocast_cie_thread_configurator = { git = "https://github.com/autowarefoundation/agnocast.git" }
 ```
 
-The crate is dependency-light (only `libc` and `log`) and links against neither Agnocast, ROS 2, nor DDS, so it can be statically linked — for example against `x86_64-unknown-linux-musl`. Reporting is best-effort: if the configurator daemon is not running, the failure is logged through the `log` crate and the thread runs normally. This makes it safe to expose behind an optional cargo feature that is enabled only when Agnocast is in use.
+The crate is dependency-light (only `libc` and `log`) and links against neither Agnocast, ROS 2, nor DDS, so it can be statically linked — for example against `x86_64-unknown-linux-musl`. Reporting is best-effort: if the configurator daemon is not running, the failure is logged through the `log` crate and the thread runs normally.
+
+### Toggling Agnocast on and off
+
+The crate performs no gating of its own — it always reports when called, and whether to call it at all is decided entirely on the consumer side. The recommended pattern is to make it an optional dependency behind a cargo feature that is **off by default**, so the program can be built either with or without Agnocast (for example, to ship a statically-linked binary in an environment where Agnocast is not installed):
+
+```toml
+[dependencies]
+agnocast_cie_thread_configurator = { git = "https://github.com/autowarefoundation/agnocast.git", optional = true }
+
+[features]
+default = []
+agnocast = ["dep:agnocast_cie_thread_configurator"]
+```
+
+Gate the calls on that feature so they compile out completely when it is disabled:
+
+```rust
+#[cfg(feature = "agnocast")]
+use agnocast_cie_thread_configurator::report_current_thread;
+
+fn main() {
+    #[cfg(feature = "agnocast")]
+    report_current_thread("main_thread");
+
+    // ... rest of the program runs identically with or without the feature ...
+}
+```
+
+Build with Agnocast off (default) or on:
+
+```bash
+cargo build                       # Agnocast off: crate is not compiled in
+cargo build --features agnocast   # Agnocast on: threads are reported
+```
+
+When the feature is off, the crate is neither compiled nor linked. When it is on, reporting still degrades gracefully if the configurator daemon is absent (see above).
 
 ## YAML Configuration
 
