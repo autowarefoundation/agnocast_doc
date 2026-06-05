@@ -85,8 +85,7 @@ A given Agnocast topic name must be used with a single message type across all p
 
 ### Other API-level limitations
 
-- **Service / client API** is experimental and may change in future versions — see [Client](api/client.md) and [Service](api/service.md).
-- **`message_filters`** does not support every policy and filter available in upstream ROS 2 — see the [compatibility table](migration-guide/message-filters.md).
+**`message_filters`** does not support every policy and filter available in upstream ROS 2 — see the [compatibility table](migration-guide/message-filters.md).
 
 ---
 
