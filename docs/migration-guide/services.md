@@ -2,9 +2,6 @@
 
 Agnocast supports ROS 2-style services with zero-copy request and response handling via shared memory.
 
-!!! warning
-    Agnocast service/client is not officially supported yet. The API may introduce breaking changes without a major version increment. Use at your own risk.
-
 ## Migrating a Service Server
 
 ### Before (rclcpp)
