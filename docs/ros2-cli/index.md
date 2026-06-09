@@ -148,7 +148,7 @@ Component containers can load `agnocast::Node` subclasses; the container itself 
 | `ros2 agnocast --version` / `-v` | Local host only | Print version information for Agnocast components installed on the host where the command is run (userland libraries and the loaded kernel module). |
 | `ros2 agnocast version` | Local host only | Same as `--version` (verb form). |
 | `ros2 agnocast generate-bridge-plugins` | Build-time | Generate a ROS 2 bridge plugin package for user message types. Operates on local source/install trees, not on any running system. |
-| `ros2 agnocast discovery-daemon-status` | Local IPC namespace | Check that the Agnocast discovery agent for the **current** IPC namespace is running and healthy — this is what lets the `*_agnocast` observability verbs see this namespace. Exits non-zero if it is not. Add `-v` for per-check detail. |
+| `ros2 agnocast discovery-daemon-status` | Local IPC namespace | Check that the Agnocast discovery agent for the **current** IPC namespace is running and healthy. Exits non-zero if it is not. Add `-v` for per-check detail. |
 
 ---
 
