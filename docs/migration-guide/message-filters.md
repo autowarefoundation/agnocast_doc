@@ -108,8 +108,8 @@ using SyncPolicy =
 
 class MySyncNode : public agnocast::Node                               // (1)
 {
-  agnocast::message_filters::Subscriber<MsgA> sub_a_;
-  agnocast::message_filters::Subscriber<MsgB> sub_b_;
+  agnocast::message_filters::Subscriber<MsgA, agnocast::Node> sub_a_;    // (2)
+  agnocast::message_filters::Subscriber<MsgB, agnocast::Node> sub_b_;
   agnocast::message_filters::Synchronizer<SyncPolicy> sync_;
 
   void callback(
@@ -130,9 +130,12 @@ public:
 };
 ```
 
-Additional change from Stage 1:
+Additional changes from Stage 1:
 
 1. Base class changes to `agnocast::Node`
+2. `Subscriber` takes the node type as its second template argument
+   (`Subscriber<MsgA, agnocast::Node>`); it defaults to `rclcpp::Node`, which
+   `agnocast::Node` does not derive from
 
 ## ApproximateTime Policy
 

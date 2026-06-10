@@ -54,14 +54,21 @@ agnocast_components_register_node(
 )
 ```
 
-For multiple ROS domains, use the `--domains` option:
+For multiple ROS domains, launch a separate process per domain and set its
+`ROS_DOMAIN_ID` environment variable (`agnocast_component_container_cie` itself
+takes no `--domains` argument):
 
 ```xml
-<node_container pkg="agnocast_components" exec="agnocast_component_container_cie"
-                name="my_container" namespace="" output="screen"
-                args="--domains 0 1">
-    <!-- components -->
-</node_container>
+<!-- Domain 0 (default) -->
+<node pkg="agnocast_sample_application" exec="cie_talker" name="cie_talker_domain_0" output="screen">
+    <env name="LD_PRELOAD" value="libagnocast_heaphook.so:$(env LD_PRELOAD '')" />
+</node>
+
+<!-- Domain 1 -->
+<node pkg="agnocast_sample_application" exec="cie_talker" name="cie_talker_domain_1" output="screen">
+    <env name="LD_PRELOAD" value="libagnocast_heaphook.so:$(env LD_PRELOAD '')" />
+    <env name="ROS_DOMAIN_ID" value="1" />
+</node>
 ```
 
 !!! warning

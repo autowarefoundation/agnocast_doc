@@ -144,11 +144,18 @@ graph TD
 
 ```bash
 ros2 agnocast generate-bridge-plugins \
-  --packages std_msgs sensor_msgs geometry_msgs
+  --message-types std_msgs/msg/String sensor_msgs/msg/Image geometry_msgs/msg/Pose
 
-# Or for all available message types
+# Service types use --service-types
+ros2 agnocast generate-bridge-plugins \
+  --service-types example_interfaces/srv/AddTwoInts
+
+# Or for all available message/service types
 ros2 agnocast generate-bridge-plugins --all
 ```
+
+Specify interface types with their fully-qualified names (e.g., `std_msgs/msg/String`).
+At least one of `--message-types`, `--service-types`, or `--all` is required.
 
 **Step 2:** Build the plugins:
 
@@ -157,16 +164,7 @@ colcon build --packages-select agnocast_bridge_plugins \
   --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
-**Step 3:** Launch the bridge manager as a separate process:
-
-```xml
-<node pkg="agnocast_components" exec="agnocast_bridge_manager"
-      name="agnocast_bridge_manager" output="screen">
-    <env name="LD_PRELOAD" value="libagnocast_heaphook.so:$(env LD_PRELOAD '')" />
-</node>
-```
-
-**Step 4:** Set all Agnocast nodes to Performance Mode:
+**Step 3:** Set all Agnocast nodes to Performance Mode:
 
 ```xml
 <node pkg="your_package" exec="your_node" name="your_node" output="screen">
@@ -174,6 +172,10 @@ colcon build --packages-select agnocast_bridge_plugins \
     <env name="AGNOCAST_BRIDGE_MODE" value="performance" />
 </node>
 ```
+
+There is no separate bridge manager process to launch manually. When the first
+process in an IPC namespace starts in Performance Mode, the Agnocast library
+automatically spawns a single shared bridge manager daemon for that namespace.
 
 ### Performance Mode Limitations
 
