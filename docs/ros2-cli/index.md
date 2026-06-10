@@ -16,7 +16,9 @@ Columns used in the tables below:
   - ⚠ Works partially — typically, DDS-visible aspects (bridged topics, `rclcpp::Node`-based nodes that use Agnocast pub/sub, etc.) are reported correctly, but purely Agnocast-only endpoints are invisible.
   - ✗ Does not see Agnocast-only endpoints because Agnocast bypasses the RMW/DDS layer.
   - N/A Not applicable (the command is Agnocast-specific and has no upstream `ros2` counterpart).
-- **Agnocast version** — whether `ros2agnocast` provides a dedicated Agnocast-aware verb (e.g. `ros2 topic list_agnocast`, `ros2 agnocast generate-bridge-plugins`). ✓ means a variant exists; ✗ means no variant exists today. Most Agnocast-aware verbs are **local-scope only** — they inspect shared memory and the Agnocast kernel module on the machine they run on, so they cannot discover Agnocast endpoints living on other hosts. The verb-level tables below mark this explicitly.
+- **Agnocast version** — whether `ros2agnocast` provides a dedicated Agnocast-aware verb (e.g. `ros2 topic list_agnocast`, `ros2 agnocast generate-bridge-plugins`). ✓ means a variant exists; ✗ means no variant exists today. The verb-level tables below mark each verb's **scope**:
+  - **Cluster-wide** — the observability verbs (`topic`/`node` `list_agnocast`/`info_agnocast`) show Agnocast endpoints wherever an Agnocast discovery agent runs, across IPC namespaces and across ECUs on the same `ROS_DOMAIN_ID`; otherwise they show only the current IPC namespace.
+  - **Local IPC namespace** — `ros2 agnocast discovery-daemon-status` inspects only the IPC namespace the command runs in.
 - **Planned** — whether dedicated Agnocast support is intended.
   - `Yes` Agnocast-specific support is planned.
   - `No` Explicitly not planned (the command is DDS-only and has no Agnocast counterpart).
@@ -44,27 +46,27 @@ Columns used in the tables below:
 | `ros2 security` | N/A | ✗ | No | Manages SROS2 / DDS-Security artifacts (enclaves, keystores, permission/policy files) that authenticate and encrypt DDS traffic. **Has no effect on Agnocast pub/sub**: communication between Agnocast endpoints goes through shared memory, not DDS, so SROS2 policies neither authorize nor restrict it. The commands still run, but generated artifacts only protect the DDS side (including the Agnocast↔ROS 2 bridge). |
 | `ros2 service` | ✗ | ✗ | TBD | Agnocast services use internal shared-memory topics prefixed with `/AGNOCAST_SRV_*` and are not exposed via DDS. Agnocast services are marked experimental (see [agnocast_node_interface_comparison.md](https://github.com/autowarefoundation/agnocast/blob/main/docs/agnocast_node_interface_comparison.md) §2.6). |
 | `ros2 topic` | ⚠ | ✓ (`list_agnocast`, `info_agnocast`) | - | `as-is` does not see pure Agnocast-only topics at all, and for bridged topics it only reports the DDS side (no Agnocast pub/sub count, no `(Agnocast enabled)` marking). Use the `_agnocast` verbs to include Agnocast topics and labels. See §3. |
-| `ros2 agnocast` | N/A | ✓ (new top-level command) | - | Provided by `ros2agnocast` for Agnocast-specific operations (`version`, `generate-bridge-plugins`). |
+| `ros2 agnocast` | N/A | ✓ (new top-level command) | - | Provided by `ros2agnocast` for Agnocast-specific operations (`version`, `generate-bridge-plugins`, `discovery-daemon-status`). See §10. |
 
 ### 2. `ros2 node` verbs
 
 | Verb | Works as-is | Agnocast version | Scope of Agnocast verb | Planned | Notes |
 |------|:-----------:|:----------------:|:----------------------:|:-------:|-------|
-| `ros2 node list` | ⚠ | ✓ `list_agnocast` | Local host only | - | `as-is` does not show pure `agnocast::Node` instances; only `rclcpp::Node`-based nodes are listed. `list_agnocast` merges that output with Agnocast-derived nodes discovered on the **local host's** shared memory. Agnocast nodes running on a remote host will not appear in the Agnocast-marked entries. Supports `-a`, `-c`, and `-d` (debug to include internal `agnocast_bridge_node_*`). |
-| `ros2 node info` | ⚠ | ✓ `info_agnocast` | Local host only | - | `as-is` cannot target a pure `agnocast::Node` (it is not in `ros2 node list`); even for visible `rclcpp::Node`-based nodes, Agnocast publishers/subscribers are not labelled. `info_agnocast` augments the standard output with Agnocast publishers/subscribers and bridge status labels read from the local Agnocast state. For a node running on a remote host, run `info_agnocast` on that host. |
+| `ros2 node list` | ⚠ | ✓ `list_agnocast` | Cluster-wide | - | `as-is` lists only `rclcpp::Node`-based nodes, not pure `agnocast::Node` instances. `list_agnocast` also lists `agnocast::Node` instances, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise only the current IPC namespace. Supports `-a`, `-c`, and `-d` (`-d` includes internal `agnocast_bridge_node_*`). |
+| `ros2 node info` | ⚠ | ✓ `info_agnocast` | Cluster-wide | - | `as-is` cannot target a pure `agnocast::Node` (it is absent from `ros2 node list`), and does not label Agnocast publishers/subscribers on the nodes it can show. `info_agnocast` adds those Agnocast publishers/subscribers and bridge-status labels, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise only the current IPC namespace. |
 
 ### 3. `ros2 topic` verbs
 
 | Verb | Works as-is | Agnocast version | Scope of Agnocast verb | Planned | Notes |
 |------|:-----------:|:----------------:|:----------------------:|:-------:|-------|
-| `ros2 topic list` | ⚠ | ✓ `list_agnocast` | Local host only | - | `as-is` only lists topics that have DDS endpoints; pure Agnocast-only topics are missing, and bridged topics appear without any indication that an Agnocast side exists. `list_agnocast` adds Agnocast-only topics and tags Agnocast-touched topics with `(Agnocast enabled)` / `(Agnocast enabled, bridged)`. Local-host scope: Agnocast topics whose publishers and subscribers all live on a remote host are not discovered. See [Topic List](#topic-list) below. |
-| `ros2 topic info` | ⚠ | ✓ `info_agnocast` | Local host only | - | `as-is` cannot target a pure Agnocast-only topic (it is not in `ros2 topic list`); for bridged topics it shows only DDS publishers/subscribers. `info_agnocast` reports Agnocast publisher/subscriber counts and QoS observed on the local host alongside the DDS side. Endpoints on other hosts only show up if they reach this host through the Agnocast↔ROS 2 bridge (DDS side). Supports `-v` and `-d`. See [Topic Info](#topic-info) below. |
+| `ros2 topic list` | ⚠ | ✓ `list_agnocast` | Cluster-wide | - | `as-is` lists only topics with DDS endpoints, so pure Agnocast-only topics are missing and bridged topics carry no Agnocast marking. `list_agnocast` adds Agnocast-only topics and tags Agnocast topics `(Agnocast enabled)` / `(Agnocast enabled, bridged)`, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise only the current IPC namespace. See [Topic List](#topic-list) below. |
+| `ros2 topic info` | ⚠ | ✓ `info_agnocast` | Cluster-wide | - | `as-is` cannot target a pure Agnocast-only topic (it is absent from `ros2 topic list`), and shows only DDS publishers/subscribers for bridged topics. `info_agnocast` adds Agnocast publisher/subscriber counts, QoS and message type, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise only the current IPC namespace. Supports `-v` and `-d`. See [Topic Info](#topic-info) below. |
 | `ros2 topic echo` | ⚠ | ✗ | — | TBD | Works when the bridge is active, but the message type must be specified explicitly, e.g. `ros2 topic echo /my_topic agnocast_sample_interfaces/msg/DynamicSizeArray`. |
 | `ros2 topic pub` | ⚠ | ✗ | — | TBD | Publishes via DDS, so messages reach Agnocast subscribers only via the bridge. The `--wait-matching-subscriptions` option does **not** work correctly for Agnocast subscribers — DDS discovery counts only the bridge-side DDS subscription (if any), not the Agnocast subscribers behind it. |
 | `ros2 topic hz` | ✗ | ✗ | — | TBD | Subscribes via DDS to measure publish rate. For Agnocast publishers the data path is shared memory and DDS sees no messages, so no rate is reported (even when the bridge is active, the DDS rate observed by `hz` does not necessarily reflect the Agnocast publisher's rate). |
 | `ros2 topic bw` | ✗ | ✗ | — | TBD | Requires subscribing to the topic. |
 | `ros2 topic delay` | ✗ | ✗ | — | TBD | Requires subscribing to the topic. |
-| `ros2 topic type` | ⚠ | ✗ | — | No | Resolves a topic name to its message type via the DDS graph. Works for bridged topics (the bridge's DDS endpoints carry the type). For pure Agnocast-only topics, no Agnocast version is planned: Agnocast does not retain a runtime type name (only a hash) per topic, so a name→type lookup is not possible in the general case. `ros2 topic info_agnocast <topic>` falls back to `<UNKNOWN>` for the same reason. |
+| `ros2 topic type` | ⚠ | ✗ | — | No | Resolves a topic's message type via the DDS graph, which works for bridged topics (their DDS endpoints carry the type). No Agnocast `type` verb is planned, but `ros2 topic info_agnocast <topic>` now reports the type of a pure Agnocast-only topic when a discovery agent is running, showing `<UNKNOWN>` only if none has reported one. |
 | `ros2 topic find` | ⚠ | ✗ | — | No | Lists topics of a given type via the DDS graph. Same constraint as `type`: bridged topics are findable; pure Agnocast-only topics are not, because no type→name index exists on the Agnocast side. |
 
 ### 4. `ros2 service` verbs
@@ -146,6 +148,7 @@ Component containers can load `agnocast::Node` subclasses; the container itself 
 | `ros2 agnocast --version` / `-v` | Local host only | Print version information for Agnocast components installed on the host where the command is run (userland libraries and the loaded kernel module). |
 | `ros2 agnocast version` | Local host only | Same as `--version` (verb form). |
 | `ros2 agnocast generate-bridge-plugins` | Build-time | Generate a ROS 2 bridge plugin package for user message types. Operates on local source/install trees, not on any running system. |
+| `ros2 agnocast discovery-daemon-status` | Local IPC namespace | Check that the Agnocast discovery agent for the **current** IPC namespace is running and healthy. Exits non-zero if it is not. Add `-v` for per-check detail. |
 
 ---
 
@@ -158,14 +161,14 @@ The following sections show usage examples for the Agnocast-specific verbs:
 - `ros2 node list_agnocast`
 - `ros2 node info_agnocast /node_name`
 
-!!! warning "Local-host scope"
-    Each of the Agnocast-specific verbs below (`list_agnocast`, `info_agnocast`) inspects the Agnocast state on **the host where the command runs**: the kernel module, `/dev/agnocast`, and shared-memory segments. To inspect Agnocast endpoints on another host, run the same command on that host. The DDS-side portion of each command's output is still cluster-wide, as usual.
+!!! info "Scope"
+    `list_agnocast` / `info_agnocast` show Agnocast endpoints wherever an Agnocast discovery agent runs, across IPC namespaces and ECUs on the same `ROS_DOMAIN_ID`; otherwise they show only the current IPC namespace. The DDS side is cluster-wide as usual.
 
 ### Topic List
 
 To list all topics including Agnocast, use `ros2 topic list_agnocast`.
 
-The `(Agnocast enabled)` marking comes from the local host's Agnocast state. ROS 2 (DDS-side) topics are still discovered cluster-wide, but a topic whose Agnocast endpoints all live on a remote host will appear as a plain ROS 2 topic from this command's perspective.
+The `(Agnocast enabled)` marking covers every IPC namespace and ECU where a discovery agent runs; otherwise it reflects only the current IPC namespace.
 
 If a topic is Agnocast enabled, it will be shown with a "(Agnocast enabled)" suffix.
 
@@ -205,9 +208,9 @@ If any one of these is missing, the suffix is just `(Agnocast enabled)`. For exa
 | pub | sub | bridge | display |
 | :--- | :--- | :--- | :--- |
 | `rclcpp::publisher` | `rclcpp::subscription` | off / standard / performance | `/my_topic` |
-| `agnocast::publisher` | `rclcpp::subscription` | off | `/my_topic (WARN: Agnocast and ROS 2 endpoints exist but bridge is not active)` |
+| `agnocast::publisher` | `rclcpp::subscription` | off | `/my_topic (WARN: one or more necessary bridges are not running)` |
 | `agnocast::publisher` | `rclcpp::subscription` | standard / performance | `/my_topic (Agnocast enabled, bridged)` |
-| `rclcpp::publisher` | `agnocast::subscription` | off | `/my_topic (WARN: Agnocast and ROS 2 endpoints exist but bridge is not active)` |
+| `rclcpp::publisher` | `agnocast::subscription` | off | `/my_topic (WARN: one or more necessary bridges are not running)` |
 | `rclcpp::publisher` | `agnocast::subscription` | standard / performance | `/my_topic (Agnocast enabled, bridged)` |
 | `agnocast::publisher` | `agnocast::subscription` | off / standard / performance | `/my_topic (Agnocast enabled)` |
 | `agnocast::publisher` | none | off / standard / performance | `/my_topic (Agnocast enabled)` |
@@ -221,7 +224,7 @@ If any one of these is missing, the suffix is just `(Agnocast enabled)`. For exa
 
 To show the topic info including Agnocast, use `ros2 topic info_agnocast /topic_name`.
 
-The Agnocast publisher/subscriber counts and per-endpoint details below are read from the **local** Agnocast state. Endpoints on other hosts only appear if they reach this host through the Agnocast↔ROS 2 bridge (and then they show up on the DDS side).
+The Agnocast publisher/subscriber details below cover every IPC namespace and ECU where a discovery agent runs; otherwise they reflect only the current IPC namespace.
 
 ```bash
 $ ros2 topic info_agnocast /my_topic
@@ -351,7 +354,7 @@ QoS profile:
 
 To list all nodes including those implemented with Agnocast, use `ros2 node list_agnocast`.
 
-Only `agnocast::Node` instances on the **local host** are augmented into the list. Run the command on each host to enumerate Agnocast nodes there.
+`agnocast::Node` instances are listed for every IPC namespace and ECU where a discovery agent runs; otherwise only for the current IPC namespace.
 
 Standard ROS 2 nodes are displayed normally, while `agnocast::Node` instances are marked with the "(Agnocast enabled)" suffix.
 
@@ -380,7 +383,7 @@ Detection of `agnocast::Node` instances depends on the presence of Agnocast-enab
 
 To show the node info including Agnocast, use `ros2 node info_agnocast /node_name`.
 
-Agnocast publisher/subscriber details for the node are taken from the **local** Agnocast state. If the target node is running on a different host, run `info_agnocast` on that host to see its Agnocast endpoints; otherwise only the DDS-visible portion of the node's interface is reported.
+Agnocast publisher/subscriber details are reported for a node in any IPC namespace or ECU where a discovery agent runs; otherwise only for the current IPC namespace.
 
 ```bash
 $ ros2 node info_agnocast /listener_node
