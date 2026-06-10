@@ -34,13 +34,13 @@ ament_target_dependencies(your_target agnocast_cie_thread_configurator)
 
 ## Rust
 
-A pure-Rust client crate (`agnocast_cie_thread_configurator`) implements the same protocol for Rust programs. It exposes two entry points:
+A pure-Rust client crate (`agnocast_cie_thread_configurator_client`) implements the same protocol for Rust programs. It exposes two entry points:
 
 - `spawn_non_ros2_thread(thread_name, closure)` — spawns a thread that reports itself to the configurator, then runs the closure; returns its `JoinHandle<T>`. This is the Rust counterpart of the C++ function.
 - `report_current_thread(thread_name)` — reports the calling thread. Use this for threads that are not created via `spawn_non_ros2_thread`, such as the `main` thread.
 
 ```rust
-use agnocast_cie_thread_configurator::{report_current_thread, spawn_non_ros2_thread};
+use agnocast_cie_thread_configurator_client::{report_current_thread, spawn_non_ros2_thread};
 
 fn main() {
     // Report a thread created outside spawn_non_ros2_thread (e.g. main).
@@ -63,7 +63,7 @@ The crate lives in the Agnocast repository under `src/agnocast_cie_thread_config
 
 ```toml
 [dependencies]
-agnocast_cie_thread_configurator = { git = "https://github.com/autowarefoundation/agnocast.git" }
+agnocast_cie_thread_configurator_client = { git = "https://github.com/autowarefoundation/agnocast.git" }
 ```
 
 The crate is dependency-light (only `libc` and `log`) and links against neither Agnocast, ROS 2, nor DDS, so it can be statically linked — for example against `x86_64-unknown-linux-musl`. Reporting is best-effort: if the configurator daemon is not running, the failure is logged through the `log` crate and the thread runs normally.
@@ -74,18 +74,18 @@ The crate performs no gating of its own — it always reports when called, and w
 
 ```toml
 [dependencies]
-agnocast_cie_thread_configurator = { git = "https://github.com/autowarefoundation/agnocast.git", optional = true }
+agnocast_cie_thread_configurator_client = { git = "https://github.com/autowarefoundation/agnocast.git", optional = true }
 
 [features]
 default = []
-agnocast = ["dep:agnocast_cie_thread_configurator"]
+agnocast = ["dep:agnocast_cie_thread_configurator_client"]
 ```
 
 Gate the calls on that feature so they compile out completely when it is disabled:
 
 ```rust
 #[cfg(feature = "agnocast")]
-use agnocast_cie_thread_configurator::report_current_thread;
+use agnocast_cie_thread_configurator_client::report_current_thread;
 
 fn main() {
     #[cfg(feature = "agnocast")]

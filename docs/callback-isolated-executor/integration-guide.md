@@ -54,13 +54,21 @@ agnocast_components_register_node(
 )
 ```
 
-For multiple ROS domains, use the `--domains` option:
+For multiple ROS domains, launch one container process per domain and set
+`ROS_DOMAIN_ID` on each container process:
 
 ```xml
+<!-- Domain 0 (default) -->
 <node_container pkg="agnocast_components" exec="agnocast_component_container_cie"
-                name="my_container" namespace="" output="screen"
-                args="--domains 0 1">
-    <!-- components -->
+                name="my_container_domain_0" namespace="" output="screen">
+    <composable_node pkg="my_package" plugin="MyNode" name="my_node" namespace="" />
+</node_container>
+
+<!-- Domain 1 -->
+<node_container pkg="agnocast_components" exec="agnocast_component_container_cie"
+                name="my_container_domain_1" namespace="" output="screen">
+    <env name="ROS_DOMAIN_ID" value="1" />
+    <composable_node pkg="my_package" plugin="MyNode" name="my_node" namespace="" />
 </node_container>
 ```
 
