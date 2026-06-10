@@ -34,7 +34,9 @@ Allocate a new default-constructed message in shared memory. The caller must eit
 | Template Parameter | Description |
 |-----------|-------------|
 | `MessageT` | ROS message type. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Owned pointer to the newly allocated message in shared memory. |
 
 
@@ -51,7 +53,9 @@ Publish a message via zero-copy IPC. Ownership is transferred: after this call, 
 | Template Parameter | Description |
 |-----------|-------------|
 | `MessageT` | ROS message type. |
-| **Parameter** | **Description** |
+
+| Parameter | Description |
+|-----------|-------------|
 | `message` | Message obtained from borrow_loaned_message(). Must be moved in. |
 
 

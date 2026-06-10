@@ -20,12 +20,16 @@ Create an Agnocast publisher (Stage 1 free function, QoS overload).
 |-----------|-------------|
 | `MessageT` | ROS message type. |
 | `NodeT` | Node type (`rclcpp::Node` or `agnocast::Node`). |
-| **Parameter** | **Default** | **Description** |
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
 | `node` | — | Pointer to the node. |
 | `topic_name` | — | Topic name. |
 | `qos` | — | Quality of service profile. |
 | `options` | `agnocast::PublisherOptions{}` | Publisher options. |
-| | | |
+
+| | |
+|-----------|-------------|
 | **Returns** | Shared pointer to the created publisher. |
 
 
@@ -43,12 +47,16 @@ Create an Agnocast publisher (Stage 1 free function, history-depth overload).
 |-----------|-------------|
 | `MessageT` | ROS message type. |
 | `NodeT` | Node type (`rclcpp::Node` or `agnocast::Node`). |
-| **Parameter** | **Default** | **Description** |
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
 | `node` | — | Pointer to the node. |
 | `topic_name` | — | Topic name. |
 | `qos_history_depth` | — | History depth for the QoS profile. |
 | `options` | `agnocast::PublisherOptions{}` | Publisher options. |
-| | | |
+
+| | |
+|-----------|-------------|
 | **Returns** | Shared pointer to the created publisher. |
 
 
@@ -67,13 +75,17 @@ Create an Agnocast subscription (Stage 1 free function, QoS overload).
 | `MessageT` | ROS message type. |
 | `NodeT` | Node type (`rclcpp::Node` or `agnocast::Node`). |
 | `Func` | Callback callable with void(`agnocast::ipc_shared_ptr<const MessageT>`&&). |
-| **Parameter** | **Default** | **Description** |
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
 | `node` | — | Pointer to the node. |
 | `topic_name` | — | Topic name. |
 | `qos` | — | Quality of service profile. |
 | `callback` | — | Callback invoked on each received message. |
 | `options` | `agnocast::SubscriptionOptions{}` | Subscription options. |
-| | | |
+
+| | |
+|-----------|-------------|
 | **Returns** | Shared pointer to the created subscription. |
 
 
@@ -92,13 +104,17 @@ Create an Agnocast subscription (Stage 1 free function, history-depth overload).
 | `MessageT` | ROS message type. |
 | `NodeT` | Node type (`rclcpp::Node` or `agnocast::Node`). |
 | `Func` | Callback callable with void(`agnocast::ipc_shared_ptr<const MessageT>`&&). |
-| **Parameter** | **Default** | **Description** |
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
 | `node` | — | Pointer to the node. |
 | `topic_name` | — | Topic name. |
 | `qos_history_depth` | — | History depth for the QoS profile. |
 | `callback` | — | Callback invoked on each received message. |
 | `options` | `agnocast::SubscriptionOptions{}` | Subscription options. |
-| | | |
+
+| | |
+|-----------|-------------|
 | **Returns** | Shared pointer to the created subscription. |
 
 
@@ -116,11 +132,15 @@ Create an Agnocast polling subscription (Stage 1 free function, history-depth ov
 |-----------|-------------|
 | `MessageT` | ROS message type. |
 | `NodeT` | Node type (`rclcpp::Node` or `agnocast::Node`). |
-| **Parameter** | **Description** |
+
+| Parameter | Description |
+|-----------|-------------|
 | `node` | Pointer to the node. |
 | `topic_name` | Topic name. |
 | `qos_history_depth` | History depth for the QoS profile. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Shared pointer to the created polling subscription. |
 
 
@@ -138,11 +158,15 @@ Create an Agnocast polling subscription (Stage 1 free function, QoS overload).
 |-----------|-------------|
 | `MessageT` | ROS message type. |
 | `NodeT` | Node type (`rclcpp::Node` or `agnocast::Node`). |
-| **Parameter** | **Description** |
+
+| Parameter | Description |
+|-----------|-------------|
 | `node` | Pointer to the node. |
 | `topic_name` | Topic name. |
 | `qos` | Quality of service profile. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Shared pointer to the created polling subscription. |
 
 
@@ -160,12 +184,16 @@ Create an Agnocast service client (Stage 1 free function).
 |-----------|-------------|
 | `ServiceT` | ROS service type. |
 | `NodeT` | Node type (`rclcpp::Node` or `agnocast::Node`). |
-| **Parameter** | **Default** | **Description** |
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
 | `node` | — | Pointer to the node. |
 | `service_name` | — | Service name. |
 | `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. Defaults to `rclcpp::ServicesQoS()`. |
 | `group` | `nullptr` | Callback group. Defaults to nullptr (default callback group). |
-| | | |
+
+| | |
+|-----------|-------------|
 | **Returns** | Shared pointer to the created client. |
 
 
@@ -184,13 +212,17 @@ Create an Agnocast service server (Stage 1 free function).
 | `ServiceT` | ROS service type. |
 | `NodeT` | Node type (`rclcpp::Node` or `agnocast::Node`). |
 | `Func` | Callable that takes ipc_shared_ptr<ServiceT::Request> and ipc_shared_ptr<ServiceT::Response> (const&, &&, or by-value) (return value ignored). |
-| **Parameter** | **Default** | **Description** |
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
 | `node` | — | Pointer to the node. |
 | `service_name` | — | Service name. |
 | `callback` | — | Callback invoked on each request. |
 | `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. Defaults to `rclcpp::ServicesQoS()`. |
 | `group` | `nullptr` | Callback group. Defaults to nullptr (default callback group). |
-| | | |
+
+| | |
+|-----------|-------------|
 | **Returns** | Shared pointer to the created service. |
 
 
@@ -208,14 +240,18 @@ Create a timer with a given clock. This free function mirrors the `rclcpp::creat
 |-----------|-------------|
 | `NodeT` | Node type (`rclcpp::Node` or `agnocast::Node`). |
 | `CallbackT` | Callable type for the callback. |
-| **Parameter** | **Default** | **Description** |
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
 | `node` | — | Node providing get_node_base_interface() for the default callback group. |
 | `clock` | — | Clock to drive the timer. |
 | `period` | — | Time interval between triggers of the callback. |
 | `callback` | — | User-defined callback function. |
 | `group` | `nullptr` | Callback group to execute this timer's callback in. |
 | `autostart` | `true` | Whether to start the timer immediately (not yet supported; always true). |
-| | | |
+
+| | |
+|-----------|-------------|
 | **Returns** | Shared pointer to the created timer. |
 
 

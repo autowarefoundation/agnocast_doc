@@ -128,7 +128,9 @@ Register a callback to be invoked when a message passes through this filter.
 | Parameter | Description |
 |-----------|-------------|
 | `callback` | Callback to register. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Connection object for disconnecting. |
 
 
@@ -542,7 +544,9 @@ Register a callback invoked when matching messages are found.
 | Parameter | Description |
 |-----------|-------------|
 | `callback` | Callback to register. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Connection object for disconnecting. |
 
 
@@ -559,7 +563,9 @@ Register a const callback.
 | Parameter | Description |
 |-----------|-------------|
 | `callback` | Callback to register. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Connection object. |
 
 
@@ -577,7 +583,9 @@ Register a member function callback.
 |-----------|-------------|
 | `callback` | Member function pointer. |
 | `t` | Object to call the member function on. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Connection object. |
 
 
@@ -595,7 +603,9 @@ Register a member function callback.
 |-----------|-------------|
 | `callback` | Member function pointer. |
 | `t` | Object to call the member function on. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Connection object. |
 
 
@@ -781,7 +791,9 @@ Register a callback invoked when messages are dropped due to queue overflow or m
 | Parameter | Description |
 |-----------|-------------|
 | `callback` | Callback to register. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Connection object for disconnecting. |
 
 

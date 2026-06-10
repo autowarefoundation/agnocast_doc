@@ -37,7 +37,9 @@ Sends a response to the client that initiated the service call. This function is
 | Template Parameter | Description |
 |-----------|-------------|
 | `ServiceT` | ROS service type. |
-| **Parameter** | **Description** |
+
+| Parameter | Description |
+|-----------|-------------|
 | `request` | The request that initiated the service call. |
 | `response` | The response to send. Must be acquired by calling borrow_loaned_response(). |
 
@@ -55,8 +57,12 @@ Allocate a service response message in shared memory. This function is expected 
 | Template Parameter | Description |
 |-----------|-------------|
 | `ServiceT` | ROS service type. |
-| **Parameter** | **Description** |
+
+| Parameter | Description |
+|-----------|-------------|
 | `request` | The request that initiated the service call. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Owned pointer to the response message in shared memory. |
 

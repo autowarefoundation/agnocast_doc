@@ -574,46 +574,36 @@ def render_member(f, sig, mbr, tparams, params, ret, seen_names=None):
     f.write(f"```cpp\n{sig}\n```\n\n")
     f.write(f"{format_prose(mbr)}\n\n")
     tparams = infer_tparams(sig, tparams)
-    has_content = tparams or params or ret
-    if has_content:
-        has_defaults = any(defval for _, _, defval in params) if params else False
 
-        if tparams:
-            f.write("| Template Parameter | Description |\n")
-            f.write("|-----------|-------------|\n")
-            for pname, pdesc in tparams:
-                f.write(f"| `{pname}` | {format_prose(pdesc)} |\n")
+    # Render template parameters, parameters, and the return value as separate
+    # tables. They have different column counts (params gain a "Default" column),
+    # so emitting them as one table would produce invalid GitHub-flavored markdown.
+    if tparams:
+        f.write("| Template Parameter | Description |\n")
+        f.write("|-----------|-------------|\n")
+        for pname, pdesc in tparams:
+            f.write(f"| `{pname}` | {format_prose(pdesc)} |\n")
+        f.write("\n")
 
-        if params:
-            if tparams:
-                if has_defaults:
-                    f.write("| **Parameter** | **Default** | **Description** |\n")
-                else:
-                    f.write("| **Parameter** | **Description** |\n")
-            else:
-                if has_defaults:
-                    f.write("| Parameter | Default | Description |\n")
-                    f.write("|-----------|---------|-------------|\n")
-                else:
-                    f.write("| Parameter | Description |\n")
-                    f.write("|-----------|-------------|\n")
+    if params:
+        has_defaults = any(defval for _, _, defval in params)
+        if has_defaults:
+            f.write("| Parameter | Default | Description |\n")
+            f.write("|-----------|---------|-------------|\n")
             for pname, pdesc, defval in params:
-                if has_defaults:
-                    defval_fmt = f"`{defval}`" if defval else "—"
-                    f.write(f"| `{pname}` | {defval_fmt} | {format_prose(pdesc)} |\n")
-                else:
-                    f.write(f"| `{pname}` | {format_prose(pdesc)} |\n")
+                defval_fmt = f"`{defval}`" if defval else "—"
+                f.write(f"| `{pname}` | {defval_fmt} | {format_prose(pdesc)} |\n")
+        else:
+            f.write("| Parameter | Description |\n")
+            f.write("|-----------|-------------|\n")
+            for pname, pdesc, _ in params:
+                f.write(f"| `{pname}` | {format_prose(pdesc)} |\n")
+        f.write("\n")
 
-        if ret:
-            if tparams or params:
-                if has_defaults:
-                    f.write("| | | |\n")
-                else:
-                    f.write("| | |\n")
-            else:
-                f.write("| | |\n")
-                f.write("|-----------|-------------|\n")
-            f.write(f"| **Returns** | {format_prose(ret)} |\n")
+    if ret:
+        f.write("| | |\n")
+        f.write("|-----------|-------------|\n")
+        f.write(f"| **Returns** | {format_prose(ret)} |\n")
         f.write("\n")
 
 
@@ -769,8 +759,8 @@ auto req2 = client->borrow_loaned_request();
 req2->a = 3;
 req2->b = 4;
 // async_send_request() returns a FutureAndRequestId; access the future via .future
-auto future = client->async_send_request(std::move(req2));
-RCLCPP_INFO(get_logger(), "Result: %ld", future.future.get()->sum);
+auto future_and_id = client->async_send_request(std::move(req2));
+RCLCPP_INFO(get_logger(), "Result: %ld", future_and_id.future.get()->sum);
 ```
 ''',
 

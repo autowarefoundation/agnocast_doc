@@ -30,8 +30,8 @@ auto req2 = client->borrow_loaned_request();
 req2->a = 3;
 req2->b = 4;
 // async_send_request() returns a FutureAndRequestId; access the future via .future
-auto future = client->async_send_request(std::move(req2));
-RCLCPP_INFO(get_logger(), "Result: %ld", future.future.get()->sum);
+auto future_and_id = client->async_send_request(std::move(req2));
+RCLCPP_INFO(get_logger(), "Result: %ld", future_and_id.future.get()->sum);
 ```
 
 
@@ -92,7 +92,9 @@ Allocate a request message in shared memory.
 | Template Parameter | Description |
 |-----------|-------------|
 | `ServiceT` | ROS service type. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Owned pointer to the request message in shared memory. |
 
 
@@ -139,7 +141,9 @@ Block until the service is available or the timeout expires.
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `timeout` | `std::chrono::nanoseconds(-1)` | Maximum duration to wait (-1 = wait forever). |
-| | | |
+
+| | |
+|-----------|-------------|
 | **Returns** | True if service became available, false on timeout. |
 
 
@@ -156,10 +160,14 @@ Send a request asynchronously and invoke a callback when the response arrives.
 | Template Parameter | Description |
 |-----------|-------------|
 | `ServiceT` | ROS service type. |
-| **Parameter** | **Description** |
+
+| Parameter | Description |
+|-----------|-------------|
 | `request` | Request from borrow_loaned_request(). Must be moved in. |
 | `callback` | Invoked with a SharedFuture when the response arrives. Call future.get() to obtain the response. |
+
 | | |
+|-----------|-------------|
 | **Returns** | A SharedFutureAndRequestId containing the shared future (.future) and a sequence number (.request_id). |
 
 
@@ -176,8 +184,12 @@ Send a request asynchronously and return a future for the response.
 | Template Parameter | Description |
 |-----------|-------------|
 | `ServiceT` | ROS service type. |
-| **Parameter** | **Description** |
+
+| Parameter | Description |
+|-----------|-------------|
 | `request` | Request from borrow_loaned_request(). Must be moved in. |
+
 | | |
+|-----------|-------------|
 | **Returns** | A FutureAndRequestId containing the future (.future) and a sequence number (.request_id). Call .future.get() to block until the response arrives. |
 

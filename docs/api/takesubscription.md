@@ -22,8 +22,12 @@ Retrieve the latest message from the topic.
 | Template Parameter | Description |
 |-----------|-------------|
 | `MessageT` | ROS message type. |
-| **Parameter** | **Default** | **Description** |
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
 | `allow_same_message` | `false` | If true, may return the same message as the previous call (useful for always having the latest value). If false, returns only new messages since the last take. |
-| | | |
+
+| | |
+|-----------|-------------|
 | **Returns** | Shared pointer to the message, or empty if unavailable. |
 
