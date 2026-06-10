@@ -17,8 +17,8 @@ Columns used in the tables below:
   - ✗ Does not see Agnocast-only endpoints because Agnocast bypasses the RMW/DDS layer.
   - N/A Not applicable (the command is Agnocast-specific and has no upstream `ros2` counterpart).
 - **Agnocast version** — whether `ros2agnocast` provides a dedicated Agnocast-aware verb (e.g. `ros2 topic list_agnocast`, `ros2 agnocast generate-bridge-plugins`). ✓ means a variant exists; ✗ means no variant exists today. The verb-level tables below mark each verb's **scope**:
-  - **Cluster-wide** — the observability verbs (`topic`/`node` `list_agnocast`/`info_agnocast`) show Agnocast endpoints wherever an Agnocast discovery agent runs, across IPC namespaces and across ECUs on the same `ROS_DOMAIN_ID`; otherwise they show only the current IPC namespace.
-  - **Local IPC namespace** — `ros2 agnocast discovery-daemon-status` inspects only the IPC namespace the command runs in.
+  - **Cluster-wide** — shows Agnocast endpoints across all IPC namespaces and ECUs on the same `ROS_DOMAIN_ID` wherever an Agnocast discovery agent runs. Without a discovery agent, some commands do not work at all; others fall back to showing only the current IPC namespace.
+  - **Local IPC namespace** — inspects only the IPC namespace the command runs in.
 - **Planned** — whether dedicated Agnocast support is intended.
   - `Yes` Agnocast-specific support is planned.
   - `No` Explicitly not planned (the command is DDS-only and has no Agnocast counterpart).
