@@ -45,7 +45,7 @@ Columns used in the tables below:
 | `ros2 run` | ✓ | ✗ | - | Launches an executable; no Agnocast-specific behavior. |
 | `ros2 security` | N/A | ✗ | No | Manages SROS2 / DDS-Security artifacts (enclaves, keystores, permission/policy files) that authenticate and encrypt DDS traffic. **Has no effect on Agnocast pub/sub**: communication between Agnocast endpoints goes through shared memory, not DDS, so SROS2 policies neither authorize nor restrict it. The commands still run, but generated artifacts only protect the DDS side (including the Agnocast↔ROS 2 bridge). |
 | `ros2 service` | ✗ | ✗ | TBD | Agnocast services use internal shared-memory topics prefixed with `/AGNOCAST_SRV_*` and are not exposed via DDS. Agnocast services are marked experimental (see [agnocast_node_interface_comparison.md](https://github.com/autowarefoundation/agnocast/blob/main/docs/agnocast_node_interface_comparison.md) §2.6). |
-| `ros2 topic` | ⚠ | ✓ (`list_agnocast`, `info_agnocast`, `echo_agnocast`, `hz_agnocast`) | - | Standard `ros2 topic` verbs have limited visibility into Agnocast: pure Agnocast-only topics are invisible, and bridged topics are seen only from the DDS side. The `_agnocast` variants extend each verb with full Agnocast awareness. See §3. |
+| `ros2 topic` | ⚠ | ✓ (`list_agnocast`, `info_agnocast`, `echo_agnocast`, `hz_agnocast`, `delay_agnocast`) | - | Standard `ros2 topic` verbs have limited visibility into Agnocast: pure Agnocast-only topics are invisible, and bridged topics are seen only from the DDS side. The `_agnocast` variants extend each verb with full Agnocast awareness. See §3. |
 | `ros2 agnocast` | N/A | ✓ (new top-level command) | - | Provided by `ros2agnocast` for Agnocast-specific operations (`version`, `generate-bridge-plugins`, `discovery-daemon-status`). See §10. |
 
 ### 2. `ros2 node` verbs
@@ -65,7 +65,7 @@ Columns used in the tables below:
 | `ros2 topic pub` | ⚠ | ✗ | — | TBD | Publishes via DDS, so messages reach Agnocast subscribers only via the bridge. The `--wait-matching-subscriptions` option does **not** work correctly for Agnocast subscribers — DDS discovery counts only the bridge-side DDS subscription (if any), not the Agnocast subscribers behind it. |
 | `ros2 topic hz` | ⚠ | ✓ `hz_agnocast` | Cluster-wide | - | `as-is` cannot target a pure Agnocast-only topic and works only when a bridge is already active. `hz_agnocast` forces an A2R bridge and then delegates to `ros2 topic hz` — all `ros2 topic hz` arguments (e.g. `--filter`) are supported. Also works for standard ROS 2 topics. Without a discovery agent, Agnocast-only topics cannot be observed. See [Topic Hz](#topic-hz) below. |
 | `ros2 topic bw` | ✗ | ✗ | — | TBD | Requires subscribing to the topic. |
-| `ros2 topic delay` | ✗ | ✗ | — | TBD | Requires subscribing to the topic. |
+| `ros2 topic delay` | ⚠ | ✓ `delay_agnocast` | Cluster-wide | - | `as-is` cannot target a pure Agnocast-only topic and works only when a bridge is already active. `delay_agnocast` forces an A2R bridge and then delegates to `ros2 topic delay` — all `ros2 topic delay` arguments (e.g. `-w`) are supported. Also works for standard ROS 2 topics. Without a discovery agent, Agnocast-only topics cannot be observed. See [Topic Delay](#topic-delay) below. |
 | `ros2 topic type` | ⚠ | ✗ | — | No | Resolves a topic's message type via the DDS graph, which works for bridged topics (their DDS endpoints carry the type). No Agnocast `type` verb is planned, but `ros2 topic info_agnocast <topic>` now reports the type of a pure Agnocast-only topic when a discovery agent is running, showing `<UNKNOWN>` only if none has reported one. |
 | `ros2 topic find` | ⚠ | ✗ | — | No | Lists topics of a given type via the DDS graph. Same constraint as `type`: bridged topics are findable; pure Agnocast-only topics are not, because no type→name index exists on the Agnocast side. |
 
@@ -160,6 +160,7 @@ The following sections show usage examples for the Agnocast-specific verbs:
 - `ros2 topic info_agnocast /topic_name`
 - `ros2 topic echo_agnocast /topic_name`
 - `ros2 topic hz_agnocast /topic_name`
+- `ros2 topic delay_agnocast /topic_name`
 - `ros2 node list_agnocast`
 - `ros2 node info_agnocast /node_name`
 
@@ -440,6 +441,51 @@ average rate: 1.002
 	min: 0.960s max: 1.011s std dev: 0.02200s window: 4
 average rate: 1.000
 	min: 0.960s max: 1.011s std dev: 0.02022s window: 5
+[...]
+```
+
+### Topic Delay
+
+`delay_agnocast` is an Agnocast extension of `ros2 topic delay`. It forces an Agnocast-to-ROS 2 (A2R) bridge for the specified topic and then delegates to `ros2 topic delay`. All standard `ros2 topic delay` arguments (e.g. `-w`) are passed through unchanged. It also works for standard ROS 2 topics.
+
+`delay_agnocast` works cluster-wide wherever a discovery agent runs (across IPC namespaces and ECUs on the same `ROS_DOMAIN_ID`); without a discovery agent, Agnocast-only topics cannot be observed.
+
+When the discovery agent is running:
+
+```bash
+$ ros2 topic delay_agnocast /pose_chatter
+[*] Triggering A2R bridge for '/pose_chatter'. This may take a few seconds...
+[*] Starting ros2cli command...
+average delay: 0.001
+	min: 0.001s max: 0.001s std dev: 0.00000s window: 1
+average delay: 0.001
+	min: 0.001s max: 0.001s std dev: 0.00014s window: 3
+average delay: 0.001
+	min: 0.001s max: 0.001s std dev: 0.00012s window: 5
+[...]
+```
+
+Without a discovery agent, the command exits with an error:
+
+```bash
+$ ros2 topic delay_agnocast /pose_chatter
+[*] Triggering A2R bridge for '/pose_chatter'. This may take a few seconds...
+NOTE: no /_agnocast_discovery agent visible; showing local NS only via ioctl. Start one with `ros2 run ros2agnocast_discovery_agent discovery_agent` to see other NSes / ECUs.
+ERROR: Could not resolve message type for '/pose_chatter'. The topic was not found in the ROS 2 graph or via /_agnocast_discovery. Make sure the topic exists and, for Agnocast topics, the discovery agent is running.
+```
+
+Standard `ros2 topic delay` CLI options are passed through:
+
+```bash
+$ ros2 topic delay_agnocast -w 1 /pose_chatter
+[*] Triggering A2R bridge for '/pose_chatter'. This may take a few seconds...
+[*] Starting ros2cli command...
+average delay: 0.002
+	min: 0.002s max: 0.002s std dev: 0.00000s window: 1
+average delay: 0.001
+	min: 0.001s max: 0.001s std dev: 0.00000s window: 1
+average delay: 0.001
+	min: 0.001s max: 0.001s std dev: 0.00000s window: 1
 [...]
 ```
 
