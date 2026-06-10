@@ -46,7 +46,7 @@ Allocate a new default-constructed message in shared memory. The caller must eit
 void Publisher::publish(agnocast::ipc_shared_ptr<MessageT> &&message)
 ```
 
-Publish a message via zero-copy IPC. Ownership is transferred: after this call, the passed-in ipc_shared_ptr and all copies sharing its control block are invalidated — dereferencing them calls `std::terminate`().
+Publish a message via zero-copy IPC. Ownership is transferred: after this call, the passed-in ipc_shared_ptr and all copies sharing its control block are invalidated — dereferencing them calls `std::terminate()`.
 
 | Template Parameter | Description |
 |-----------|-------------|

@@ -66,7 +66,7 @@ Create an Agnocast subscription (Stage 1 free function, QoS overload).
 |-----------|-------------|
 | `MessageT` | ROS message type. |
 | `NodeT` | Node type (`rclcpp::Node` or `agnocast::Node`). |
-| `Func` | Callback callable with void(`agnocast::ipc_shared_ptr`<const MessageT>&&). |
+| `Func` | Callback callable with void(`agnocast::ipc_shared_ptr<const MessageT>`&&). |
 | **Parameter** | **Default** | **Description** |
 | `node` | — | Pointer to the node. |
 | `topic_name` | — | Topic name. |
@@ -91,7 +91,7 @@ Create an Agnocast subscription (Stage 1 free function, history-depth overload).
 |-----------|-------------|
 | `MessageT` | ROS message type. |
 | `NodeT` | Node type (`rclcpp::Node` or `agnocast::Node`). |
-| `Func` | Callback callable with void(`agnocast::ipc_shared_ptr`<const MessageT>&&). |
+| `Func` | Callback callable with void(`agnocast::ipc_shared_ptr<const MessageT>`&&). |
 | **Parameter** | **Default** | **Description** |
 | `node` | — | Pointer to the node. |
 | `topic_name` | — | Topic name. |
@@ -151,7 +151,7 @@ Create an Agnocast polling subscription (Stage 1 free function, QoS overload).
 #### `create_client()`
 
 ```cpp
-agnocast::Client<ServiceT>::SharedPtr create_client(rclcpp::Node *node, std::string &service_name, rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
+agnocast::Client<ServiceT>::SharedPtr create_client(NodeT *node, std::string &service_name, rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
 ```
 
 Create an Agnocast service client (Stage 1 free function).
@@ -159,11 +159,12 @@ Create an Agnocast service client (Stage 1 free function).
 | Template Parameter | Description |
 |-----------|-------------|
 | `ServiceT` | ROS service type. |
+| `NodeT` | Node type (`rclcpp::Node` or `agnocast::Node`). |
 | **Parameter** | **Default** | **Description** |
-| `node` | — | Pointer to `rclcpp::Node`. |
+| `node` | — | Pointer to the node. |
 | `service_name` | — | Service name. |
-| `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. |
-| `group` | `nullptr` | Callback group (nullptr = default). |
+| `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. Defaults to `rclcpp::ServicesQoS()`. |
+| `group` | `nullptr` | Callback group. Defaults to nullptr (default callback group). |
 | | | |
 | **Returns** | Shared pointer to the created client. |
 
@@ -173,7 +174,7 @@ Create an Agnocast service client (Stage 1 free function).
 #### `create_service()`
 
 ```cpp
-agnocast::Service<ServiceT>::SharedPtr create_service(rclcpp::Node *node, std::string &service_name, Func &&callback, rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
+agnocast::Service<ServiceT>::SharedPtr create_service(NodeT *node, std::string &service_name, Func &&callback, rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
 ```
 
 Create an Agnocast service server (Stage 1 free function).
@@ -181,13 +182,14 @@ Create an Agnocast service server (Stage 1 free function).
 | Template Parameter | Description |
 |-----------|-------------|
 | `ServiceT` | ROS service type. |
-| `Func` | Callable with signature void(const `agnocast::ipc_shared_ptr`<const RequestT>&, `agnocast::ipc_shared_ptr`<ResponseT>&). |
+| `NodeT` | Node type (`rclcpp::Node` or `agnocast::Node`). |
+| `Func` | Callable that takes ipc_shared_ptr<ServiceT::Request> and ipc_shared_ptr<ServiceT::Response> (const&, &&, or by-value) (return value ignored). |
 | **Parameter** | **Default** | **Description** |
-| `node` | — | Pointer to `rclcpp::Node`. |
+| `node` | — | Pointer to the node. |
 | `service_name` | — | Service name. |
 | `callback` | — | Callback invoked on each request. |
-| `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. |
-| `group` | `nullptr` | Callback group (nullptr = default). |
+| `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. Defaults to `rclcpp::ServicesQoS()`. |
+| `group` | `nullptr` | Callback group. Defaults to nullptr (default callback group). |
 | | | |
 | **Returns** | Shared pointer to the created service. |
 
@@ -200,7 +202,7 @@ Create an Agnocast service server (Stage 1 free function).
 agnocast::TimerBase::SharedPtr create_timer(NodeT node, rclcpp::Clock::SharedPtr clock, rclcpp::Duration period, CallbackT &&callback, rclcpp::CallbackGroup::SharedPtr group, bool autostart)
 ```
 
-Create a timer with a given clock. This free function mirrors the `rclcpp::create_timer`() API for portability.
+Create a timer with a given clock. This free function mirrors the `rclcpp::create_timer()` API for portability.
 
 | Template Parameter | Description |
 |-----------|-------------|
@@ -225,10 +227,32 @@ Create a timer with a given clock. This free function mirrors the `rclcpp::creat
 void init(int argc, char **argv)
 ```
 
-Initialize Agnocast for Stage 2 (`agnocast::Node`). Must be called once before creating any `agnocast::Node` . This is the Stage 2 equivalent of `rclcpp::init`().
+Initialize Agnocast. Must be called once before creating any `agnocast::Node`. This is the counterpart of `rclcpp::init()` for `agnocast::Node`.
 
 | Parameter | Description |
 |-----------|-------------|
 | `argc` | Number of command-line arguments. |
 | `argv` | Command-line argument array. |
+
+
+---
+
+#### `shutdown()`
+
+```cpp
+void shutdown()
+```
+
+Shut down Agnocast. Should be called before process exit in `agnocast::Node` processes. This is the counterpart of `rclcpp::shutdown()` for `agnocast::Node`.
+
+
+---
+
+#### `ok()`
+
+```cpp
+bool ok()
+```
+
+Check whether Agnocast context is valid (initialized and not shutdown). This is the counterpart of `rclcpp::ok()` for `agnocast::Node`.
 

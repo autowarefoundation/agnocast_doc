@@ -54,7 +54,7 @@ Copy constructor. Creates a new reference to the same message. The reference cou
 agnocast::ipc_shared_ptr& agnocast::ipc_shared_ptr::operator=(agnocast::ipc_shared_ptr &r)
 ```
 
-Copy assignment. Releases the current reference and shares ownership with r . Same thread-safety guarantees as the copy constructor.
+Copy assignment. Releases the current reference and shares ownership with r. Same thread-safety guarantees as the copy constructor.
 
 | | |
 |-----------|-------------|
@@ -80,7 +80,7 @@ Move constructor. Transfers ownership from r without changing the reference coun
 agnocast::ipc_shared_ptr& agnocast::ipc_shared_ptr::operator=(agnocast::ipc_shared_ptr &&r) noexcept
 ```
 
-Move assignment. Releases the current reference and takes ownership from r . Not thread-safe: the caller must ensure no other thread accesses r concurrently.
+Move assignment. Releases the current reference and takes ownership from r. Not thread-safe: the caller must ensure no other thread accesses r concurrently.
 
 | | |
 |-----------|-------------|
@@ -117,7 +117,7 @@ Converting move constructor (e.g., ipc_shared_ptr<T> to ipc_shared_ptr<const T>)
 agnocast::ipc_shared_ptr& agnocast::ipc_shared_ptr::operator=(agnocast::ipc_shared_ptr<U> &r)
 ```
 
-Converting copy assignment (e.g., ipc_shared_ptr<T> to ipc_shared_ptr<const T>). Enabled only when U* is implicitly convertible to T* .
+Converting copy assignment (e.g., ipc_shared_ptr<T> to ipc_shared_ptr<const T>). Enabled only when U* is implicitly convertible to T*.
 
 | | |
 |-----------|-------------|
@@ -132,7 +132,7 @@ Converting copy assignment (e.g., ipc_shared_ptr<T> to ipc_shared_ptr<const T>).
 agnocast::ipc_shared_ptr& agnocast::ipc_shared_ptr::operator=(agnocast::ipc_shared_ptr<U> &&r)
 ```
 
-Converting move assignment (e.g., ipc_shared_ptr<T> to ipc_shared_ptr<const T>). Enabled only when U* is implicitly convertible to T* .
+Converting move assignment (e.g., ipc_shared_ptr<T> to ipc_shared_ptr<const T>). Enabled only when U* is implicitly convertible to T*.
 
 | | |
 |-----------|-------------|
@@ -147,7 +147,7 @@ Converting move assignment (e.g., ipc_shared_ptr<T> to ipc_shared_ptr<const T>).
 T& agnocast::ipc_shared_ptr::operator*() noexcept
 ```
 
-Dereference the managed message. Calls `std::terminate`() if the pointer has been invalidated by publish().
+Dereference the managed message. Calls `std::terminate()` if the pointer has been invalidated by publish().
 
 | | |
 |-----------|-------------|
@@ -162,7 +162,7 @@ Dereference the managed message. Calls `std::terminate`() if the pointer has bee
 T* agnocast::ipc_shared_ptr::operator->() noexcept
 ```
 
-Access a member of the managed message. Calls `std::terminate`() if the pointer has been invalidated by publish().
+Access a member of the managed message. Calls `std::terminate()` if the pointer has been invalidated by publish().
 
 | | |
 |-----------|-------------|
@@ -174,7 +174,7 @@ Access a member of the managed message. Calls `std::terminate`() if the pointer 
 #### `operator bool()`
 
 ```cpp
-agnocast::ipc_shared_ptr::operator bool() noexcept
+agnocast::ipc_shared_ptr<T>::operator bool() noexcept
 ```
 
 Return true if the pointer is non-null and has not been invalidated.

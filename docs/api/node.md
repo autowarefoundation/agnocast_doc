@@ -530,7 +530,7 @@ Return the number of subscribers on a topic.
 #### `create_publisher()`
 
 ```cpp
-agnocast::Publisher::SharedPtr Node::create_publisher(std::string &topic_name, rclcpp::QoS &qos, agnocast::PublisherOptions options)
+agnocast::Publisher<MessageT>::SharedPtr Node::create_publisher(std::string &topic_name, rclcpp::QoS &qos, agnocast::PublisherOptions options)
 ```
 
 Create a publisher (QoS overload).
@@ -551,7 +551,7 @@ Create a publisher (QoS overload).
 #### `create_publisher() [overload 2]`
 
 ```cpp
-agnocast::Publisher::SharedPtr Node::create_publisher(std::string &topic_name, size_t queue_size, agnocast::PublisherOptions options)
+agnocast::Publisher<MessageT>::SharedPtr Node::create_publisher(std::string &topic_name, size_t queue_size, agnocast::PublisherOptions options)
 ```
 
 Create a publisher (queue-size overload).
@@ -572,7 +572,7 @@ Create a publisher (queue-size overload).
 #### `create_subscription()`
 
 ```cpp
-agnocast::Subscription::SharedPtr Node::create_subscription(std::string &topic_name, rclcpp::QoS &qos, Func &&callback, agnocast::SubscriptionOptions options)
+agnocast::Subscription<MessageT>::SharedPtr Node::create_subscription(std::string &topic_name, rclcpp::QoS &qos, Func &&callback, agnocast::SubscriptionOptions options)
 ```
 
 Create a subscription (QoS overload).
@@ -595,7 +595,7 @@ Create a subscription (QoS overload).
 #### `create_subscription() [overload 2]`
 
 ```cpp
-agnocast::Subscription::SharedPtr Node::create_subscription(std::string &topic_name, size_t queue_size, Func &&callback, agnocast::SubscriptionOptions options)
+agnocast::Subscription<MessageT>::SharedPtr Node::create_subscription(std::string &topic_name, size_t queue_size, Func &&callback, agnocast::SubscriptionOptions options)
 ```
 
 Create a subscription (queue-size overload).
@@ -618,7 +618,7 @@ Create a subscription (queue-size overload).
 #### `create_subscription() [overload 3]`
 
 ```cpp
-agnocast::PollingSubscriber::SharedPtr Node::create_subscription(std::string &topic_name, size_t qos_history_depth)
+agnocast::PollingSubscriber<MessageT>::SharedPtr Node::create_subscription(std::string &topic_name, size_t qos_history_depth)
 ```
 
 Create a polling subscription (history-depth overload).
@@ -638,7 +638,7 @@ Create a polling subscription (history-depth overload).
 #### `create_subscription() [overload 4]`
 
 ```cpp
-agnocast::PollingSubscriber::SharedPtr Node::create_subscription(std::string &topic_name, rclcpp::QoS &qos)
+agnocast::PollingSubscriber<MessageT>::SharedPtr Node::create_subscription(std::string &topic_name, rclcpp::QoS &qos)
 ```
 
 Create a polling subscription (QoS overload).
@@ -702,16 +702,18 @@ Create a timer using the node's clock.
 #### `create_client()`
 
 ```cpp
-agnocast::Client::SharedPtr Node::create_client(std::string &service_name, rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
+agnocast::Client<ServiceT>::SharedPtr Node::create_client(std::string &service_name, rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
 ```
 
 Create a service client.
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
+| Template Parameter | Description |
+|-----------|-------------|
+| `ServiceT` | ROS service type. |
+| **Parameter** | **Default** | **Description** |
 | `service_name` | — | Service name. |
-| `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. |
-| `group` | `nullptr` | Callback group (nullptr = default). |
+| `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. Defaults to `rclcpp::ServicesQoS()`. |
+| `group` | `nullptr` | Callback group. Defaults to nullptr (default callback group). |
 | | | |
 | **Returns** | Shared pointer to the created client. |
 
@@ -721,19 +723,20 @@ Create a service client.
 #### `create_service()`
 
 ```cpp
-agnocast::Service::SharedPtr Node::create_service(std::string &service_name, Func &&callback, rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
+agnocast::Service<ServiceT>::SharedPtr Node::create_service(std::string &service_name, Func &&callback, rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
 ```
 
 Create a service server.
 
 | Template Parameter | Description |
 |-----------|-------------|
-| `Func` | Callable with signature void(const `agnocast::ipc_shared_ptr`<const RequestT>&, `agnocast::ipc_shared_ptr`<ResponseT>&). |
+| `ServiceT` | ROS service type. |
+| `Func` | Callable that takes ipc_shared_ptr<ServiceT::Request> and ipc_shared_ptr<ServiceT::Response> (const&, &&, or by-value) (return value ignored). |
 | **Parameter** | **Default** | **Description** |
 | `service_name` | — | Service name. |
 | `callback` | — | Callback invoked on each request. |
-| `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. |
-| `group` | `nullptr` | Callback group (nullptr = default). |
+| `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. Defaults to `rclcpp::ServicesQoS()`. |
+| `group` | `nullptr` | Callback group. Defaults to nullptr (default callback group). |
 | | | |
 | **Returns** | Shared pointer to the created service. |
 

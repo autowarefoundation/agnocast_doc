@@ -6,8 +6,6 @@
 
 ### `agnocast::TakeSubscription<MessageT>`
 
-**Extends:** `agnocast::SubscriptionBase`
-
 Polling-based subscription that retrieves messages on demand via take().
 
 
