@@ -17,8 +17,8 @@ Columns used in the tables below:
   - ✗ Does not see Agnocast-only endpoints because Agnocast bypasses the RMW/DDS layer.
   - N/A Not applicable (the command is Agnocast-specific and has no upstream `ros2` counterpart).
 - **Agnocast version** — whether `ros2agnocast` provides a dedicated Agnocast-aware verb (e.g. `ros2 topic list_agnocast`, `ros2 agnocast generate-bridge-plugins`). ✓ means a variant exists; ✗ means no variant exists today. The verb-level tables below mark each verb's **scope**:
-  - **Cluster-wide** — the observability verbs (`topic`/`node` `list_agnocast`/`info_agnocast`) show Agnocast endpoints wherever an Agnocast discovery agent runs, across IPC namespaces and across ECUs on the same `ROS_DOMAIN_ID`; otherwise they show only the current IPC namespace.
-  - **Local IPC namespace** — `ros2 agnocast discovery-daemon-status` inspects only the IPC namespace the command runs in.
+  - **Cluster-wide** — shows Agnocast endpoints across all IPC namespaces and ECUs on the same `ROS_DOMAIN_ID` wherever an Agnocast discovery agent runs. Without a discovery agent, some commands do not work at all; others fall back to showing only the current IPC namespace.
+  - **Local IPC namespace** — inspects only the IPC namespace the command runs in.
 - **Planned** — whether dedicated Agnocast support is intended.
   - `Yes` Agnocast-specific support is planned.
   - `No` Explicitly not planned (the command is DDS-only and has no Agnocast counterpart).
@@ -31,7 +31,7 @@ Columns used in the tables below:
 | Command | Works as-is | Agnocast version | Planned | Notes |
 |---------|:-----------:|:----------------:|:-------:|-------|
 | `ros2 action` | ✗ | ✗ | TBD | Agnocast does not implement Actions (see [agnocast_node_interface_comparison.md](https://github.com/autowarefoundation/agnocast/blob/main/docs/agnocast_node_interface_comparison.md)). Pure Agnocast nodes are not visible. |
-| `ros2 bag` | ✓ | ✗ | - | Works for bridged topics via the DDS side of the bridge. Purely Agnocast-only topics (without a bridge) are not captured. |
+| `ros2 bag` | ⚠ | ✓ (`record_agnocast`) | - | Standard `ros2 bag record` works only when a bridge is already active; Agnocast-only topics are not captured without one. The `_agnocast` variant extends `record` with full Agnocast awareness. See §9. |
 | `ros2 component` | ✓ | ✗ | - | Component Container loading works for `agnocast::Node`. See "Composable Node Considerations" in [agnocast_node_interface_comparison.md](https://github.com/autowarefoundation/agnocast/blob/main/docs/agnocast_node_interface_comparison.md). |
 | `ros2 daemon` | ✓ | ✗ | - | DDS discovery daemon; unrelated to Agnocast's shared memory path. |
 | `ros2 doctor` / `ros2 wtf` | ✓ | ✗ | TBD | Reports DDS/RMW health only. No Agnocast-specific diagnostics yet. |
@@ -45,8 +45,8 @@ Columns used in the tables below:
 | `ros2 run` | ✓ | ✗ | - | Launches an executable; no Agnocast-specific behavior. |
 | `ros2 security` | N/A | ✗ | No | Manages SROS2 / DDS-Security artifacts (enclaves, keystores, permission/policy files) that authenticate and encrypt DDS traffic. **Has no effect on Agnocast pub/sub**: communication between Agnocast endpoints goes through shared memory, not DDS, so SROS2 policies neither authorize nor restrict it. The commands still run, but generated artifacts only protect the DDS side (including the Agnocast↔ROS 2 bridge). |
 | `ros2 service` | ✗ | ✗ | TBD | Agnocast services use internal shared-memory topics prefixed with `/AGNOCAST_SRV_*` and are not exposed via DDS. Agnocast services are marked experimental (see [agnocast_node_interface_comparison.md](https://github.com/autowarefoundation/agnocast/blob/main/docs/agnocast_node_interface_comparison.md) §2.6). |
-| `ros2 topic` | ⚠ | ✓ (`list_agnocast`, `info_agnocast`) | - | `as-is` does not see pure Agnocast-only topics at all, and for bridged topics it only reports the DDS side (no Agnocast pub/sub count, no `(Agnocast enabled)` marking). Use the `_agnocast` verbs to include Agnocast topics and labels. See §3. |
-| `ros2 agnocast` | N/A | ✓ (new top-level command) | - | Provided by `ros2agnocast` for Agnocast-specific operations (`version`, `generate-bridge-plugins`, `discovery-daemon-status`). See §10. |
+| `ros2 topic` | ⚠ | ✓ (`list_agnocast`, `info_agnocast`, `echo_agnocast`, `hz_agnocast`, `delay_agnocast`) | - | Standard `ros2 topic` verbs have limited visibility into Agnocast: pure Agnocast-only topics are invisible, and bridged topics are seen only from the DDS side. The `_agnocast` variants extend each verb with full Agnocast awareness. See §3. |
+| `ros2 agnocast` | N/A | ✓ (new top-level command) | - | Provided by `ros2agnocast` for Agnocast-specific operations (`version`, `generate-bridge-plugins`, `discovery-daemon-status`, `bridge-daemon-status`). See §10. |
 
 ### 2. `ros2 node` verbs
 
@@ -61,11 +61,11 @@ Columns used in the tables below:
 |------|:-----------:|:----------------:|:----------------------:|:-------:|-------|
 | `ros2 topic list` | ⚠ | ✓ `list_agnocast` | Cluster-wide | - | `as-is` lists only topics with DDS endpoints, so pure Agnocast-only topics are missing and bridged topics carry no Agnocast marking. `list_agnocast` adds Agnocast-only topics and tags Agnocast topics `(Agnocast enabled)` / `(Agnocast enabled, bridged)`, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise only the current IPC namespace. See [Topic List](#topic-list) below. |
 | `ros2 topic info` | ⚠ | ✓ `info_agnocast` | Cluster-wide | - | `as-is` cannot target a pure Agnocast-only topic (it is absent from `ros2 topic list`), and shows only DDS publishers/subscribers for bridged topics. `info_agnocast` adds Agnocast publisher/subscriber counts, QoS and message type, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise only the current IPC namespace. Supports `-v` and `-d`. See [Topic Info](#topic-info) below. |
-| `ros2 topic echo` | ⚠ | ✗ | — | TBD | Works when the bridge is active, but the message type must be specified explicitly, e.g. `ros2 topic echo /my_topic agnocast_sample_interfaces/msg/DynamicSizeArray`. |
+| `ros2 topic echo` | ⚠ | ✓ `echo_agnocast` | Cluster-wide | - | `as-is` cannot target pure Agnocast-only topics and works only for bridged topics. `echo_agnocast` adds support for pure Agnocast-only topics, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise, these topics cannot be observed. See [Topic Echo](#topic-echo) below. |
 | `ros2 topic pub` | ⚠ | ✗ | — | TBD | Publishes via DDS, so messages reach Agnocast subscribers only via the bridge. The `--wait-matching-subscriptions` option does **not** work correctly for Agnocast subscribers — DDS discovery counts only the bridge-side DDS subscription (if any), not the Agnocast subscribers behind it. |
-| `ros2 topic hz` | ✗ | ✗ | — | TBD | Subscribes via DDS to measure publish rate. For Agnocast publishers the data path is shared memory and DDS sees no messages, so no rate is reported (even when the bridge is active, the DDS rate observed by `hz` does not necessarily reflect the Agnocast publisher's rate). |
+| `ros2 topic hz` | ⚠ | ✓ `hz_agnocast` | Cluster-wide | - | `as-is` cannot target pure Agnocast-only topics and works only for bridged topics. `hz_agnocast` adds support for pure Agnocast-only topics, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise, these topics cannot be observed. See [Topic Hz](#topic-hz) below. |
 | `ros2 topic bw` | ✗ | ✗ | — | TBD | Requires subscribing to the topic. |
-| `ros2 topic delay` | ✗ | ✗ | — | TBD | Requires subscribing to the topic. |
+| `ros2 topic delay` | ⚠ | ✓ `delay_agnocast` | Cluster-wide | - | `as-is` cannot target pure Agnocast-only topics and works only for bridged topics. `delay_agnocast` adds support for pure Agnocast-only topics, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise, these topics cannot be observed. See [Topic Delay](#topic-delay) below. |
 | `ros2 topic type` | ⚠ | ✗ | — | No | Resolves a topic's message type via the DDS graph, which works for bridged topics (their DDS endpoints carry the type). No Agnocast `type` verb is planned, but `ros2 topic info_agnocast <topic>` now reports the type of a pure Agnocast-only topic when a discovery agent is running, showing `<UNKNOWN>` only if none has reported one. |
 | `ros2 topic find` | ⚠ | ✗ | — | No | Lists topics of a given type via the DDS graph. Same constraint as `type`: bridged topics are findable; pure Agnocast-only topics are not, because no type→name index exists on the Agnocast side. |
 
@@ -127,17 +127,17 @@ Component containers can load `agnocast::Node` subclasses; the container itself 
 
 ### 9. `ros2 bag` verbs
 
-`ros2 bag` records DDS traffic; Agnocast-only topics live in shared memory and are not captured unless the Agnocast↔ROS 2 bridge is active.
+`ros2 bag record` captures DDS traffic only; Agnocast-only topics live in shared memory and are not captured unless the Agnocast↔ROS 2 bridge is active. `record_agnocast` watches for Agnocast topics and automatically creates the required bridges, making them visible to DDS and therefore recordable.
 
-| Verb | Works as-is | Agnocast version | Planned | Notes |
-|------|:-----------:|:----------------:|:-------:|-------|
-| `ros2 bag record` | ✓ | ✗ | - | Works via the bridge. Agnocast-only topics without a bridge are not captured. |
-| `ros2 bag play` | ✓ | ✗ | - | Works via the bridge. Playback publishes via DDS; reaches Agnocast only if a bridge exists. |
-| `ros2 bag info` | ✓ | ✗ | - | Operates on a stored bag file, independent of transport. |
-| `ros2 bag list` | ✓ | ✗ | - | Same as above. |
-| `ros2 bag convert` | ✓ | ✗ | - | Same as above. |
-| `ros2 bag reindex` | ✓ | ✗ | - | Same as above. |
-| `ros2 bag burst` | ✓ | ✗ | - | Same as `play`. |
+| Verb | Works as-is | Agnocast version | Scope of Agnocast verb | Planned | Notes |
+|------|:-----------:|:----------------:|:----------------------:|:-------:|-------|
+| `ros2 bag record` | ⚠ | ✓ `record_agnocast` | Cluster-wide | - | `as-is` cannot target pure Agnocast-only topics and works only for bridged topics. `record_agnocast` adds support for pure Agnocast-only topics, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise, these topics cannot be recorded. See [Bag Record](#bag-record) below. |
+| `ros2 bag play` | ✓ | ✗ | — | - | Works as-is. Note that messages originally published by Agnocast publishers are replayed as ROS 2 (DDS) publishers. |
+| `ros2 bag info` | ✓ | ✗ | — | - | Operates on a stored bag file, independent of transport. |
+| `ros2 bag list` | ✓ | ✗ | — | - | Same as above. |
+| `ros2 bag convert` | ✓ | ✗ | — | - | Same as above. |
+| `ros2 bag reindex` | ✓ | ✗ | — | - | Same as above. |
+| `ros2 bag burst` | ✓ | ✗ | — | - | Same as `play`. |
 
 ### 10. `ros2 agnocast` verbs
 
@@ -149,6 +149,7 @@ Component containers can load `agnocast::Node` subclasses; the container itself 
 | `ros2 agnocast version` | Local host only | Same as `--version` (verb form). |
 | `ros2 agnocast generate-bridge-plugins` | Build-time | Generate a ROS 2 bridge plugin package for user message types. Operates on local source/install trees, not on any running system. |
 | `ros2 agnocast discovery-daemon-status` | Local IPC namespace | Check that the Agnocast discovery agent for the **current** IPC namespace is running and healthy. Exits non-zero if it is not. Add `-v` for per-check detail. |
+| `ros2 agnocast bridge-daemon-status` | Local IPC namespace | Check that the Agnocast bridge daemon process for the **current** IPC namespace is running and healthy. Exits non-zero if it is not. Add `-v` for per-check detail. |
 
 ---
 
@@ -158,8 +159,12 @@ The following sections show usage examples for the Agnocast-specific verbs:
 
 - `ros2 topic list_agnocast`
 - `ros2 topic info_agnocast /topic_name`
+- `ros2 topic echo_agnocast /topic_name`
+- `ros2 topic hz_agnocast /topic_name`
+- `ros2 topic delay_agnocast /topic_name`
 - `ros2 node list_agnocast`
 - `ros2 node info_agnocast /node_name`
+- `ros2 bag record_agnocast`
 
 !!! info "Scope"
     `list_agnocast` / `info_agnocast` show Agnocast endpoints wherever an Agnocast discovery agent runs, across IPC namespaces and ECUs on the same `ROS_DOMAIN_ID`; otherwise they show only the current IPC namespace. The DDS side is cluster-wide as usual.
@@ -350,6 +355,137 @@ QoS profile:
   Durability: VOLATILE
 ```
 
+### Topic Echo
+
+`echo_agnocast` is an Agnocast extension of `ros2 topic echo`. It also works for standard ROS 2 topics.
+
+`echo_agnocast` works cluster-wide wherever a discovery agent runs (across IPC namespaces and ECUs on the same `ROS_DOMAIN_ID`); without a discovery agent, Agnocast-only topics cannot be observed.
+
+When the discovery agent is running:
+
+```bash
+$ ros2 topic echo_agnocast /my_topic
+[*] Triggering A2R bridge for '/my_topic'. This may take a few seconds...
+[*] Starting ros2cli command...
+id: 870
+data:
+- 870
+- 871
+- 872
+- 873
+[...]
+```
+
+Without a discovery agent, the command exits with an error:
+
+```bash
+$ ros2 topic echo_agnocast /my_topic
+[*] Triggering A2R bridge for '/my_topic'. This may take a few seconds...
+NOTE: no /_agnocast_discovery agent visible; showing local NS only via ioctl. Start one with `ros2 run ros2agnocast_discovery_agent discovery_agent` to see other NSes / ECUs.
+ERROR: Could not resolve message type for '/my_topic'. The topic was not found in the ROS 2 graph or via /_agnocast_discovery. Make sure the topic exists and, for Agnocast topics, the discovery agent is running.
+```
+
+Standard `ros2 topic echo` CLI options are passed through:
+
+```bash
+$ ros2 topic echo_agnocast --once --no-arr --filter "m.id % 50 == 0" /my_topic
+[*] Triggering A2R bridge for '/my_topic'. This may take a few seconds...
+[*] Starting ros2cli command...
+id: 4450
+data: '<sequence type: int64, length: 128000>'
+---
+```
+
+### Topic Hz
+
+`hz_agnocast` is an Agnocast extension of `ros2 topic hz`. It also works for standard ROS 2 topics.
+
+`hz_agnocast` works cluster-wide wherever a discovery agent runs (across IPC namespaces and ECUs on the same `ROS_DOMAIN_ID`); without a discovery agent, Agnocast-only topics cannot be observed.
+
+When the discovery agent is running:
+
+```bash
+$ ros2 topic hz_agnocast /my_topic
+[*] Triggering A2R bridge for '/my_topic'. This may take a few seconds...
+[*] Starting ros2cli command...
+average rate: 9.832
+        min: 0.101s max: 0.103s std dev: 0.00049s window: 11
+average rate: 10.037
+        min: 0.052s max: 0.103s std dev: 0.01052s window: 22
+average rate: 9.977
+        min: 0.052s max: 0.103s std dev: 0.00878s window: 32
+[...]
+```
+
+Without a discovery agent, the command exits with an error:
+
+```bash
+$ ros2 topic hz_agnocast /my_topic
+[*] Triggering A2R bridge for '/my_topic'. This may take a few seconds...
+NOTE: no /_agnocast_discovery agent visible; showing local NS only via ioctl. Start one with `ros2 run ros2agnocast_discovery_agent discovery_agent` to see other NSes / ECUs.
+ERROR: Could not resolve message type for '/my_topic'. The topic was not found in the ROS 2 graph or via /_agnocast_discovery. Make sure the topic exists and, for Agnocast topics, the discovery agent is running.
+```
+
+Standard `ros2 topic hz` CLI options are passed through:
+
+```bash
+$ ros2 topic hz_agnocast --filter "m.id % 10 == 0" /my_topic
+[*] Triggering A2R bridge for '/my_topic'. This may take a few seconds...
+[*] Starting ros2cli command...
+average rate: 0.990
+        min: 1.009s max: 1.011s std dev: 0.00077s window: 2
+average rate: 1.002
+        min: 0.960s max: 1.011s std dev: 0.02200s window: 4
+average rate: 1.000
+        min: 0.960s max: 1.011s std dev: 0.02022s window: 5
+[...]
+```
+
+### Topic Delay
+
+`delay_agnocast` is an Agnocast extension of `ros2 topic delay`. It also works for standard ROS 2 topics.
+
+`delay_agnocast` works cluster-wide wherever a discovery agent runs (across IPC namespaces and ECUs on the same `ROS_DOMAIN_ID`); without a discovery agent, Agnocast-only topics cannot be observed.
+
+When the discovery agent is running:
+
+```bash
+$ ros2 topic delay_agnocast /pose_chatter
+[*] Triggering A2R bridge for '/pose_chatter'. This may take a few seconds...
+[*] Starting ros2cli command...
+average delay: 0.001
+        min: 0.001s max: 0.001s std dev: 0.00000s window: 1
+average delay: 0.001
+        min: 0.001s max: 0.001s std dev: 0.00014s window: 3
+average delay: 0.001
+        min: 0.001s max: 0.001s std dev: 0.00012s window: 5
+[...]
+```
+
+Without a discovery agent, the command exits with an error:
+
+```bash
+$ ros2 topic delay_agnocast /pose_chatter
+[*] Triggering A2R bridge for '/pose_chatter'. This may take a few seconds...
+NOTE: no /_agnocast_discovery agent visible; showing local NS only via ioctl. Start one with `ros2 run ros2agnocast_discovery_agent discovery_agent` to see other NSes / ECUs.
+ERROR: Could not resolve message type for '/pose_chatter'. The topic was not found in the ROS 2 graph or via /_agnocast_discovery. Make sure the topic exists and, for Agnocast topics, the discovery agent is running.
+```
+
+Standard `ros2 topic delay` CLI options are passed through:
+
+```bash
+$ ros2 topic delay_agnocast -w 1 /pose_chatter
+[*] Triggering A2R bridge for '/pose_chatter'. This may take a few seconds...
+[*] Starting ros2cli command...
+average delay: 0.002
+        min: 0.002s max: 0.002s std dev: 0.00000s window: 1
+average delay: 0.001
+        min: 0.001s max: 0.001s std dev: 0.00000s window: 1
+average delay: 0.001
+        min: 0.001s max: 0.001s std dev: 0.00000s window: 1
+[...]
+```
+
 ### Node List
 
 To list all nodes including those implemented with Agnocast, use `ros2 node list_agnocast`.
@@ -409,3 +545,70 @@ $ ros2 node info_agnocast /listener_node
 Similar to `ros2 topic list_agnocast`, the (Agnocast enabled, bridged) suffix in the node info indicates that communication has been successfully established between Agnocast and ROS 2 for that specific topic.
 
 If a topic is Agnocast-enabled but not currently bridged (e.g., there is no corresponding ROS 2 publisher/subscriber or the bridge process is not active), it will be displayed simply as (Agnocast enabled). This allows you to verify the connectivity status of each topic directly from the node's perspective.
+
+### Bag Record
+
+`record_agnocast` is an Agnocast extension of `ros2 bag record`. It continuously watches for Agnocast topics and automatically creates the corresponding bridge when they appear, making them recordable. It also works for standard ROS 2 topics.
+
+`record_agnocast` works cluster-wide wherever a discovery agent runs (across IPC namespaces and ECUs on the same `ROS_DOMAIN_ID`); without a discovery agent, Agnocast-only topics cannot be recorded (they are silently missed).
+
+When the discovery agent is running:
+
+```bash
+$ ros2 bag record_agnocast -o rosbag_output -e /my_*
+[INFO 1781059372.244129306] [rosbag2_recorder]: Press SPACE for pausing/resuming (RecorderImpl() at ./src/rosbag2_transport/recorder.cpp:223)
+[INFO 1781059372.244225399] [rosbag2_recorder]: Event publisher thread: Started (event_publisher_thread_main() at ./src/rosbag2_transport/recorder_event_notifier_impl.hpp:169)
+[INFO 1781059372.245935596] [rosbag2_recorder]: Starting recording to 'rosbag_output' (record() at ./src/rosbag2_transport/recorder.cpp:303)
+[INFO 1781059372.246716373] [rosbag2_recorder]: Listening for topics... (record() at ./src/rosbag2_transport/recorder.cpp:329)
+[INFO 1781059372.246728940] [rosbag2_recorder]: Recording... (record() at ./src/rosbag2_transport/recorder.cpp:338)
+[INFO 1781059372.246865915] [rosbag2_recorder]: Topics discovery started. (topics_discovery() at ./src/rosbag2_transport/recorder.cpp:629)
+[INFO 1781059373.218892553] [rosbag2_recorder]: Subscribed to topic '/my_topic' (subscribe_topic() at ./src/rosbag2_transport/recorder.cpp:730)
+[INFO 1781059379.681077909] [rosbag2_recorder]: Topics discovery stopped. (topics_discovery() at ./src/rosbag2_transport/recorder.cpp:671)
+[INFO 1781059379.681410757] [rosbag2_recorder]: Pausing recording. (pause() at ./src/rosbag2_transport/recorder.cpp:547)
+[INFO 1781059379.681530215] [rosbag2_cpp]: Writing remaining messages from cache to the bag. It may take a while (stop() at ./src/rosbag2_cpp/cache/cache_consumer.cpp:44)
+[INFO 1781059379.684395117] [rosbag2_recorder]: Recording stopped (stop() at ./src/rosbag2_transport/recorder.cpp:281)
+[INFO 1781059379.691063397] [rosbag2_recorder]: Event publisher thread: Exited (event_publisher_thread_main() at ./src/rosbag2_transport/recorder_event_notifier_impl.hpp:220)
+$ ros2 bag info rosbag_output
+
+Files:             rosbag_output_0.mcap
+Bag size:          62.5 MiB
+Storage id:        mcap
+ROS Distro:        jazzy
+Duration:          6.272831748s
+Start:             Jun 10 2026 11:42:53.307379851 (1781059373.307379851)
+End:               Jun 10 2026 11:42:59.580211599 (1781059379.580211599)
+Messages:          64
+Topic information: Topic: /my_topic | Type: agnocast_sample_interfaces/msg/DynamicSizeArray | Count: 64 | Serialization Format: cdr
+Service:           0
+Service information: 
+```
+
+Without a discovery agent, the command starts but records nothing for Agnocast-only topics (silently unobservable):
+
+```bash
+$ ros2 bag record_agnocast -o rosbag_output -e /my_*
+[INFO 1781059455.269319259] [rosbag2_recorder]: Press SPACE for pausing/resuming (RecorderImpl() at ./src/rosbag2_transport/recorder.cpp:223)
+[INFO 1781059455.269340122] [rosbag2_recorder]: Event publisher thread: Started (event_publisher_thread_main() at ./src/rosbag2_transport/recorder_event_notifier_impl.hpp:169)
+[INFO 1781059455.271078152] [rosbag2_recorder]: Starting recording to 'rosbag_output' (record() at ./src/rosbag2_transport/recorder.cpp:303)
+[INFO 1781059455.271900382] [rosbag2_recorder]: Listening for topics... (record() at ./src/rosbag2_transport/recorder.cpp:329)
+[INFO 1781059455.271912956] [rosbag2_recorder]: Recording... (record() at ./src/rosbag2_transport/recorder.cpp:338)
+[INFO 1781059455.271961053] [rosbag2_recorder]: Topics discovery started. (topics_discovery() at ./src/rosbag2_transport/recorder.cpp:629)
+[INFO 1781059462.239325076] [rosbag2_recorder]: Topics discovery stopped. (topics_discovery() at ./src/rosbag2_transport/recorder.cpp:671)
+[INFO 1781059462.239964342] [rosbag2_recorder]: Pausing recording. (pause() at ./src/rosbag2_transport/recorder.cpp:547)
+[INFO 1781059462.240101000] [rosbag2_cpp]: Writing remaining messages from cache to the bag. It may take a while (stop() at ./src/rosbag2_cpp/cache/cache_consumer.cpp:44)
+[INFO 1781059462.241862458] [rosbag2_recorder]: Recording stopped (stop() at ./src/rosbag2_transport/recorder.cpp:281)
+[INFO 1781059462.244343500] [rosbag2_recorder]: Event publisher thread: Exited (event_publisher_thread_main() at ./src/rosbag2_transport/recorder_event_notifier_impl.hpp:220)
+$ ros2 bag info rosbag_output
+
+Files:             rosbag_output_0.mcap
+Bag size:          1.8 KiB
+Storage id:        mcap
+ROS Distro:        jazzy
+Duration:          0.000000000s
+Start:             Apr 12 2262 08:47:16.854775807 (9223372036.854775807)
+End:               Apr 12 2262 08:47:16.854775807 (9223372036.854775807)
+Messages:          0
+Topic information: 
+Service:           0
+Service information: 
+```
