@@ -55,8 +55,7 @@ agnocast_components_register_node(
 ```
 
 For multiple ROS domains, launch a separate process per domain and set its
-`ROS_DOMAIN_ID` environment variable (`agnocast_component_container_cie` itself
-takes no `--domains` argument):
+`ROS_DOMAIN_ID` environment variable:
 
 ```xml
 <!-- Domain 0 (default) -->

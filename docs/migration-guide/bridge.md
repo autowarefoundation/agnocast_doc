@@ -173,10 +173,6 @@ colcon build --packages-select agnocast_bridge_plugins \
 </node>
 ```
 
-There is no separate bridge manager process to launch manually. When the first
-process in an IPC namespace starts in Performance Mode, the Agnocast library
-automatically spawns a single shared bridge manager daemon for that namespace.
-
 ### Performance Mode Limitations
 
 - Only message types included in the generated plugins can be bridged
