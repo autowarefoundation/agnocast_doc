@@ -31,7 +31,7 @@ Columns used in the tables below:
 | Command | Works as-is | Agnocast version | Planned | Notes |
 |---------|:-----------:|:----------------:|:-------:|-------|
 | `ros2 action` | ✗ | ✗ | TBD | Agnocast does not implement Actions (see [agnocast_node_interface_comparison.md](https://github.com/autowarefoundation/agnocast/blob/main/docs/agnocast_node_interface_comparison.md)). Pure Agnocast nodes are not visible. |
-| `ros2 bag` | ✓ | ✗ | - | Works for bridged topics via the DDS side of the bridge. Purely Agnocast-only topics (without a bridge) are not captured. |
+| `ros2 bag` | ⚠ | ✓ (`record_agnocast`) | - | Standard `ros2 bag record` works only when a bridge is already active; Agnocast-only topics are not captured without one. The `_agnocast` variant extends `record` with full Agnocast awareness. See §9. |
 | `ros2 component` | ✓ | ✗ | - | Component Container loading works for `agnocast::Node`. See "Composable Node Considerations" in [agnocast_node_interface_comparison.md](https://github.com/autowarefoundation/agnocast/blob/main/docs/agnocast_node_interface_comparison.md). |
 | `ros2 daemon` | ✓ | ✗ | - | DDS discovery daemon; unrelated to Agnocast's shared memory path. |
 | `ros2 doctor` / `ros2 wtf` | ✓ | ✗ | TBD | Reports DDS/RMW health only. No Agnocast-specific diagnostics yet. |
@@ -127,11 +127,11 @@ Component containers can load `agnocast::Node` subclasses; the container itself 
 
 ### 9. `ros2 bag` verbs
 
-`ros2 bag` records DDS traffic; Agnocast-only topics live in shared memory and are not captured unless the Agnocast↔ROS 2 bridge is active.
+`ros2 bag record` captures DDS traffic only; Agnocast-only topics live in shared memory and are not captured unless the Agnocast↔ROS 2 bridge is active. `record_agnocast` watches for Agnocast topics and automatically creates the required A2R bridge, making them visible to DDS and therefore recordable.
 
-| Verb | Works as-is | Agnocast version | Planned | Notes |
-|------|:-----------:|:----------------:|:-------:|-------|
-| `ros2 bag record` | ✓ | ✗ | - | Works via the bridge. Agnocast-only topics without a bridge are not captured. |
+| Verb | Works as-is | Agnocast version | Scope of Agnocast verb | Planned | Notes |
+|------|:-----------:|:----------------:|:----------------------:|:-------:|-------|
+| `ros2 bag record` | ⚠ | ✓ `record_agnocast` | Cluster-wide | - | `as-is` cannot target a pure Agnocast-only topic and works only when a bridge is already active. `record_agnocast` runs a component that continuously watches for Agnocast topics and automatically creates the corresponding A2R bridge when they appear, while concurrently running `ros2 bag record` — all `ros2 bag record` arguments (e.g. `-e`) are supported. Also works for standard ROS 2 topics. Without a discovery agent, Agnocast-only topics cannot be recorded. See [Bag Record](#bag-record) below. |
 | `ros2 bag play` | ✓ | ✗ | - | Works via the bridge. Playback publishes via DDS; reaches Agnocast only if a bridge exists. |
 | `ros2 bag info` | ✓ | ✗ | - | Operates on a stored bag file, independent of transport. |
 | `ros2 bag list` | ✓ | ✗ | - | Same as above. |
@@ -164,6 +164,7 @@ The following sections show usage examples for the Agnocast-specific verbs:
 - `ros2 topic delay_agnocast /topic_name`
 - `ros2 node list_agnocast`
 - `ros2 node info_agnocast /node_name`
+- `ros2 bag record_agnocast`
 
 !!! info "Scope"
     `list_agnocast` / `info_agnocast` show Agnocast endpoints wherever an Agnocast discovery agent runs, across IPC namespaces and ECUs on the same `ROS_DOMAIN_ID`; otherwise they show only the current IPC namespace. The DDS side is cluster-wide as usual.
@@ -549,3 +550,70 @@ $ ros2 node info_agnocast /listener_node
 Similar to `ros2 topic list_agnocast`, the (Agnocast enabled, bridged) suffix in the node info indicates that communication has been successfully established between Agnocast and ROS 2 for that specific topic.
 
 If a topic is Agnocast-enabled but not currently bridged (e.g., there is no corresponding ROS 2 publisher/subscriber or the bridge process is not active), it will be displayed simply as (Agnocast enabled). This allows you to verify the connectivity status of each topic directly from the node's perspective.
+
+### Bag Record
+
+`record_agnocast` is an Agnocast extension of `ros2 bag record`. It runs a component that continuously watches for Agnocast topics and automatically creates the corresponding A2R bridge when they appear, making them visible to DDS and therefore recordable, while concurrently running `ros2 bag record`. All standard `ros2 bag record` arguments (e.g. `-e`) are passed through unchanged. It also works for standard ROS 2 topics.
+
+`record_agnocast` works cluster-wide wherever a discovery agent runs (across IPC namespaces and ECUs on the same `ROS_DOMAIN_ID`); without a discovery agent, Agnocast-only topics cannot be recorded (they are silently missed).
+
+When the discovery agent is running:
+
+```bash
+$ ros2 bag record_agnocast -o rosbag_output -e /my_*
+[INFO 1781059372.244129306] [rosbag2_recorder]: Press SPACE for pausing/resuming (RecorderImpl() at ./src/rosbag2_transport/recorder.cpp:223)
+[INFO 1781059372.244225399] [rosbag2_recorder]: Event publisher thread: Started (event_publisher_thread_main() at ./src/rosbag2_transport/recorder_event_notifier_impl.hpp:169)
+[INFO 1781059372.245935596] [rosbag2_recorder]: Starting recording to 'rosbag_output' (record() at ./src/rosbag2_transport/recorder.cpp:303)
+[INFO 1781059372.246716373] [rosbag2_recorder]: Listening for topics... (record() at ./src/rosbag2_transport/recorder.cpp:329)
+[INFO 1781059372.246728940] [rosbag2_recorder]: Recording... (record() at ./src/rosbag2_transport/recorder.cpp:338)
+[INFO 1781059372.246865915] [rosbag2_recorder]: Topics discovery started. (topics_discovery() at ./src/rosbag2_transport/recorder.cpp:629)
+[INFO 1781059373.218892553] [rosbag2_recorder]: Subscribed to topic '/my_topic' (subscribe_topic() at ./src/rosbag2_transport/recorder.cpp:730)
+[INFO 1781059379.681077909] [rosbag2_recorder]: Topics discovery stopped. (topics_discovery() at ./src/rosbag2_transport/recorder.cpp:671)
+[INFO 1781059379.681410757] [rosbag2_recorder]: Pausing recording. (pause() at ./src/rosbag2_transport/recorder.cpp:547)
+[INFO 1781059379.681530215] [rosbag2_cpp]: Writing remaining messages from cache to the bag. It may take a while (stop() at ./src/rosbag2_cpp/cache/cache_consumer.cpp:44)
+[INFO 1781059379.684395117] [rosbag2_recorder]: Recording stopped (stop() at ./src/rosbag2_transport/recorder.cpp:281)
+[INFO 1781059379.691063397] [rosbag2_recorder]: Event publisher thread: Exited (event_publisher_thread_main() at ./src/rosbag2_transport/recorder_event_notifier_impl.hpp:220)
+$ ros2 bag info rosbag_output
+
+Files:             rosbag_output_0.mcap
+Bag size:          62.5 MiB
+Storage id:        mcap
+ROS Distro:        jazzy
+Duration:          6.272831748s
+Start:             Jun 10 2026 11:42:53.307379851 (1781059373.307379851)
+End:               Jun 10 2026 11:42:59.580211599 (1781059379.580211599)
+Messages:          64
+Topic information: Topic: /my_topic | Type: agnocast_sample_interfaces/msg/DynamicSizeArray | Count: 64 | Serialization Format: cdr
+Service:           0
+Service information: 
+```
+
+Without a discovery agent, the command starts but records nothing for Agnocast-only topics (silently unobservable):
+
+```bash
+$ ros2 bag record_agnocast -o rosbag_output -e /my_*
+[INFO 1781059455.269319259] [rosbag2_recorder]: Press SPACE for pausing/resuming (RecorderImpl() at ./src/rosbag2_transport/recorder.cpp:223)
+[INFO 1781059455.269340122] [rosbag2_recorder]: Event publisher thread: Started (event_publisher_thread_main() at ./src/rosbag2_transport/recorder_event_notifier_impl.hpp:169)
+[INFO 1781059455.271078152] [rosbag2_recorder]: Starting recording to 'rosbag_output' (record() at ./src/rosbag2_transport/recorder.cpp:303)
+[INFO 1781059455.271900382] [rosbag2_recorder]: Listening for topics... (record() at ./src/rosbag2_transport/recorder.cpp:329)
+[INFO 1781059455.271912956] [rosbag2_recorder]: Recording... (record() at ./src/rosbag2_transport/recorder.cpp:338)
+[INFO 1781059455.271961053] [rosbag2_recorder]: Topics discovery started. (topics_discovery() at ./src/rosbag2_transport/recorder.cpp:629)
+[INFO 1781059462.239325076] [rosbag2_recorder]: Topics discovery stopped. (topics_discovery() at ./src/rosbag2_transport/recorder.cpp:671)
+[INFO 1781059462.239964342] [rosbag2_recorder]: Pausing recording. (pause() at ./src/rosbag2_transport/recorder.cpp:547)
+[INFO 1781059462.240101000] [rosbag2_cpp]: Writing remaining messages from cache to the bag. It may take a while (stop() at ./src/rosbag2_cpp/cache/cache_consumer.cpp:44)
+[INFO 1781059462.241862458] [rosbag2_recorder]: Recording stopped (stop() at ./src/rosbag2_transport/recorder.cpp:281)
+[INFO 1781059462.244343500] [rosbag2_recorder]: Event publisher thread: Exited (event_publisher_thread_main() at ./src/rosbag2_transport/recorder_event_notifier_impl.hpp:220)
+$ ros2 bag info rosbag_output
+
+Files:             rosbag_output_0.mcap
+Bag size:          1.8 KiB
+Storage id:        mcap
+ROS Distro:        jazzy
+Duration:          0.000000000s
+Start:             Apr 12 2262 08:47:16.854775807 (9223372036.854775807)
+End:               Apr 12 2262 08:47:16.854775807 (9223372036.854775807)
+Messages:          0
+Topic information: 
+Service:           0
+Service information: 
+```
