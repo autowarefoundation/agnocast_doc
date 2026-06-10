@@ -54,20 +54,22 @@ agnocast_components_register_node(
 )
 ```
 
-For multiple ROS domains, launch a separate process per domain and set its
-`ROS_DOMAIN_ID` environment variable:
+For multiple ROS domains, launch one container process per domain and set
+`ROS_DOMAIN_ID` on each container process:
 
 ```xml
 <!-- Domain 0 (default) -->
-<node pkg="agnocast_sample_application" exec="cie_talker" name="cie_talker_domain_0" output="screen">
-    <env name="LD_PRELOAD" value="libagnocast_heaphook.so:$(env LD_PRELOAD '')" />
-</node>
+<node_container pkg="agnocast_components" exec="agnocast_component_container_cie"
+                name="my_container_domain_0" namespace="" output="screen">
+    <composable_node pkg="my_package" plugin="MyNode" name="my_node" namespace="" />
+</node_container>
 
 <!-- Domain 1 -->
-<node pkg="agnocast_sample_application" exec="cie_talker" name="cie_talker_domain_1" output="screen">
-    <env name="LD_PRELOAD" value="libagnocast_heaphook.so:$(env LD_PRELOAD '')" />
+<node_container pkg="agnocast_components" exec="agnocast_component_container_cie"
+                name="my_container_domain_1" namespace="" output="screen">
     <env name="ROS_DOMAIN_ID" value="1" />
-</node>
+    <composable_node pkg="my_package" plugin="MyNode" name="my_node" namespace="" />
+</node_container>
 ```
 
 !!! warning
