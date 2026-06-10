@@ -46,7 +46,7 @@ Columns used in the tables below:
 | `ros2 security` | N/A | ✗ | No | Manages SROS2 / DDS-Security artifacts (enclaves, keystores, permission/policy files) that authenticate and encrypt DDS traffic. **Has no effect on Agnocast pub/sub**: communication between Agnocast endpoints goes through shared memory, not DDS, so SROS2 policies neither authorize nor restrict it. The commands still run, but generated artifacts only protect the DDS side (including the Agnocast↔ROS 2 bridge). |
 | `ros2 service` | ✗ | ✗ | TBD | Agnocast services use internal shared-memory topics prefixed with `/AGNOCAST_SRV_*` and are not exposed via DDS. Agnocast services are marked experimental (see [agnocast_node_interface_comparison.md](https://github.com/autowarefoundation/agnocast/blob/main/docs/agnocast_node_interface_comparison.md) §2.6). |
 | `ros2 topic` | ⚠ | ✓ (`list_agnocast`, `info_agnocast`, `echo_agnocast`, `hz_agnocast`, `delay_agnocast`) | - | Standard `ros2 topic` verbs have limited visibility into Agnocast: pure Agnocast-only topics are invisible, and bridged topics are seen only from the DDS side. The `_agnocast` variants extend each verb with full Agnocast awareness. See §3. |
-| `ros2 agnocast` | N/A | ✓ (new top-level command) | - | Provided by `ros2agnocast` for Agnocast-specific operations (`version`, `generate-bridge-plugins`, `discovery-daemon-status`). See §10. |
+| `ros2 agnocast` | N/A | ✓ (new top-level command) | - | Provided by `ros2agnocast` for Agnocast-specific operations (`version`, `generate-bridge-plugins`, `discovery-daemon-status`, `bridge-daemon-status`). See §10. |
 
 ### 2. `ros2 node` verbs
 
@@ -149,6 +149,7 @@ Component containers can load `agnocast::Node` subclasses; the container itself 
 | `ros2 agnocast version` | Local host only | Same as `--version` (verb form). |
 | `ros2 agnocast generate-bridge-plugins` | Build-time | Generate a ROS 2 bridge plugin package for user message types. Operates on local source/install trees, not on any running system. |
 | `ros2 agnocast discovery-daemon-status` | Local IPC namespace | Check that the Agnocast discovery agent for the **current** IPC namespace is running and healthy. Exits non-zero if it is not. Add `-v` for per-check detail. |
+| `ros2 agnocast bridge-daemon-status` | Local IPC namespace | Check that the Agnocast bridge daemon process for the **current** IPC namespace is running and healthy. Exits non-zero if it is not. Add `-v` for per-check detail. |
 
 ---
 
