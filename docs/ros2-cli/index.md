@@ -409,11 +409,11 @@ $ ros2 topic hz_agnocast /my_topic
 [*] Triggering A2R bridge for '/my_topic'. This may take a few seconds...
 [*] Starting ros2cli command...
 average rate: 9.832
-	min: 0.101s max: 0.103s std dev: 0.00049s window: 11
+        min: 0.101s max: 0.103s std dev: 0.00049s window: 11
 average rate: 10.037
-	min: 0.052s max: 0.103s std dev: 0.01052s window: 22
+        min: 0.052s max: 0.103s std dev: 0.01052s window: 22
 average rate: 9.977
-	min: 0.052s max: 0.103s std dev: 0.00878s window: 32
+        min: 0.052s max: 0.103s std dev: 0.00878s window: 32
 [...]
 ```
 
@@ -433,11 +433,11 @@ $ ros2 topic hz_agnocast --filter "m.id % 10 == 0" /my_topic
 [*] Triggering A2R bridge for '/my_topic'. This may take a few seconds...
 [*] Starting ros2cli command...
 average rate: 0.990
-	min: 1.009s max: 1.011s std dev: 0.00077s window: 2
+        min: 1.009s max: 1.011s std dev: 0.00077s window: 2
 average rate: 1.002
-	min: 0.960s max: 1.011s std dev: 0.02200s window: 4
+        min: 0.960s max: 1.011s std dev: 0.02200s window: 4
 average rate: 1.000
-	min: 0.960s max: 1.011s std dev: 0.02022s window: 5
+        min: 0.960s max: 1.011s std dev: 0.02022s window: 5
 [...]
 ```
 
@@ -454,11 +454,11 @@ $ ros2 topic delay_agnocast /pose_chatter
 [*] Triggering A2R bridge for '/pose_chatter'. This may take a few seconds...
 [*] Starting ros2cli command...
 average delay: 0.001
-	min: 0.001s max: 0.001s std dev: 0.00000s window: 1
+        min: 0.001s max: 0.001s std dev: 0.00000s window: 1
 average delay: 0.001
-	min: 0.001s max: 0.001s std dev: 0.00014s window: 3
+        min: 0.001s max: 0.001s std dev: 0.00014s window: 3
 average delay: 0.001
-	min: 0.001s max: 0.001s std dev: 0.00012s window: 5
+        min: 0.001s max: 0.001s std dev: 0.00012s window: 5
 [...]
 ```
 
@@ -478,11 +478,11 @@ $ ros2 topic delay_agnocast -w 1 /pose_chatter
 [*] Triggering A2R bridge for '/pose_chatter'. This may take a few seconds...
 [*] Starting ros2cli command...
 average delay: 0.002
-	min: 0.002s max: 0.002s std dev: 0.00000s window: 1
+        min: 0.002s max: 0.002s std dev: 0.00000s window: 1
 average delay: 0.001
-	min: 0.001s max: 0.001s std dev: 0.00000s window: 1
+        min: 0.001s max: 0.001s std dev: 0.00000s window: 1
 average delay: 0.001
-	min: 0.001s max: 0.001s std dev: 0.00000s window: 1
+        min: 0.001s max: 0.001s std dev: 0.00000s window: 1
 [...]
 ```
 
