@@ -132,7 +132,7 @@ Component containers can load `agnocast::Node` subclasses; the container itself 
 | Verb | Works as-is | Agnocast version | Scope of Agnocast verb | Planned | Notes |
 |------|:-----------:|:----------------:|:----------------------:|:-------:|-------|
 | `ros2 bag record` | ⚠ | ✓ `record_agnocast` | Cluster-wide | - | `as-is` cannot target a pure Agnocast-only topic and works only when a bridge is already active. `record_agnocast` runs a component that continuously watches for Agnocast topics and automatically creates the corresponding A2R bridge when they appear, while concurrently running `ros2 bag record` — all `ros2 bag record` arguments (e.g. `-e`) are supported. Also works for standard ROS 2 topics. Without a discovery agent, Agnocast-only topics cannot be recorded. See [Bag Record](#bag-record) below. |
-| `ros2 bag play` | ✓ | ✗ | - | Works via the bridge. Playback publishes via DDS; reaches Agnocast only if a bridge exists. |
+| `ros2 bag play` | ✓ | ✗ | - | Works as-is. Messages originally published by Agnocast publishers are replayed as ROS 2 (DDS) publishers. If Agnocast subscribers exist for the topic, an R2A bridge is created automatically, so playback reaches them without any extra steps. |
 | `ros2 bag info` | ✓ | ✗ | - | Operates on a stored bag file, independent of transport. |
 | `ros2 bag list` | ✓ | ✗ | - | Same as above. |
 | `ros2 bag convert` | ✓ | ✗ | - | Same as above. |
