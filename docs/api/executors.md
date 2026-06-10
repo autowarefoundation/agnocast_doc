@@ -157,6 +157,17 @@ Request the executor to stop spinning. Causes the current or next spin() call to
 
 ---
 
+#### `stop_callback_group()`
+
+```cpp
+void CallbackIsolatedAgnocastExecutor::stop_callback_group(rclcpp::CallbackGroup::SharedPtr &group_ptr)
+```
+
+Stop the child executor running the given callback group, join its thread, and remove it. If group_ptr is nullptr or not found, this is a no-op.
+
+
+---
+
 #### `add_callback_group()`
 
 ```cpp
@@ -299,7 +310,7 @@ Remove a node from this executor.
 
 ### `agnocast::AgnocastOnlyExecutor`
 
-Base class for Stage 2 executors that handle only Agnocast callbacks (no RMW). Used with `agnocast::Node`.
+Base class for Stage 2 executors that handle only Agnocast callbacks (no RMW). Used with `agnocast::Node`. One-shot: once cancel() is called, spin() will not run again on the same instance  create a new executor instead. All current uses (clock executor, CIE child executors) are recreated. TODO: to support re-spin, replace the spinning_ / cancel_requested_ flags with one atomic state enum (Idle / Spinning / Cancelled) so spin() can re-arm to Idle on exit.
 
 
 ---
@@ -321,7 +332,7 @@ Construct the executor.
 void AgnocastOnlyExecutor::spin()
 ```
 
-Block the calling thread and process Agnocast callbacks in a loop until cancel() is called.
+Block the calling thread and process Agnocast callbacks in a loop until cancel() is called. One-shot: if cancel() was already called, spin() returns at once (see class comment).
 
 
 ---
@@ -332,7 +343,7 @@ Block the calling thread and process Agnocast callbacks in a loop until cancel()
 void AgnocastOnlyExecutor::cancel()
 ```
 
-Request the executor to stop spinning. Causes the current or next spin() call to return.
+Request the executor to stop spinning. Causes the current spin() call to return. One-shot: once called, the executor is permanently stopped  every subsequent spin() returns immediately. Create a new instance to spin again.
 
 
 ---

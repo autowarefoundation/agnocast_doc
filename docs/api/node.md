@@ -707,11 +707,13 @@ agnocast::Client::SharedPtr Node::create_client(std::string &service_name, rclcp
 
 Create a service client.
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
+| Template Parameter | Description |
+|-----------|-------------|
+| `ServiceT` | ROS service type. |
+| **Parameter** | **Default** | **Description** |
 | `service_name` | — | Service name. |
-| `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. |
-| `group` | `nullptr` | Callback group (nullptr = default). |
+| `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. Defaults to `rclcpp::ServicesQoS`(). |
+| `group` | `nullptr` | Callback group. Defaults to nullptr (default callback group). |
 | | | |
 | **Returns** | Shared pointer to the created client. |
 
@@ -728,12 +730,13 @@ Create a service server.
 
 | Template Parameter | Description |
 |-----------|-------------|
-| `Func` | Callable with signature void(const `agnocast::ipc_shared_ptr`<const RequestT>&, `agnocast::ipc_shared_ptr`<ResponseT>&). |
+| `ServiceT` | ROS service type. |
+| `Func` | Callable that takes ipc_shared_ptr<ServiceT::Request> and ipc_shared_ptr<ServiceT::Response> (const&, &&, or by-value) (return value ignored). |
 | **Parameter** | **Default** | **Description** |
 | `service_name` | — | Service name. |
 | `callback` | — | Callback invoked on each request. |
-| `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. |
-| `group` | `nullptr` | Callback group (nullptr = default). |
+| `qos` | `rclcpp::ServicesQoS()` | Quality of service profile. Defaults to `rclcpp::ServicesQoS`(). |
+| `group` | `nullptr` | Callback group. Defaults to nullptr (default callback group). |
 | | | |
 | **Returns** | Shared pointer to the created service. |
 
