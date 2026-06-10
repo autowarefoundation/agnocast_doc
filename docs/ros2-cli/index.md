@@ -45,7 +45,7 @@ Columns used in the tables below:
 | `ros2 run` | ✓ | ✗ | - | Launches an executable; no Agnocast-specific behavior. |
 | `ros2 security` | N/A | ✗ | No | Manages SROS2 / DDS-Security artifacts (enclaves, keystores, permission/policy files) that authenticate and encrypt DDS traffic. **Has no effect on Agnocast pub/sub**: communication between Agnocast endpoints goes through shared memory, not DDS, so SROS2 policies neither authorize nor restrict it. The commands still run, but generated artifacts only protect the DDS side (including the Agnocast↔ROS 2 bridge). |
 | `ros2 service` | ✗ | ✗ | TBD | Agnocast services use internal shared-memory topics prefixed with `/AGNOCAST_SRV_*` and are not exposed via DDS. Agnocast services are marked experimental (see [agnocast_node_interface_comparison.md](https://github.com/autowarefoundation/agnocast/blob/main/docs/agnocast_node_interface_comparison.md) §2.6). |
-| `ros2 topic` | ⚠ | ✓ (`list_agnocast`, `info_agnocast`) | - | `as-is` does not see pure Agnocast-only topics at all, and for bridged topics it only reports the DDS side (no Agnocast pub/sub count, no `(Agnocast enabled)` marking). Use the `_agnocast` verbs to include Agnocast topics and labels. See §3. |
+| `ros2 topic` | ⚠ | ✓ (`list_agnocast`, `info_agnocast`, `echo_agnocast`) | - | Standard `ros2 topic` verbs have limited visibility into Agnocast: pure Agnocast-only topics are invisible, and bridged topics are seen only from the DDS side. The `_agnocast` variants extend each verb with full Agnocast awareness. See §3. |
 | `ros2 agnocast` | N/A | ✓ (new top-level command) | - | Provided by `ros2agnocast` for Agnocast-specific operations (`version`, `generate-bridge-plugins`, `discovery-daemon-status`). See §10. |
 
 ### 2. `ros2 node` verbs
@@ -61,7 +61,7 @@ Columns used in the tables below:
 |------|:-----------:|:----------------:|:----------------------:|:-------:|-------|
 | `ros2 topic list` | ⚠ | ✓ `list_agnocast` | Cluster-wide | - | `as-is` lists only topics with DDS endpoints, so pure Agnocast-only topics are missing and bridged topics carry no Agnocast marking. `list_agnocast` adds Agnocast-only topics and tags Agnocast topics `(Agnocast enabled)` / `(Agnocast enabled, bridged)`, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise only the current IPC namespace. See [Topic List](#topic-list) below. |
 | `ros2 topic info` | ⚠ | ✓ `info_agnocast` | Cluster-wide | - | `as-is` cannot target a pure Agnocast-only topic (it is absent from `ros2 topic list`), and shows only DDS publishers/subscribers for bridged topics. `info_agnocast` adds Agnocast publisher/subscriber counts, QoS and message type, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise only the current IPC namespace. Supports `-v` and `-d`. See [Topic Info](#topic-info) below. |
-| `ros2 topic echo` | ⚠ | ✗ | — | TBD | Works when the bridge is active, but the message type must be specified explicitly, e.g. `ros2 topic echo /my_topic agnocast_sample_interfaces/msg/DynamicSizeArray`. |
+| `ros2 topic echo` | ⚠ | ✓ `echo_agnocast` | Cluster-wide | - | `as-is` cannot target a pure Agnocast-only topic and works only when a bridge is already active; the message type does not need to be specified explicitly. `echo_agnocast` forces an A2R bridge and then delegates to `ros2 topic echo` — all `ros2 topic echo` arguments (e.g. `--filter`, `--once`, `--no-arr`) are supported. Also works for standard ROS 2 topics. Without a discovery agent, Agnocast-only topics cannot be observed. See [Topic Echo](#topic-echo) below. |
 | `ros2 topic pub` | ⚠ | ✗ | — | TBD | Publishes via DDS, so messages reach Agnocast subscribers only via the bridge. The `--wait-matching-subscriptions` option does **not** work correctly for Agnocast subscribers — DDS discovery counts only the bridge-side DDS subscription (if any), not the Agnocast subscribers behind it. |
 | `ros2 topic hz` | ✗ | ✗ | — | TBD | Subscribes via DDS to measure publish rate. For Agnocast publishers the data path is shared memory and DDS sees no messages, so no rate is reported (even when the bridge is active, the DDS rate observed by `hz` does not necessarily reflect the Agnocast publisher's rate). |
 | `ros2 topic bw` | ✗ | ✗ | — | TBD | Requires subscribing to the topic. |
@@ -158,6 +158,7 @@ The following sections show usage examples for the Agnocast-specific verbs:
 
 - `ros2 topic list_agnocast`
 - `ros2 topic info_agnocast /topic_name`
+- `ros2 topic echo_agnocast /topic_name`
 - `ros2 node list_agnocast`
 - `ros2 node info_agnocast /node_name`
 
@@ -320,6 +321,11 @@ ROS 2 Subscription count: 1
 Agnocast Subscription count: 2
 
 Node name: agnocast_bridge_node_86050
+このコマンドはA2R bridgeを強制的に作成してからros2 topic echoを実行している。bridgeが作成されるまでのタイムアウトを以下のように指定することができる。このオプションはecho_agnocast onlyである。
+
+```
+
+```
 Node namespace: /
 Topic type: agnocast_sample_interfaces/msg/DynamicSizeArray
 Endpoint type: SUBSCRIPTION
@@ -348,6 +354,47 @@ Endpoint type: SUBSCRIPTION (Agnocast enabled)
 QoS profile:
   History (Depth): KEEP_LAST (1)
   Durability: VOLATILE
+```
+
+### Topic Echo
+
+`echo_agnocast` is an Agnocast extension of `ros2 topic echo`. It forces an Agnocast-to-ROS 2 (A2R) bridge for the specified topic and then delegates to `ros2 topic echo`. All standard `ros2 topic echo` arguments (e.g. `--filter`, `--once`, `--no-arr`) are passed through unchanged. It also works for standard ROS 2 topics.
+
+`echo_agnocast` works cluster-wide wherever a discovery agent runs (across IPC namespaces and ECUs on the same `ROS_DOMAIN_ID`); without a discovery agent, Agnocast-only topics cannot be observed.
+
+When the discovery agent is running:
+
+```bash
+$ ros2 topic echo_agnocast /my_topic
+[*] Triggering A2R bridge for '/my_topic'. This may take a few seconds...
+[*] Starting ros2cli command...
+id: 870
+data:
+- 870
+- 871
+- 872
+- 873
+[...]
+```
+
+Without a discovery agent, the command exits with an error:
+
+```bash
+$ ros2 topic echo_agnocast /my_topic
+[*] Triggering A2R bridge for '/my_topic'. This may take a few seconds...
+NOTE: no /_agnocast_discovery agent visible; showing local NS only via ioctl. Start one with `ros2 run ros2agnocast_discovery_agent discovery_agent` to see other NSes / ECUs.
+ERROR: Could not resolve message type for '/my_topic'. The topic was not found in the ROS 2 graph or via /_agnocast_discovery. Make sure the topic exists and, for Agnocast topics, the discovery agent is running.
+```
+
+Standard `ros2 topic echo` CLI options are passed through:
+
+```bash
+$ ros2 topic echo_agnocast --once --no-arr --filter "m.id % 50 == 0" /my_topic
+[*] Triggering A2R bridge for '/my_topic'. This may take a few seconds...
+[*] Starting ros2cli command...
+id: 4450
+data: '<sequence type: int64, length: 128000>'
+---
 ```
 
 ### Node List
