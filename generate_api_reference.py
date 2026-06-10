@@ -141,25 +141,40 @@ def get_return(mdef):
     return ""
 
 
+def _split_return_and_name(defn):
+    """Split "<return type> <function name>" on the last top-level (non-template) space."""
+    depth = 0
+    split_at = -1
+    for i, ch in enumerate(defn):
+        if ch == "<":
+            depth += 1
+        elif ch == ">":
+            if depth > 0:
+                depth -= 1
+        elif ch == " " and depth == 0:
+            split_at = i
+    if split_at == -1:
+        return "", defn
+    return defn[:split_at], defn[split_at + 1:]
+
+
 def clean_sig(definition, argsstring):
     """Build a readable signature from Doxygen's definition + argsstring."""
     defn = definition or ""
     args = argsstring or ""
 
-    # For member functions, strip "agnocast::" and template args from the class prefix,
-    # keeping "ClassName::" e.g.:
-    #   "agnocast::BasicPublisher<MessageT, BridgeRequestPolicy>::borrow_loaned_message"
-    #   → "BasicPublisher::borrow_loaned_message"
-    # For member functions, strip "agnocast::" namespace and template args from the
-    # class prefix, keeping "ClassName::" e.g.:
-    #   "agnocast::BasicPublisher<MessageT, BridgeRequestPolicy>::publish"
-    #   → "BasicPublisher::publish"
-    defn = re.sub(r"agnocast::(\w+)(<[^>]+>)?\s*::", r"\1::", defn)
+    # Simplify the class prefix only on the function name, not the return type, so a
+    # return type like "agnocast::Client<ServiceT>::SharedPtr" keeps its "<ServiceT>".
+    ret_type, fn_name = _split_return_and_name(defn)
+    # "agnocast::BasicPublisher<MessageT, BridgeRequestPolicy>::publish" → "BasicPublisher::publish"
+    fn_name = re.sub(r"agnocast::(\w+)(<[^>]+>)?\s*::", r"\1::", fn_name)
+    defn = f"{ret_type} {fn_name}".strip()
     # Map internal class names to user-facing alias names
     defn = defn.replace("BasicPublisher::", "Publisher::")
     defn = defn.replace("BasicSubscription::", "Subscription::")
     defn = defn.replace("BasicTakeSubscription::", "TakeSubscription::")
     defn = defn.replace("BasicPollingSubscriber::", "PollingSubscriber::")
+    defn = defn.replace("BasicService::", "Service::")
     # For free functions, strip bare "agnocast::" before function name
     defn = re.sub(r"\bagnocast::(?=\w+$)", "", defn)
 
@@ -302,6 +317,31 @@ BASE_CLASS_DISPLAY = {
     "SubscriptionBase": None,  # internal, don't show
 }
 
+# Implementation-detail base classes to omit from the "Extends:" line. Matched
+# against the bare class name (namespaces and template args stripped).
+HIDDEN_BASE_NAMES = {
+    "SubscriptionBase",
+    "enable_shared_from_this",
+    "noncopyable",
+    "PolicyBase",
+    "BasicService",
+    "BasicPublisher",
+    "BasicSubscription",
+    "NullType",
+}
+
+
+def clean_base_class(b):
+    """Normalize a base-class name for display, or return None to hide internals."""
+    bare = re.sub(r"<.*$", "", b).strip().rsplit("::", 1)[-1]
+    if bare in HIDDEN_BASE_NAMES:
+        return None
+    # Normalize Doxygen template spacing: "< X, Y >" → "<X, Y>"
+    display = re.sub(r"<\s+", "<", b)
+    display = re.sub(r"\s+>", ">", display)
+    display = re.sub(r"\s+,", ",", display)
+    return display
+
 
 def parse_class(xml_path):
     """Parse a class XML file. Return (name, brief, bases, [Member])."""
@@ -376,18 +416,28 @@ def parse_namespace_typedefs(xml_path):
             defn = text_content(mdef.find("definition"))
             detail = get_detailed_prose(mdef)
             full_desc = f"{mbr} {detail}".strip() if detail else mbr
+            # Real template parameter names, so the alias shows "Service<ServiceT>" etc.
+            tparam_names = []
+            for tparam in mdef.findall("templateparamlist/param"):
+                ptype = text_content(tparam.find("type"))
+                pname = re.sub(r"^(?:typename|class)\s+", "", ptype).strip()
+                if pname:
+                    tparam_names.append(pname)
+            tparam_str = f"<{', '.join(tparam_names)}>" if tparam_names else ""
             # Extract the "= ..." part from definition
-            # e.g. "using agnocast::Publisher = typedef agnocast::BasicPublisher<...>"
             target = ""
             if "typedef" in defn:
                 target = defn.split("typedef", 1)[1].strip()
             elif "=" in defn:
                 target = defn.split("=", 1)[1].strip()
-            # Strip internal policy template args from the target
-            # e.g. "BasicPublisher<MessageT, agnocast::AgnocastToRosRequestPolicy>"
-            #    → "BasicPublisher<MessageT>"
-            target = re.sub(r",\s*agnocast::\w+RequestPolicy", "", target)
-            typedefs.append((name, target, full_desc))
+            # Strip internal policy template args (namespace prefix optional)
+            target = re.sub(r",\s*(?:agnocast::)?\w+RequestPolicy", "", target)
+            # Normalize Doxygen spacing in template args: "< X, Y >" → "<X, Y>"
+            target = re.sub(r"<\s+", "<", target)
+            target = re.sub(r"\s+>", ">", target)
+            if "agnocast::" not in target:
+                target = re.sub(r"\b(Basic\w+)\b", r"agnocast::\1", target)
+            typedefs.append((name, tparam_str, target, full_desc))
     return typedefs
 
 
@@ -448,13 +498,32 @@ def infer_tparams(sig, existing_tparams):
     return result
 
 
-def format_prose(text):
-    """Wrap namespace-qualified type names in backticks for consistency."""
-    # Match rclcpp::X, agnocast::X, std::X patterns not already in backticks
-    text = re.sub(r'(?<!`)\b((?:rclcpp|agnocast|std|rcl_interfaces)\b(?:::\w+)+)', r'`\1`', text)
-    # Fix double-backtick from already-backticked content
-    text = text.replace("``", "`")
+def _format_prose_segment(text):
+    """Backtick namespace-qualified type names in a non-code-span segment."""
+    # Backtick a name plus any trailing template args, "::Member" tail, and "()",
+    # so e.g. "agnocast::ipc_shared_ptr<const M>" stays in one span.
+    type_pat = (
+        r'\b(?:rclcpp|agnocast|std|rcl_interfaces)\b(?:::\w+)+'  # namespace-qualified name
+        r'(?:<[^<>]*(?:<[^<>]*>[^<>]*)*>)?'                      # optional template args (1 nest)
+        r'(?:::\w+)*'                                            # optional ::Member tail
+        r'(?:\(\))?'                                             # optional ()
+    )
+    text = re.sub(rf'({type_pat})', r'`\1`', text)
+    # Drop stray whitespace before punctuation, but keep member-access dots
+    # like "Call .future" (where a word follows the dot).
+    text = re.sub(r'\s+([,;:)])', r'\1', text)
+    text = re.sub(r'\s+\.(?=\s|$)', '.', text)
     return text
+
+
+def format_prose(text):
+    """Backtick namespace-qualified type names, leaving existing code spans intact."""
+    # Even indices are prose; odd indices are existing `...` spans — pass those through.
+    parts = re.split(r'(`[^`]*`)', text)
+    return "".join(
+        part if i % 2 == 1 else _format_prose_segment(part)
+        for i, part in enumerate(parts)
+    )
 
 
 def extract_short_name(sig):
@@ -505,46 +574,36 @@ def render_member(f, sig, mbr, tparams, params, ret, seen_names=None):
     f.write(f"```cpp\n{sig}\n```\n\n")
     f.write(f"{format_prose(mbr)}\n\n")
     tparams = infer_tparams(sig, tparams)
-    has_content = tparams or params or ret
-    if has_content:
-        has_defaults = any(defval for _, _, defval in params) if params else False
 
-        if tparams:
-            f.write("| Template Parameter | Description |\n")
-            f.write("|-----------|-------------|\n")
-            for pname, pdesc in tparams:
-                f.write(f"| `{pname}` | {format_prose(pdesc)} |\n")
+    # Render template parameters, parameters, and the return value as separate
+    # tables. They have different column counts (params gain a "Default" column),
+    # so emitting them as one table would produce invalid GitHub-flavored markdown.
+    if tparams:
+        f.write("| Template Parameter | Description |\n")
+        f.write("|-----------|-------------|\n")
+        for pname, pdesc in tparams:
+            f.write(f"| `{pname}` | {format_prose(pdesc)} |\n")
+        f.write("\n")
 
-        if params:
-            if tparams:
-                if has_defaults:
-                    f.write("| **Parameter** | **Default** | **Description** |\n")
-                else:
-                    f.write("| **Parameter** | **Description** |\n")
-            else:
-                if has_defaults:
-                    f.write("| Parameter | Default | Description |\n")
-                    f.write("|-----------|---------|-------------|\n")
-                else:
-                    f.write("| Parameter | Description |\n")
-                    f.write("|-----------|-------------|\n")
+    if params:
+        has_defaults = any(defval for _, _, defval in params)
+        if has_defaults:
+            f.write("| Parameter | Default | Description |\n")
+            f.write("|-----------|---------|-------------|\n")
             for pname, pdesc, defval in params:
-                if has_defaults:
-                    defval_fmt = f"`{defval}`" if defval else "—"
-                    f.write(f"| `{pname}` | {defval_fmt} | {format_prose(pdesc)} |\n")
-                else:
-                    f.write(f"| `{pname}` | {format_prose(pdesc)} |\n")
+                defval_fmt = f"`{defval}`" if defval else "—"
+                f.write(f"| `{pname}` | {defval_fmt} | {format_prose(pdesc)} |\n")
+        else:
+            f.write("| Parameter | Description |\n")
+            f.write("|-----------|-------------|\n")
+            for pname, pdesc, _ in params:
+                f.write(f"| `{pname}` | {format_prose(pdesc)} |\n")
+        f.write("\n")
 
-        if ret:
-            if tparams or params:
-                if has_defaults:
-                    f.write("| | | |\n")
-                else:
-                    f.write("| | |\n")
-            else:
-                f.write("| | |\n")
-                f.write("|-----------|-------------|\n")
-            f.write(f"| **Returns** | {format_prose(ret)} |\n")
+    if ret:
+        f.write("| | |\n")
+        f.write("|-----------|-------------|\n")
+        f.write(f"| **Returns** | {format_prose(ret)} |\n")
         f.write("\n")
 
 
@@ -566,7 +625,10 @@ def render_class_section(f, display_name, xml_file, desc_override=None, section_
     # Show base class(es)
     visible_bases = []
     for b in bases:
-        display = BASE_CLASS_DISPLAY.get(b, b)  # default: show as-is
+        if b in BASE_CLASS_DISPLAY:
+            display = BASE_CLASS_DISPLAY[b]
+        else:
+            display = clean_base_class(b)
         if display is not None:
             visible_bases.append(display)
     if visible_bases:
@@ -696,8 +758,9 @@ client->async_send_request(std::move(req),
 auto req2 = client->borrow_loaned_request();
 req2->a = 3;
 req2->b = 4;
-auto future = client->async_send_request(std::move(req2));
-RCLCPP_INFO(get_logger(), "Result: %ld", future.get()->sum);
+// async_send_request() returns a FutureAndRequestId; access the future via .future
+auto future_and_id = client->async_send_request(std::move(req2));
+RCLCPP_INFO(get_logger(), "Result: %ld", future_and_id.future.get()->sum);
 ```
 ''',
 
@@ -744,7 +807,7 @@ CLASSES = [
      None),
     ("Service", "classagnocast_1_1BasicService.xml",
      "agnocast::Service<ServiceT>",
-     "Service server for zero-copy Agnocast service communication. The service/client API is experimental and may change in future versions."),
+     "Service server for zero-copy Agnocast service communication."),
     ("TimerBase", "classagnocast_1_1TimerBase.xml",
      "agnocast::TimerBase",
      None),
@@ -830,8 +893,8 @@ def main():
             if typedefs:
                 f.write("| Alias | Defined As | Description |\n")
                 f.write("|-------|-----------|-------------|\n")
-                for name, target, desc in typedefs:
-                    f.write(f"| `agnocast::{name}<MessageT>` | `{target}` | {format_prose(desc)} |\n")
+                for name, tparam_str, target, desc in typedefs:
+                    f.write(f"| `agnocast::{name}{tparam_str}` | `{target}` | {format_prose(desc)} |\n")
                 f.write("\n")
 
     write_page("type-aliases.md", write_type_aliases)
@@ -986,8 +1049,6 @@ def main():
         f.write("    These signatures are **stable** and will not break backward compatibility unless the\n")
         f.write("    **major version** is incremented. See the [versioning rules](../environment-setup/index.md)\n")
         f.write("    for details.\n\n")
-        f.write("    **Exception:** The [Service](service.md) and [Client](client.md) APIs are **experimental**.\n")
-        f.write("    Their signatures may introduce breaking changes without a major version increment.\n\n")
         f.write("| Section | Description |\n")
         f.write("|---------|-------------|\n")
         for title, link, desc in landing_entries:

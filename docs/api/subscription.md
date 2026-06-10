@@ -6,9 +6,7 @@
 
 ### `agnocast::Subscription<MessageT>`
 
-**Extends:** `agnocast::SubscriptionBase`
-
-Event-driven subscription that invokes a callback on each new message. The callback signature is `void(const `agnocast::ipc_shared_ptr`<const MessageT>&)`.
+Event-driven subscription that invokes a callback on each new message. The callback signature is `void(const agnocast::ipc_shared_ptr<const MessageT>&)`.
 
 **Example:**
 

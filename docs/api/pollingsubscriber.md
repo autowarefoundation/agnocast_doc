@@ -36,6 +36,8 @@ Retrieve the latest message. Always returns the most recent message even if alre
 | Template Parameter | Description |
 |-----------|-------------|
 | `MessageT` | ROS message type. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Shared pointer to the latest message. |
 

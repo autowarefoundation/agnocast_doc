@@ -6,19 +6,19 @@
 
 ### `agnocast::Service<ServiceT>`
 
-Agnocast service server. The callback signature is void(const ipc_shared_ptr<RequestT>&, ipc_shared_ptr<ResponseT>&). The service/client API is experimental and may change in future versions.
+Service server for zero-copy Agnocast service communication.
 
 **Example:**
 
 ```cpp
 using SrvT = example_interfaces::srv::AddTwoInts;
-using RequestT = agnocast::Service<SrvT>::RequestT;
-using ResponseT = agnocast::Service<SrvT>::ResponseT;
+using Request = SrvT::Request;
+using Response = SrvT::Response;
 
 auto service = agnocast::create_service<SrvT>(
   this, "add_two_ints",
-  [this](const agnocast::ipc_shared_ptr<RequestT> & req,
-         agnocast::ipc_shared_ptr<ResponseT> & res) {
+  [this](const agnocast::ipc_shared_ptr<Request> & req,
+         const agnocast::ipc_shared_ptr<Response> & res) {
     res->sum = req->a + req->b;
   });
 ```
@@ -26,30 +26,43 @@ auto service = agnocast::create_service<SrvT>(
 
 ---
 
-#### `RequestT`
+#### `send_response()`
 
 ```cpp
-struct RequestT
+void Service::send_response(agnocast::ipc_shared_ptr<typename ServiceT::Request> &&request, agnocast::ipc_shared_ptr<typename ServiceT::Response> &&response)
 ```
 
-Request type extending ServiceT::Request with internal metadata. Received in the service callback's first argument.
+Sends a response to the client that initiated the service call. This function is expected to be used in deferred response callbacks. response must be the object returned by borrow_loaned_response(). The entire borrow_loaned_response() -> populate -> send_response() sequence must run on the same thread (typically in a single callback).
 
 | Template Parameter | Description |
 |-----------|-------------|
-| `RequestT` | Request message type (derived from `ServiceT::Request`). |
+| `ServiceT` | ROS service type. |
+
+| Parameter | Description |
+|-----------|-------------|
+| `request` | The request that initiated the service call. |
+| `response` | The response to send. Must be acquired by calling borrow_loaned_response(). |
 
 
 ---
 
-#### `ResponseT`
+#### `borrow_loaned_response()`
 
 ```cpp
-struct ResponseT
+agnocast::ipc_shared_ptr<typename ServiceT::Response> Service::borrow_loaned_response(agnocast::ipc_shared_ptr<typename ServiceT::Request> &request)
 ```
 
-Response type extending ServiceT::Response with internal metadata. Populated in the service callback's second argument.
+Allocate a service response message in shared memory. This function is expected to be used in deferred response callbacks. This function does not consume request. In deferred callbacks, keep request and pass it to send_response() after populating the returned response.
 
 | Template Parameter | Description |
 |-----------|-------------|
-| `ResponseT` | Response message type (derived from `ServiceT::Response`). |
+| `ServiceT` | ROS service type. |
+
+| Parameter | Description |
+|-----------|-------------|
+| `request` | The request that initiated the service call. |
+
+| | |
+|-----------|-------------|
+| **Returns** | Owned pointer to the response message in shared memory. |
 

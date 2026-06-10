@@ -112,8 +112,6 @@ Less-than comparison, ordered by pointer then receipt time.
 
 ### `agnocast::message_filters::SimpleFilter<M>`
 
-**Extends:** `noncopyable`
-
 Base class for simple one-output filters. Provides callback registration and signal dispatch.
 
 
@@ -130,7 +128,9 @@ Register a callback to be invoked when a message passes through this filter.
 | Parameter | Description |
 |-----------|-------------|
 | `callback` | Callback to register. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Connection object for disconnecting. |
 
 
@@ -263,7 +263,7 @@ Force immediate unsubscription of this subscriber from its topic.
 
 ### `agnocast::message_filters::Subscriber<M>`
 
-**Extends:** `agnocast::message_filters::SubscriberBase< rclcpp::Node >`, `agnocast::message_filters::SimpleFilter< M >`
+**Extends:** `agnocast::message_filters::SubscriberBase<rclcpp::Node>`, `agnocast::message_filters::SimpleFilter<M>`
 
 Agnocast subscription filter. This class acts as a highest-level filter, simply passing messages from an agnocast subscription through to the filters which have connected to it. When this object is destroyed it will unsubscribe from the agnocast subscription. The Subscriber object is templated on the type of message being subscribed to.
 
@@ -276,7 +276,7 @@ Agnocast subscription filter. This class acts as a highest-level filter, simply 
 message_filters::Subscriber<M, NodeType>::Subscriber(NodePtr node, std::string &topic, rmw_qos_profile_t qos)
 ```
 
-Constructor. See the `agnocast::create_subscription`() variants for more information on the parameters
+Constructor. See the `agnocast::create_subscription()` variants for more information on the parameters
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
@@ -293,7 +293,7 @@ Constructor. See the `agnocast::create_subscription`() variants for more informa
 message_filters::Subscriber<M, NodeType>::Subscriber(NodePtr node, std::string &topic, rmw_qos_profile_t qos, agnocast::SubscriptionOptions options)
 ```
 
-Constructor. See the `agnocast::create_subscription`() variants for more information on the parameters
+Constructor. See the `agnocast::create_subscription()` variants for more information on the parameters
 
 | Parameter | Description |
 |-----------|-------------|
@@ -426,10 +426,10 @@ Return the topic name this subscriber is subscribed to.
 #### `getSubscriber()`
 
 ```cpp
-agnocast::Subscription::SharedPtr message_filters::Subscriber<M, NodeType>::getSubscriber() const
+agnocast::Subscription<M>::SharedPtr message_filters::Subscriber<M, NodeType>::getSubscriber() const
 ```
 
-Returns the internal `agnocast::Subscription`<M>::SharedPtr object.
+Returns the internal `agnocast::Subscription<M>::SharedPtr` object.
 
 
 ---
@@ -456,9 +456,9 @@ No-op. Provided for compatibility with message_filters::Chain.
 
 ### `agnocast::message_filters::Synchronizer<Policy>`
 
-**Extends:** `noncopyable`, `Policy`
+**Extends:** `Policy`
 
-Synchronizes messages from 2–9 input filters based on a time policy. Drop-in replacement for message_filters::Synchronizer<Policy>. When matching messages are found according to the policy, the registered callback is invoked with one `agnocast::ipc_shared_ptr`<const M> per input.
+Synchronizes messages from 2–9 input filters based on a time policy. Drop-in replacement for message_filters::Synchronizer<Policy>. When matching messages are found according to the policy, the registered callback is invoked with one `agnocast::ipc_shared_ptr<const M>` per input.
 
 
 ---
@@ -544,7 +544,9 @@ Register a callback invoked when matching messages are found.
 | Parameter | Description |
 |-----------|-------------|
 | `callback` | Callback to register. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Connection object for disconnecting. |
 
 
@@ -561,7 +563,9 @@ Register a const callback.
 | Parameter | Description |
 |-----------|-------------|
 | `callback` | Callback to register. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Connection object. |
 
 
@@ -579,7 +583,9 @@ Register a member function callback.
 |-----------|-------------|
 | `callback` | Member function pointer. |
 | `t` | Object to call the member function on. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Connection object. |
 
 
@@ -597,7 +603,9 @@ Register a member function callback.
 |-----------|-------------|
 | `callback` | Member function pointer. |
 | `t` | Object to call the member function on. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Connection object. |
 
 
@@ -639,7 +647,7 @@ Return the name of this synchronizer.
 Policy* message_filters::Synchronizer<Policy>::getPolicy()
 ```
 
-Return a pointer to the sync policy. Use this to configure policy parameters after construction (e.g., sync.getPolicy()->setAgePenalty(0.5) ).
+Return a pointer to the sync policy. Use this to configure policy parameters after construction (e.g., sync.getPolicy()->setAgePenalty(0.5)).
 
 | | |
 |-----------|-------------|
@@ -648,7 +656,7 @@ Return a pointer to the sync policy. Use this to configure policy parameters aft
 
 ### `agnocast::message_filters::PassThrough<M>`
 
-**Extends:** `agnocast::message_filters::SimpleFilter< M >`
+**Extends:** `agnocast::message_filters::SimpleFilter<M>`
 
 Simple passthrough filter. What comes in goes out immediately.
 
@@ -726,8 +734,6 @@ Feed a message event to all downstream filters.
 
 ### `agnocast::message_filters::sync_policies::ExactTime<M0, M1, ...>`
 
-**Extends:** `agnocast::message_filters::PolicyBase< M0, M1, NullType, NullType, NullType, NullType, NullType, NullType, NullType >`
-
 Sync policy that matches messages with exactly equal timestamps. Supports 2-9 message types.
 
 
@@ -785,13 +791,13 @@ Register a callback invoked when messages are dropped due to queue overflow or m
 | Parameter | Description |
 |-----------|-------------|
 | `callback` | Callback to register. |
+
 | | |
+|-----------|-------------|
 | **Returns** | Connection object for disconnecting. |
 
 
 ### `agnocast::message_filters::sync_policies::ApproximateTime<M0, M1, ...>`
-
-**Extends:** `agnocast::message_filters::PolicyBase< M0, M1, NullType, NullType, NullType, NullType, NullType, NullType, NullType >`
 
 Sync policy that matches messages with approximately equal timestamps using cost-based optimization. Supports 2-9 message types.
 

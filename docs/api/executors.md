@@ -34,7 +34,7 @@ Construct the executor.
 void AgnocastExecutor::spin()
 ```
 
-Block the calling thread and process callbacks in a loop until `rclcpp::shutdown`() is called or the executor is cancelled.
+Block the calling thread and process callbacks in a loop until `rclcpp::shutdown()` is called or the executor is cancelled.
 
 
 ### `agnocast::SingleThreadedAgnocastExecutor`
@@ -68,7 +68,7 @@ Construct the executor.
 void SingleThreadedAgnocastExecutor::spin()
 ```
 
-Block the calling thread and process callbacks in a loop until `rclcpp::shutdown`() is called or the executor is cancelled.
+Block the calling thread and process callbacks in a loop until `rclcpp::shutdown()` is called or the executor is cancelled.
 
 
 ### `agnocast::MultiThreadedAgnocastExecutor`
@@ -93,7 +93,7 @@ Construct the executor.
 | `options` | `rclcpp::ExecutorOptions()` | Executor options. |
 | `number_of_ros2_threads` | `0` | Number of threads for ROS 2 callbacks (0 = auto). |
 | `number_of_agnocast_threads` | `0` | Number of threads for Agnocast callbacks (0 = auto). |
-| `yield_before_execute` | `false` | If true, call `std::this_thread::yield`() before each callback execution to reduce CPU usage at the cost of latency. |
+| `yield_before_execute` | `false` | If true, call `std::this_thread::yield()` before each callback execution to reduce CPU usage at the cost of latency. |
 | `ros2_next_exec_timeout` | `std::chrono::nanoseconds(-1)` | Timeout for ROS 2 executables. |
 | `agnocast_next_exec_timeout_ms` | `50` | Timeout in ms for Agnocast executables. |
 
@@ -106,7 +106,7 @@ Construct the executor.
 void MultiThreadedAgnocastExecutor::spin()
 ```
 
-Block the calling thread and process callbacks in a loop until `rclcpp::shutdown`() is called or the executor is cancelled.
+Block the calling thread and process callbacks in a loop until `rclcpp::shutdown()` is called or the executor is cancelled.
 
 
 ### `agnocast::CallbackIsolatedAgnocastExecutor`
@@ -141,7 +141,7 @@ Construct the executor.
 void CallbackIsolatedAgnocastExecutor::spin()
 ```
 
-Block the calling thread and process callbacks in a loop until `rclcpp::shutdown`() is called or the executor is cancelled.
+Block the calling thread and process callbacks in a loop until `rclcpp::shutdown()` is called or the executor is cancelled.
 
 
 ---
@@ -153,6 +153,17 @@ void CallbackIsolatedAgnocastExecutor::cancel()
 ```
 
 Request the executor to stop spinning. Causes the current or next spin() call to return.
+
+
+---
+
+#### `stop_callback_group()`
+
+```cpp
+void CallbackIsolatedAgnocastExecutor::stop_callback_group(rclcpp::CallbackGroup::SharedPtr &group_ptr)
+```
+
+Stop the child executor running the given callback group, join its thread, and remove it. If group_ptr is nullptr or not found, this is a no-op.
 
 
 ---
@@ -299,7 +310,7 @@ Remove a node from this executor.
 
 ### `agnocast::AgnocastOnlyExecutor`
 
-Base class for Stage 2 executors that handle only Agnocast callbacks (no RMW). Used with `agnocast::Node`.
+Base class for Stage 2 executors that handle only Agnocast callbacks (no RMW). Used with `agnocast::Node`. One-shot: once cancel() is called, spin() will not run again on the same instance  create a new executor instead. All current uses (clock executor, CIE child executors) are recreated. TODO: to support re-spin, replace the spinning_ / cancel_requested_ flags with one atomic state enum (Idle / Spinning / Cancelled) so spin() can re-arm to Idle on exit.
 
 
 ---
@@ -321,7 +332,7 @@ Construct the executor.
 void AgnocastOnlyExecutor::spin()
 ```
 
-Block the calling thread and process Agnocast callbacks in a loop until cancel() is called.
+Block the calling thread and process Agnocast callbacks in a loop until cancel() is called. One-shot: if cancel() was already called, spin() returns at once (see class comment).
 
 
 ---
@@ -332,7 +343,7 @@ Block the calling thread and process Agnocast callbacks in a loop until cancel()
 void AgnocastOnlyExecutor::cancel()
 ```
 
-Request the executor to stop spinning. Causes the current or next spin() call to return.
+Request the executor to stop spinning. Causes the current spin() call to return. One-shot: once called, the executor is permanently stopped  every subsequent spin() returns immediately. Create a new instance to spin again.
 
 
 ---
@@ -597,7 +608,7 @@ Request the executor to stop spinning. Causes the current or next spin() call to
 void AgnocastOnlyCallbackIsolatedExecutor::add_node(rclcpp::node_interfaces::NodeBaseInterface::SharedPtr &node_ptr, bool notify)
 ```
 
-Add a node to this executor. Unlike the base class add_node() , this does NOT set the has_executor atomic flag on the node or its callback groups, because the CIE distributes callback groups to child executors which claim ownership individually.
+Add a node to this executor. Unlike the base class add_node(), this does NOT set the has_executor atomic flag on the node or its callback groups, because the CIE distributes callback groups to child executors which claim ownership individually.
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
