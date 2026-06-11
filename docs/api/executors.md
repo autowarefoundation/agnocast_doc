@@ -16,7 +16,7 @@ Base class for Stage 1 executors that handle both ROS 2 (RMW) and Agnocast callb
 #### `AgnocastExecutor() (constructor)`
 
 ```cpp
-AgnocastExecutor::AgnocastExecutor(rclcpp::ExecutorOptions &options)
+AgnocastExecutor::AgnocastExecutor(const rclcpp::ExecutorOptions &options)
 ```
 
 Construct the executor.
@@ -49,7 +49,7 @@ Single-threaded executor for Stage 1 that processes both ROS 2 and Agnocast call
 #### `SingleThreadedAgnocastExecutor() (constructor)`
 
 ```cpp
-SingleThreadedAgnocastExecutor::SingleThreadedAgnocastExecutor(rclcpp::ExecutorOptions &options, int next_exec_timeout_ms)
+SingleThreadedAgnocastExecutor::SingleThreadedAgnocastExecutor(const rclcpp::ExecutorOptions &options, int next_exec_timeout_ms)
 ```
 
 Construct the executor.
@@ -83,7 +83,7 @@ Multi-threaded executor for Stage 1 with configurable thread counts for ROS 2 an
 #### `MultiThreadedAgnocastExecutor() (constructor)`
 
 ```cpp
-MultiThreadedAgnocastExecutor::MultiThreadedAgnocastExecutor(rclcpp::ExecutorOptions &options, size_t number_of_ros2_threads, size_t number_of_agnocast_threads, bool yield_before_execute, std::chrono::nanoseconds ros2_next_exec_timeout, int agnocast_next_exec_timeout_ms)
+MultiThreadedAgnocastExecutor::MultiThreadedAgnocastExecutor(const rclcpp::ExecutorOptions &options, size_t number_of_ros2_threads, size_t number_of_agnocast_threads, bool yield_before_execute, std::chrono::nanoseconds ros2_next_exec_timeout, int agnocast_next_exec_timeout_ms)
 ```
 
 Construct the executor.
@@ -121,7 +121,7 @@ Callback-isolated executor for Stage 1. Assigns a dedicated thread to each callb
 #### `CallbackIsolatedAgnocastExecutor() (constructor)`
 
 ```cpp
-CallbackIsolatedAgnocastExecutor::CallbackIsolatedAgnocastExecutor(rclcpp::ExecutorOptions &options, int next_exec_timeout_ms, int monitor_polling_interval_ms)
+CallbackIsolatedAgnocastExecutor::CallbackIsolatedAgnocastExecutor(const rclcpp::ExecutorOptions &options, int next_exec_timeout_ms, int monitor_polling_interval_ms)
 ```
 
 Construct the executor.
@@ -160,7 +160,7 @@ Request the executor to stop spinning. Causes the current or next spin() call to
 #### `stop_callback_group()`
 
 ```cpp
-void CallbackIsolatedAgnocastExecutor::stop_callback_group(rclcpp::CallbackGroup::SharedPtr &group_ptr)
+void CallbackIsolatedAgnocastExecutor::stop_callback_group(const rclcpp::CallbackGroup::SharedPtr &group_ptr)
 ```
 
 Stop the child executor running the given callback group, join its thread, and remove it. If group_ptr is nullptr or not found, this is a no-op.
@@ -445,7 +445,7 @@ Add a node to this executor.
 #### `add_node() [overload 2]`
 
 ```cpp
-void AgnocastOnlyExecutor::add_node(std::shared_ptr<agnocast::Node> &node, bool notify)
+void AgnocastOnlyExecutor::add_node(const std::shared_ptr<agnocast::Node> &node, bool notify)
 ```
 
 Add a node to this executor.
@@ -477,7 +477,7 @@ Remove a node from this executor.
 #### `remove_node() [overload 2]`
 
 ```cpp
-void AgnocastOnlyExecutor::remove_node(std::shared_ptr<agnocast::Node> &node, bool notify)
+void AgnocastOnlyExecutor::remove_node(const std::shared_ptr<agnocast::Node> &node, bool notify)
 ```
 
 Remove a node from this executor.
@@ -605,7 +605,7 @@ Request the executor to stop spinning. Causes the current or next spin() call to
 #### `add_node()`
 
 ```cpp
-void AgnocastOnlyCallbackIsolatedExecutor::add_node(rclcpp::node_interfaces::NodeBaseInterface::SharedPtr &node_ptr, bool notify)
+void AgnocastOnlyCallbackIsolatedExecutor::add_node(const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr &node_ptr, bool notify)
 ```
 
 Add a node to this executor. Unlike the base class add_node(), this does NOT set the has_executor atomic flag on the node or its callback groups, because the CIE distributes callback groups to child executors which claim ownership individually.
@@ -621,7 +621,7 @@ Add a node to this executor. Unlike the base class add_node(), this does NOT set
 #### `add_node() [overload 2]`
 
 ```cpp
-void AgnocastOnlyCallbackIsolatedExecutor::add_node(agnocast::Node::SharedPtr &node_ptr, bool notify)
+void AgnocastOnlyCallbackIsolatedExecutor::add_node(const agnocast::Node::SharedPtr &node_ptr, bool notify)
 ```
 
 Add a node to this executor.

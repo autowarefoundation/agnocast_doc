@@ -205,7 +205,6 @@ def clean_sig(definition, argsstring):
     sig = re.sub(r"< ", "<", sig)
     sig = re.sub(r" >", ">", sig)
 
-    sig = sig.replace("const ", "")
     # Drop default values from signature (they'll be shown in the parameter table)
     # But don't strip "=" that's part of "operator="
     sig = re.sub(r"(?<!operator)\s*=\s*[^,)]+", "", sig)

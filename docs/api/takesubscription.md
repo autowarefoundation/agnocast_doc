@@ -14,7 +14,7 @@ Polling-based subscription that retrieves messages on demand via take().
 #### `take()`
 
 ```cpp
-agnocast::ipc_shared_ptr<MessageT> TakeSubscription::take(bool allow_same_message)
+agnocast::ipc_shared_ptr<const MessageT> TakeSubscription::take(bool allow_same_message)
 ```
 
 Retrieve the latest message from the topic.

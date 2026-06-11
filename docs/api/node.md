@@ -14,7 +14,7 @@ Agnocast-only node. Drop-in replacement for `rclcpp::Node` in pure-Agnocast proc
 #### `Node() (constructor)`
 
 ```cpp
-Node::Node(std::string &node_name, rclcpp::NodeOptions &options)
+Node::Node(const std::string &node_name, const rclcpp::NodeOptions &options)
 ```
 
 Construct a node with the given name.
@@ -30,7 +30,7 @@ Construct a node with the given name.
 #### `Node() (constructor) [overload 2]`
 
 ```cpp
-Node::Node(std::string &node_name, std::string &namespace_, rclcpp::NodeOptions &options)
+Node::Node(const std::string &node_name, const std::string &namespace_, const rclcpp::NodeOptions &options)
 ```
 
 Construct a node with the given name and namespace.
@@ -127,7 +127,7 @@ Create a callback group.
 #### `for_each_callback_group()`
 
 ```cpp
-void Node::for_each_callback_group(rclcpp::node_interfaces::NodeBaseInterface::CallbackGroupFunction &func)
+void Node::for_each_callback_group(const rclcpp::node_interfaces::NodeBaseInterface::CallbackGroupFunction &func)
 ```
 
 Iterate over all callback groups, invoking the given function on each.
@@ -138,7 +138,7 @@ Iterate over all callback groups, invoking the given function on each.
 #### `declare_parameter()`
 
 ```cpp
-rclcpp::ParameterValue& Node::declare_parameter(std::string &name, rclcpp::ParameterValue &default_value, rcl_interfaces::msg::ParameterDescriptor &descriptor, bool ignore_override)
+const rclcpp::ParameterValue& Node::declare_parameter(const std::string &name, const rclcpp::ParameterValue &default_value, const rcl_interfaces::msg::ParameterDescriptor &descriptor, bool ignore_override)
 ```
 
 Declare a parameter with a default value.
@@ -160,7 +160,7 @@ Declare a parameter with a default value.
 #### `declare_parameter() [overload 2]`
 
 ```cpp
-rclcpp::ParameterValue& Node::declare_parameter(std::string &name, rclcpp::ParameterType type, rcl_interfaces::msg::ParameterDescriptor &descriptor, bool ignore_override)
+const rclcpp::ParameterValue& Node::declare_parameter(const std::string &name, rclcpp::ParameterType type, const rcl_interfaces::msg::ParameterDescriptor &descriptor, bool ignore_override)
 ```
 
 Declare a parameter with a given type (no default value).
@@ -182,7 +182,7 @@ Declare a parameter with a given type (no default value).
 #### `declare_parameter() [overload 3]`
 
 ```cpp
-auto Node::declare_parameter(std::string &name, ParameterT &default_value, rcl_interfaces::msg::ParameterDescriptor &descriptor, bool ignore_override)
+auto Node::declare_parameter(const std::string &name, const ParameterT &default_value, const rcl_interfaces::msg::ParameterDescriptor &descriptor, bool ignore_override)
 ```
 
 Declare a parameter with a typed default value.
@@ -208,7 +208,7 @@ Declare a parameter with a typed default value.
 #### `declare_parameter() [overload 4]`
 
 ```cpp
-auto Node::declare_parameter(std::string &name, rcl_interfaces::msg::ParameterDescriptor &descriptor, bool ignore_override)
+auto Node::declare_parameter(const std::string &name, const rcl_interfaces::msg::ParameterDescriptor &descriptor, bool ignore_override)
 ```
 
 Declare a parameter using only its type (default-constructed).
@@ -233,7 +233,7 @@ Declare a parameter using only its type (default-constructed).
 #### `has_parameter()`
 
 ```cpp
-bool Node::has_parameter(std::string &name) const
+bool Node::has_parameter(const std::string &name) const
 ```
 
 Check whether a parameter has been declared.
@@ -248,7 +248,7 @@ Check whether a parameter has been declared.
 #### `undeclare_parameter()`
 
 ```cpp
-void Node::undeclare_parameter(std::string &name)
+void Node::undeclare_parameter(const std::string &name)
 ```
 
 Undeclare a previously declared parameter.
@@ -259,7 +259,7 @@ Undeclare a previously declared parameter.
 #### `get_parameter()`
 
 ```cpp
-rclcpp::Parameter Node::get_parameter(std::string &name) const
+rclcpp::Parameter Node::get_parameter(const std::string &name) const
 ```
 
 Get a parameter by name.
@@ -274,7 +274,7 @@ Get a parameter by name.
 #### `get_parameter() [overload 2]`
 
 ```cpp
-bool Node::get_parameter(std::string &name, rclcpp::Parameter &parameter) const
+bool Node::get_parameter(const std::string &name, rclcpp::Parameter &parameter) const
 ```
 
 Get a parameter by name, returning success status via bool.
@@ -289,7 +289,7 @@ Get a parameter by name, returning success status via bool.
 #### `get_parameter() [overload 3]`
 
 ```cpp
-bool Node::get_parameter(std::string &name, ParameterT &parameter) const
+bool Node::get_parameter(const std::string &name, ParameterT &parameter) const
 ```
 
 Get a parameter and extract its typed value.
@@ -308,7 +308,7 @@ Get a parameter and extract its typed value.
 #### `get_parameters()`
 
 ```cpp
-std::vector<rclcpp::Parameter> Node::get_parameters(std::vector<std::string> &names) const
+std::vector<rclcpp::Parameter> Node::get_parameters(const std::vector<std::string> &names) const
 ```
 
 Get multiple parameters by name.
@@ -323,7 +323,7 @@ Get multiple parameters by name.
 #### `get_parameters() [overload 2]`
 
 ```cpp
-bool Node::get_parameters(std::string &prefix, std::map<std::string, ParameterT> &values) const
+bool Node::get_parameters(const std::string &prefix, std::map<std::string, ParameterT> &values) const
 ```
 
 Get parameters matching a prefix into a typed map.
@@ -342,7 +342,7 @@ Get parameters matching a prefix into a typed map.
 #### `set_parameter()`
 
 ```cpp
-rcl_interfaces::msg::SetParametersResult Node::set_parameter(rclcpp::Parameter &parameter)
+rcl_interfaces::msg::SetParametersResult Node::set_parameter(const rclcpp::Parameter &parameter)
 ```
 
 Set a single parameter.
@@ -357,7 +357,7 @@ Set a single parameter.
 #### `set_parameters()`
 
 ```cpp
-std::vector<rcl_interfaces::msg::SetParametersResult> Node::set_parameters(std::vector<rclcpp::Parameter> &parameters)
+std::vector<rcl_interfaces::msg::SetParametersResult> Node::set_parameters(const std::vector<rclcpp::Parameter> &parameters)
 ```
 
 Set multiple parameters, one at a time.
@@ -372,7 +372,7 @@ Set multiple parameters, one at a time.
 #### `set_parameters_atomically()`
 
 ```cpp
-rcl_interfaces::msg::SetParametersResult Node::set_parameters_atomically(std::vector<rclcpp::Parameter> &parameters)
+rcl_interfaces::msg::SetParametersResult Node::set_parameters_atomically(const std::vector<rclcpp::Parameter> &parameters)
 ```
 
 Set multiple parameters atomically (all-or-nothing).
@@ -387,7 +387,7 @@ Set multiple parameters atomically (all-or-nothing).
 #### `describe_parameter()`
 
 ```cpp
-rcl_interfaces::msg::rcl_interfaces::msg::ParameterDescriptor Node::describe_parameter(std::string &name) const
+rcl_interfaces::msg::rcl_interfaces::msg::ParameterDescriptor Node::describe_parameter(const std::string &name) const
 ```
 
 Describe a single parameter.
@@ -402,7 +402,7 @@ Describe a single parameter.
 #### `describe_parameters()`
 
 ```cpp
-std::vector<rcl_interfaces::msg::rcl_interfaces::msg::ParameterDescriptor> Node::describe_parameters(std::vector<std::string> &names) const
+std::vector<rcl_interfaces::msg::rcl_interfaces::msg::ParameterDescriptor> Node::describe_parameters(const std::vector<std::string> &names) const
 ```
 
 Describe multiple parameters.
@@ -417,7 +417,7 @@ Describe multiple parameters.
 #### `get_parameter_types()`
 
 ```cpp
-std::vector<uint8_t> Node::get_parameter_types(std::vector<std::string> &names) const
+std::vector<uint8_t> Node::get_parameter_types(const std::vector<std::string> &names) const
 ```
 
 Get the types of the given parameters.
@@ -432,7 +432,7 @@ Get the types of the given parameters.
 #### `list_parameters()`
 
 ```cpp
-rcl_interfaces::msg::ListParametersResult Node::list_parameters(std::vector<std::string> &prefixes, uint64_t depth) const
+rcl_interfaces::msg::ListParametersResult Node::list_parameters(const std::vector<std::string> &prefixes, uint64_t depth) const
 ```
 
 List parameters matching the given prefixes up to the given depth.
@@ -462,7 +462,7 @@ Register a callback invoked before parameters are set.
 #### `remove_on_set_parameters_callback()`
 
 ```cpp
-void Node::remove_on_set_parameters_callback(rclcpp::node_interfaces::OnSetParametersCallbackHandle *handler)
+void Node::remove_on_set_parameters_callback(const rclcpp::node_interfaces::OnSetParametersCallbackHandle *const handler)
 ```
 
 Remove a previously registered on-set-parameters callback.
@@ -518,7 +518,7 @@ Return the current time according to this node's clock.
 #### `count_publishers()`
 
 ```cpp
-size_t Node::count_publishers(std::string &topic_name) const
+size_t Node::count_publishers(const std::string &topic_name) const
 ```
 
 Return the number of publishers on a topic.
@@ -533,7 +533,7 @@ Return the number of publishers on a topic.
 #### `count_subscribers()`
 
 ```cpp
-size_t Node::count_subscribers(std::string &topic_name) const
+size_t Node::count_subscribers(const std::string &topic_name) const
 ```
 
 Return the number of subscribers on a topic.
@@ -548,7 +548,7 @@ Return the number of subscribers on a topic.
 #### `create_publisher()`
 
 ```cpp
-agnocast::Publisher<MessageT>::SharedPtr Node::create_publisher(std::string &topic_name, rclcpp::QoS &qos, agnocast::PublisherOptions options)
+agnocast::Publisher<MessageT>::SharedPtr Node::create_publisher(const std::string &topic_name, const rclcpp::QoS &qos, agnocast::PublisherOptions options)
 ```
 
 Create a publisher (QoS overload).
@@ -573,7 +573,7 @@ Create a publisher (QoS overload).
 #### `create_publisher() [overload 2]`
 
 ```cpp
-agnocast::Publisher<MessageT>::SharedPtr Node::create_publisher(std::string &topic_name, size_t queue_size, agnocast::PublisherOptions options)
+agnocast::Publisher<MessageT>::SharedPtr Node::create_publisher(const std::string &topic_name, size_t queue_size, agnocast::PublisherOptions options)
 ```
 
 Create a publisher (queue-size overload).
@@ -598,7 +598,7 @@ Create a publisher (queue-size overload).
 #### `create_subscription()`
 
 ```cpp
-agnocast::Subscription<MessageT>::SharedPtr Node::create_subscription(std::string &topic_name, rclcpp::QoS &qos, Func &&callback, agnocast::SubscriptionOptions options)
+agnocast::Subscription<MessageT>::SharedPtr Node::create_subscription(const std::string &topic_name, const rclcpp::QoS &qos, Func &&callback, agnocast::SubscriptionOptions options)
 ```
 
 Create a subscription (QoS overload).
@@ -625,7 +625,7 @@ Create a subscription (QoS overload).
 #### `create_subscription() [overload 2]`
 
 ```cpp
-agnocast::Subscription<MessageT>::SharedPtr Node::create_subscription(std::string &topic_name, size_t queue_size, Func &&callback, agnocast::SubscriptionOptions options)
+agnocast::Subscription<MessageT>::SharedPtr Node::create_subscription(const std::string &topic_name, size_t queue_size, Func &&callback, agnocast::SubscriptionOptions options)
 ```
 
 Create a subscription (queue-size overload).
@@ -652,7 +652,7 @@ Create a subscription (queue-size overload).
 #### `create_subscription() [overload 3]`
 
 ```cpp
-agnocast::PollingSubscriber<MessageT>::SharedPtr Node::create_subscription(std::string &topic_name, size_t qos_history_depth)
+agnocast::PollingSubscriber<MessageT>::SharedPtr Node::create_subscription(const std::string &topic_name, const size_t qos_history_depth)
 ```
 
 Create a polling subscription (history-depth overload).
@@ -676,7 +676,7 @@ Create a polling subscription (history-depth overload).
 #### `create_subscription() [overload 4]`
 
 ```cpp
-agnocast::PollingSubscriber<MessageT>::SharedPtr Node::create_subscription(std::string &topic_name, rclcpp::QoS &qos)
+agnocast::PollingSubscriber<MessageT>::SharedPtr Node::create_subscription(const std::string &topic_name, const rclcpp::QoS &qos)
 ```
 
 Create a polling subscription (QoS overload).
@@ -752,7 +752,7 @@ Create a timer using the node's clock.
 #### `create_client()`
 
 ```cpp
-agnocast::Client<ServiceT>::SharedPtr Node::create_client(std::string &service_name, rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
+agnocast::Client<ServiceT>::SharedPtr Node::create_client(const std::string &service_name, const rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
 ```
 
 Create a service client.
@@ -777,7 +777,7 @@ Create a service client.
 #### `create_service()`
 
 ```cpp
-agnocast::Service<ServiceT>::SharedPtr Node::create_service(std::string &service_name, Func &&callback, rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
+agnocast::Service<ServiceT>::SharedPtr Node::create_service(const std::string &service_name, Func &&callback, const rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
 ```
 
 Create a service server.

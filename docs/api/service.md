@@ -49,7 +49,7 @@ Sends a response to the client that initiated the service call. This function is
 #### `borrow_loaned_response()`
 
 ```cpp
-agnocast::ipc_shared_ptr<typename ServiceT::Response> Service::borrow_loaned_response(agnocast::ipc_shared_ptr<typename ServiceT::Request> &request)
+agnocast::ipc_shared_ptr<typename ServiceT::Response> Service::borrow_loaned_response(const agnocast::ipc_shared_ptr<typename ServiceT::Request> &request)
 ```
 
 Allocate a service response message in shared memory. This function is expected to be used in deferred response callbacks. This function does not consume request. In deferred callbacks, keep request and pass it to send_response() after populating the returned response.
