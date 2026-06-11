@@ -164,7 +164,7 @@ Return the name of this filter.
 | **Returns** | Filter name string. |
 
 
-### `agnocast::message_filters::SubscriberBase<M>`
+### `agnocast::message_filters::SubscriberBase<NodeType>`
 
 Base class for Subscriber, allowing subscription management without knowing the message type. Used for type-erased subscriber collections.
 

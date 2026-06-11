@@ -18,6 +18,11 @@ OUTPUT_DIR = Path(__file__).parent / "docs" / "api"
 # ── helpers ──────────────────────────────────────────────────────────────────
 
 
+# Doxygen represents some characters as empty XML elements (e.g. " -- " → <ndash/>).
+# Map them back to text so they aren't silently dropped, leaving doubled spaces.
+DOXYGEN_CHAR_ENTITIES = {"ndash": "–", "mdash": "—", "nbsp": " "}
+
+
 def text_content(elem):
     """Recursively extract text from an XML element, stripping tags."""
     if elem is None:
@@ -26,7 +31,10 @@ def text_content(elem):
     if elem.text:
         parts.append(elem.text)
     for child in elem:
-        parts.append(text_content(child))
+        if child.tag in DOXYGEN_CHAR_ENTITIES:
+            parts.append(DOXYGEN_CHAR_ENTITIES[child.tag])
+        else:
+            parts.append(text_content(child))
         if child.tail:
             parts.append(child.tail)
     return "".join(parts).strip()
@@ -83,7 +91,8 @@ def get_param_defaults(mdef):
                 if "agnocast::" not in defval:
                     defval = defval.replace("PublisherOptions", "agnocast::PublisherOptions")
                     defval = defval.replace("SubscriptionOptions", "agnocast::SubscriptionOptions")
-                defval = defval.replace("ParameterDescriptor", "rcl_interfaces::msg::ParameterDescriptor")
+                defval = re.sub(r"(?<!::)\bParameterDescriptor\b",
+                                "rcl_interfaces::msg::ParameterDescriptor", defval)
                 defaults[pname] = defval
     return defaults
 
@@ -195,10 +204,12 @@ def clean_sig(definition, argsstring):
     # Match "agnocast::ClassName::methodName(" pattern and remove "agnocast::"
     sig = re.sub(r"agnocast::(\w+::(?:\w+|~\w+)\s*\()", r"\1", sig)
 
-    # Restore namespace prefixes for aliased types that Doxygen strips
-    sig = re.sub(r"\bParameterValue\b", "rclcpp::ParameterValue", sig)
-    sig = re.sub(r"\bParameterDescriptor\b", "rcl_interfaces::msg::ParameterDescriptor", sig)
-    sig = re.sub(r"\bOnSetParametersCallbackType\b",
+    # Restore namespace prefixes for aliased types that Doxygen strips. The "(?<!::)"
+    # guard avoids re-prefixing names Doxygen already emitted fully qualified (which
+    # would produce "rcl_interfaces::msg::rcl_interfaces::msg::ParameterDescriptor").
+    sig = re.sub(r"(?<!::)\bParameterValue\b", "rclcpp::ParameterValue", sig)
+    sig = re.sub(r"(?<!::)\bParameterDescriptor\b", "rcl_interfaces::msg::ParameterDescriptor", sig)
+    sig = re.sub(r"(?<!::)\bOnSetParametersCallbackType\b",
                  "rclcpp::node_interfaces::OnSetParametersCallbackType", sig)
 
     # Normalize Doxygen spacing in template args: "< X, Y >" → "<X, Y>"
@@ -257,7 +268,17 @@ def parse_memberdef(mdef):
     elif mkind == "variable":
         return (mname, full_desc, [], [], "")
     elif mkind == "typedef":
-        return (mname, full_desc, [], [], "")
+        # Render as "using Name = Target" so the alias target is shown, not just
+        # the bare name. The target comes from the <type> element.
+        target = text_content(mdef.find("type"))
+        if target:
+            target = re.sub(r"<\s+", "<", target)
+            target = re.sub(r"\s+>", ">", target)
+            target = re.sub(r"(?<!:|\w)\bipc_shared_ptr\b", "agnocast::ipc_shared_ptr", target)
+            sig = f"using {mname} = {target}"
+        else:
+            sig = mname
+        return (sig, full_desc, [], [], "")
     return None
 
 
@@ -527,6 +548,11 @@ def format_prose(text):
 
 def extract_short_name(sig):
     """Extract a short method/function name for ToC headings."""
+    # Type alias: "using Name = ..." → "Name"
+    m = re.match(r"using\s+(\w+)\s*=", sig)
+    if m:
+        return m.group(1)
+
     # Destructor: "~ClassName()"
     m = re.search(r"(~\w+)\s*\(", sig)
     if m:
@@ -987,7 +1013,7 @@ def main():
         ("SimpleFilter", "classagnocast_1_1message__filters_1_1SimpleFilter.xml",
          "agnocast::message_filters::SimpleFilter<M>", None),
         ("SubscriberBase", "classagnocast_1_1message__filters_1_1SubscriberBase.xml",
-         "agnocast::message_filters::SubscriberBase<M>", None),
+         "agnocast::message_filters::SubscriberBase<NodeType>", None),
         ("Subscriber", "classagnocast_1_1message__filters_1_1Subscriber.xml",
          "agnocast::message_filters::Subscriber<M>", None),
         ("Synchronizer", "classagnocast_1_1message__filters_1_1Synchronizer.xml",
