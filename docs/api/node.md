@@ -387,7 +387,7 @@ Set multiple parameters atomically (all-or-nothing).
 #### `describe_parameter()`
 
 ```cpp
-rcl_interfaces::msg::rcl_interfaces::msg::ParameterDescriptor Node::describe_parameter(const std::string &name) const
+rcl_interfaces::msg::ParameterDescriptor Node::describe_parameter(const std::string &name) const
 ```
 
 Describe a single parameter.
@@ -402,7 +402,7 @@ Describe a single parameter.
 #### `describe_parameters()`
 
 ```cpp
-std::vector<rcl_interfaces::msg::rcl_interfaces::msg::ParameterDescriptor> Node::describe_parameters(const std::vector<std::string> &names) const
+std::vector<rcl_interfaces::msg::ParameterDescriptor> Node::describe_parameters(const std::vector<std::string> &names) const
 ```
 
 Describe multiple parameters.

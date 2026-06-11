@@ -62,10 +62,14 @@ Return type of async_send_request() (callback overload). Contains a SharedFuture
 #### `Future`
 
 ```cpp
-Future
+using Future = std::future<agnocast::ipc_shared_ptr<typename ServiceT::Response>>
 ```
 
 Future that resolves to the service response. Returned by async_send_request() (no-callback overload).
+
+| Template Parameter | Description |
+|-----------|-------------|
+| `ServiceT` | ROS service type. |
 
 
 ---
@@ -73,10 +77,14 @@ Future that resolves to the service response. Returned by async_send_request() (
 #### `SharedFuture`
 
 ```cpp
-SharedFuture
+using SharedFuture = std::shared_future<agnocast::ipc_shared_ptr<typename ServiceT::Response>>
 ```
 
 Shared future that resolves to the service response. Passed to the callback in async_send_request().
+
+| Template Parameter | Description |
+|-----------|-------------|
+| `ServiceT` | ROS service type. |
 
 
 ---
