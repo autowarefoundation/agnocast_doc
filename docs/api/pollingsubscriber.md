@@ -28,7 +28,7 @@ auto timer = this->create_wall_timer(100ms, [this, sub]() {
 #### `take_data()`
 
 ```cpp
-agnocast::ipc_shared_ptr<MessageT> PollingSubscriber::take_data()
+const agnocast::ipc_shared_ptr<const MessageT> PollingSubscriber::take_data()
 ```
 
 Retrieve the latest message. Always returns the most recent message even if already retrieved. Returns an empty pointer if no message has been published yet.

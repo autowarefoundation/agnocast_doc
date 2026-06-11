@@ -27,7 +27,7 @@ Default-construct an empty MessageEvent.
 #### `MessageEvent() [overload 2]`
 
 ```cpp
-message_filters::MessageEvent<M>::MessageEvent(MessageEvent &rhs)
+message_filters::MessageEvent<M>::MessageEvent(const MessageEvent &rhs)
 ```
 
 Copy constructor.
@@ -38,7 +38,7 @@ Copy constructor.
 #### `MessageEvent() [overload 3]`
 
 ```cpp
-message_filters::MessageEvent<M>::MessageEvent(ConstMessagePtr &message)
+message_filters::MessageEvent<M>::MessageEvent(const ConstMessagePtr &message)
 ```
 
 Construct from a message pointer, recording the current time as receipt time.
@@ -49,7 +49,7 @@ Construct from a message pointer, recording the current time as receipt time.
 #### `MessageEvent() [overload 4]`
 
 ```cpp
-message_filters::MessageEvent<M>::MessageEvent(ConstMessagePtr &message, rclcpp::Time receipt_time)
+message_filters::MessageEvent<M>::MessageEvent(const ConstMessagePtr &message, rclcpp::Time receipt_time)
 ```
 
 Construct from a message pointer and an explicit receipt time.
@@ -60,7 +60,7 @@ Construct from a message pointer and an explicit receipt time.
 #### `operator=()`
 
 ```cpp
-MessageEvent& message_filters::MessageEvent<M>::operator=(MessageEvent &rhs)
+MessageEvent& message_filters::MessageEvent<M>::operator=(const MessageEvent &rhs)
 ```
 
 Copy assignment operator.
@@ -71,7 +71,7 @@ Copy assignment operator.
 #### `getMessage()`
 
 ```cpp
-ConstMessagePtr& message_filters::MessageEvent<M>::getMessage() const
+const ConstMessagePtr& message_filters::MessageEvent<M>::getMessage() const
 ```
 
 Retrieve the message. Returns ipc_shared_ptr<M const> pointing to shared memory.
@@ -82,7 +82,7 @@ Retrieve the message. Returns ipc_shared_ptr<M const> pointing to shared memory.
 #### `getConstMessage()`
 
 ```cpp
-ConstMessagePtr& message_filters::MessageEvent<M>::getConstMessage() const
+const ConstMessagePtr& message_filters::MessageEvent<M>::getConstMessage() const
 ```
 
 Retrieve a const version of the message (same as getMessage() in agnocast)
@@ -104,7 +104,7 @@ Returns the time at which this message was received.
 #### `operator<()`
 
 ```cpp
-bool message_filters::MessageEvent<M>::operator<(MessageEvent &rhs) const
+bool message_filters::MessageEvent<M>::operator<(const MessageEvent &rhs) const
 ```
 
 Less-than comparison, ordered by pointer then receipt time.
@@ -120,7 +120,7 @@ Base class for simple one-output filters. Provides callback registration and sig
 #### `registerCallback()`
 
 ```cpp
-Connection message_filters::SimpleFilter<M>::registerCallback(C &callback)
+Connection message_filters::SimpleFilter<M>::registerCallback(const C &callback)
 ```
 
 Register a callback to be invoked when a message passes through this filter.
@@ -139,7 +139,7 @@ Register a callback to be invoked when a message passes through this filter.
 #### `setName()`
 
 ```cpp
-void message_filters::SimpleFilter<M>::setName(std::string &name)
+void message_filters::SimpleFilter<M>::setName(const std::string &name)
 ```
 
 Set the name of this filter (for debugging).
@@ -154,7 +154,7 @@ Set the name of this filter (for debugging).
 #### `getName()`
 
 ```cpp
-std::string& message_filters::SimpleFilter<M>::getName() const
+const std::string& message_filters::SimpleFilter<M>::getName() const
 ```
 
 Return the name of this filter.
@@ -174,7 +174,7 @@ Base class for Subscriber, allowing subscription management without knowing the 
 #### `subscribe()`
 
 ```cpp
-void message_filters::SubscriberBase<NodeType>::subscribe(NodePtr node, std::string &topic, rmw_qos_profile_t qos)
+void message_filters::SubscriberBase<NodeType>::subscribe(NodePtr node, const std::string &topic, const rmw_qos_profile_t qos)
 ```
 
 Subscribe to a topic. If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
@@ -191,7 +191,7 @@ Subscribe to a topic. If this Subscriber is already subscribed to a topic, this 
 #### `subscribe() [overload 2]`
 
 ```cpp
-void message_filters::SubscriberBase<NodeType>::subscribe(NodeType *node, std::string &topic, rmw_qos_profile_t qos)
+void message_filters::SubscriberBase<NodeType>::subscribe(NodeType *node, const std::string &topic, const rmw_qos_profile_t qos)
 ```
 
 Subscribe to a topic. If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
@@ -208,7 +208,7 @@ Subscribe to a topic. If this Subscriber is already subscribed to a topic, this 
 #### `subscribe() [overload 3]`
 
 ```cpp
-void message_filters::SubscriberBase<NodeType>::subscribe(NodePtr node, std::string &topic, rmw_qos_profile_t qos, agnocast::SubscriptionOptions options)
+void message_filters::SubscriberBase<NodeType>::subscribe(NodePtr node, const std::string &topic, const rmw_qos_profile_t qos, agnocast::SubscriptionOptions options)
 ```
 
 Subscribe to a topic. If this Subscriber is already subscribed to a topic, this function will first unsubscribe. This override allows SubscriptionOptions to be passed into the class without changing API.
@@ -226,7 +226,7 @@ Subscribe to a topic. If this Subscriber is already subscribed to a topic, this 
 #### `subscribe() [overload 4]`
 
 ```cpp
-void message_filters::SubscriberBase<NodeType>::subscribe(NodeType *node, std::string &topic, rmw_qos_profile_t qos, agnocast::SubscriptionOptions options)
+void message_filters::SubscriberBase<NodeType>::subscribe(NodeType *node, const std::string &topic, const rmw_qos_profile_t qos, agnocast::SubscriptionOptions options)
 ```
 
 Subscribe to a topic. If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
@@ -273,7 +273,7 @@ Agnocast subscription filter. This class acts as a highest-level filter, simply 
 #### `Subscriber()`
 
 ```cpp
-message_filters::Subscriber<M, NodeType>::Subscriber(NodePtr node, std::string &topic, rmw_qos_profile_t qos)
+message_filters::Subscriber<M, NodeType>::Subscriber(NodePtr node, const std::string &topic, const rmw_qos_profile_t qos)
 ```
 
 Constructor. See the `agnocast::create_subscription()` variants for more information on the parameters
@@ -290,7 +290,7 @@ Constructor. See the `agnocast::create_subscription()` variants for more informa
 #### `Subscriber() [overload 2]`
 
 ```cpp
-message_filters::Subscriber<M, NodeType>::Subscriber(NodePtr node, std::string &topic, rmw_qos_profile_t qos, agnocast::SubscriptionOptions options)
+message_filters::Subscriber<M, NodeType>::Subscriber(NodePtr node, const std::string &topic, const rmw_qos_profile_t qos, agnocast::SubscriptionOptions options)
 ```
 
 Constructor. See the `agnocast::create_subscription()` variants for more information on the parameters
@@ -319,7 +319,7 @@ Empty constructor, use subscribe() to subscribe to a topic.
 #### `subscribe()`
 
 ```cpp
-void message_filters::Subscriber<M, NodeType>::subscribe(NodePtr node, std::string &topic, rmw_qos_profile_t qos)
+void message_filters::Subscriber<M, NodeType>::subscribe(NodePtr node, const std::string &topic, const rmw_qos_profile_t qos)
 ```
 
 Subscribe to a topic. If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
@@ -336,7 +336,7 @@ Subscribe to a topic. If this Subscriber is already subscribed to a topic, this 
 #### `subscribe() [overload 2]`
 
 ```cpp
-void message_filters::Subscriber<M, NodeType>::subscribe(NodeType *node, std::string &topic, rmw_qos_profile_t qos)
+void message_filters::Subscriber<M, NodeType>::subscribe(NodeType *node, const std::string &topic, const rmw_qos_profile_t qos)
 ```
 
 Subscribe to a topic. If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
@@ -353,7 +353,7 @@ Subscribe to a topic. If this Subscriber is already subscribed to a topic, this 
 #### `subscribe() [overload 3]`
 
 ```cpp
-void message_filters::Subscriber<M, NodeType>::subscribe(NodePtr node, std::string &topic, rmw_qos_profile_t qos, agnocast::SubscriptionOptions options)
+void message_filters::Subscriber<M, NodeType>::subscribe(NodePtr node, const std::string &topic, const rmw_qos_profile_t qos, agnocast::SubscriptionOptions options)
 ```
 
 Subscribe to a topic. If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
@@ -371,7 +371,7 @@ Subscribe to a topic. If this Subscriber is already subscribed to a topic, this 
 #### `subscribe() [overload 4]`
 
 ```cpp
-void message_filters::Subscriber<M, NodeType>::subscribe(NodeType *node, std::string &topic, rmw_qos_profile_t qos, agnocast::SubscriptionOptions options)
+void message_filters::Subscriber<M, NodeType>::subscribe(NodeType *node, const std::string &topic, const rmw_qos_profile_t qos, agnocast::SubscriptionOptions options)
 ```
 
 Subscribe to a topic. If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
@@ -426,7 +426,7 @@ Return the topic name this subscriber is subscribed to.
 #### `getSubscriber()`
 
 ```cpp
-agnocast::Subscription<M>::SharedPtr message_filters::Subscriber<M, NodeType>::getSubscriber() const
+const agnocast::Subscription<M>::SharedPtr message_filters::Subscriber<M, NodeType>::getSubscriber() const
 ```
 
 Returns the internal `agnocast::Subscription<M>::SharedPtr` object.
@@ -448,7 +448,7 @@ No-op. Provided for compatibility with message_filters::Chain.
 #### `add()`
 
 ```cpp
-void message_filters::Subscriber<M, NodeType>::add(EventType &e)
+void message_filters::Subscriber<M, NodeType>::add(const EventType &e)
 ```
 
 No-op. Provided for compatibility with message_filters::Chain.
@@ -488,7 +488,7 @@ Construct an unconnected synchronizer. Call connectInput() to connect filters.
 #### `Synchronizer() [overload 3]`
 
 ```cpp
-message_filters::Synchronizer<Policy>::Synchronizer(Policy &policy, F0 &f0, F1 &f1)
+message_filters::Synchronizer<Policy>::Synchronizer(const Policy &policy, F0 &f0, F1 &f1)
 ```
 
 Construct a synchronizer with a policy and 2–9 input filters.
@@ -505,7 +505,7 @@ Construct a synchronizer with a policy and 2–9 input filters.
 #### `Synchronizer() [overload 4]`
 
 ```cpp
-message_filters::Synchronizer<Policy>::Synchronizer(Policy &policy)
+message_filters::Synchronizer<Policy>::Synchronizer(const Policy &policy)
 ```
 
 Construct a synchronizer with a policy but no input filters.
@@ -555,7 +555,7 @@ Register a callback invoked when matching messages are found.
 #### `registerCallback() [overload 2]`
 
 ```cpp
-Connection message_filters::Synchronizer<Policy>::registerCallback(C &callback)
+Connection message_filters::Synchronizer<Policy>::registerCallback(const C &callback)
 ```
 
 Register a const callback.
@@ -574,7 +574,7 @@ Register a const callback.
 #### `registerCallback() [overload 3]`
 
 ```cpp
-Connection message_filters::Synchronizer<Policy>::registerCallback(C &callback, T *t)
+Connection message_filters::Synchronizer<Policy>::registerCallback(const C &callback, T *t)
 ```
 
 Register a member function callback.
@@ -614,7 +614,7 @@ Register a member function callback.
 #### `setName()`
 
 ```cpp
-void message_filters::Synchronizer<Policy>::setName(std::string &name)
+void message_filters::Synchronizer<Policy>::setName(const std::string &name)
 ```
 
 Set the name of this synchronizer (for debugging).
@@ -629,7 +629,7 @@ Set the name of this synchronizer (for debugging).
 #### `getName()`
 
 ```cpp
-std::string& message_filters::Synchronizer<Policy>::getName()
+const std::string& message_filters::Synchronizer<Policy>::getName()
 ```
 
 Return the name of this synchronizer.
@@ -707,7 +707,7 @@ Connect an upstream filter so its output is forwarded through this PassThrough.
 #### `add()`
 
 ```cpp
-void message_filters::PassThrough<M>::add(MConstPtr &msg)
+void message_filters::PassThrough<M>::add(const MConstPtr &msg)
 ```
 
 Feed a message to all downstream filters.
@@ -722,7 +722,7 @@ Feed a message to all downstream filters.
 #### `add() [overload 2]`
 
 ```cpp
-void message_filters::PassThrough<M>::add(EventType &evt)
+void message_filters::PassThrough<M>::add(const EventType &evt)
 ```
 
 Feed a message event to all downstream filters.
@@ -757,7 +757,7 @@ Construct with a queue size.
 #### `ExactTime() [overload 2]`
 
 ```cpp
-message_filters::sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6, M7, M8>::ExactTime(ExactTime &e)
+message_filters::sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6, M7, M8>::ExactTime(const ExactTime &e)
 ```
 
 Copy constructor.
@@ -768,7 +768,7 @@ Copy constructor.
 #### `operator=()`
 
 ```cpp
-ExactTime& message_filters::sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6, M7, M8>::operator=(ExactTime &rhs)
+ExactTime& message_filters::sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6, M7, M8>::operator=(const ExactTime &rhs)
 ```
 
 Copy assignment.
@@ -783,7 +783,7 @@ Copy assignment.
 #### `registerDropCallback()`
 
 ```cpp
-Connection message_filters::sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6, M7, M8>::registerDropCallback(C &callback)
+Connection message_filters::sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6, M7, M8>::registerDropCallback(const C &callback)
 ```
 
 Register a callback invoked when messages are dropped due to queue overflow or missing matches.
@@ -822,7 +822,7 @@ Construct with a queue size.
 #### `ApproximateTime() [overload 2]`
 
 ```cpp
-message_filters::sync_policies::ApproximateTime<M0, M1, M2, M3, M4, M5, M6, M7, M8>::ApproximateTime(ApproximateTime &e)
+message_filters::sync_policies::ApproximateTime<M0, M1, M2, M3, M4, M5, M6, M7, M8>::ApproximateTime(const ApproximateTime &e)
 ```
 
 Copy constructor.
@@ -833,7 +833,7 @@ Copy constructor.
 #### `operator=()`
 
 ```cpp
-ApproximateTime& message_filters::sync_policies::ApproximateTime<M0, M1, M2, M3, M4, M5, M6, M7, M8>::operator=(ApproximateTime &rhs)
+ApproximateTime& message_filters::sync_policies::ApproximateTime<M0, M1, M2, M3, M4, M5, M6, M7, M8>::operator=(const ApproximateTime &rhs)
 ```
 
 Copy assignment.

@@ -103,7 +103,7 @@ Allocate a request message in shared memory.
 #### `get_service_name()`
 
 ```cpp
-char* Client::get_service_name() const
+const char* Client::get_service_name() const
 ```
 
 Return the resolved service name.

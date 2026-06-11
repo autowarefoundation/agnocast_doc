@@ -29,7 +29,7 @@ Update the timer's period. Aligned with rcl_timer_exchange_period: the already-s
 #### `is_steady()`
 
 ```cpp
-bool TimerBase::is_steady()
+bool TimerBase::is_steady() const
 ```
 
 Return whether this timer uses a steady clock.
@@ -44,7 +44,7 @@ Return whether this timer uses a steady clock.
 #### `get_clock()`
 
 ```cpp
-rclcpp::Clock::SharedPtr TimerBase::get_clock()
+rclcpp::Clock::SharedPtr TimerBase::get_clock() const
 ```
 
 Get the clock associated with this timer.

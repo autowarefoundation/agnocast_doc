@@ -16,7 +16,7 @@ Timer that fires periodically using a user-provided clock.
 #### `is_steady()`
 
 ```cpp
-bool GenericTimer::is_steady()
+bool GenericTimer::is_steady() const
 ```
 
 Return whether this timer uses a steady clock.
@@ -31,7 +31,7 @@ Return whether this timer uses a steady clock.
 #### `get_clock()`
 
 ```cpp
-rclcpp::Clock::SharedPtr GenericTimer::get_clock()
+rclcpp::Clock::SharedPtr GenericTimer::get_clock() const
 ```
 
 Get the clock associated with this timer.

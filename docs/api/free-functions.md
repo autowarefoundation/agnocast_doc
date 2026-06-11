@@ -11,7 +11,7 @@ These free functions are used with `rclcpp::Node` at Stage 1. Pass the node poin
 #### `create_publisher()`
 
 ```cpp
-agnocast::Publisher<MessageT>::SharedPtr create_publisher(NodeT *node, std::string &topic_name, rclcpp::QoS &qos, agnocast::PublisherOptions &options)
+agnocast::Publisher<MessageT>::SharedPtr create_publisher(NodeT *node, const std::string &topic_name, const rclcpp::QoS &qos, const agnocast::PublisherOptions &options)
 ```
 
 Create an Agnocast publisher (Stage 1 free function, QoS overload).
@@ -38,7 +38,7 @@ Create an Agnocast publisher (Stage 1 free function, QoS overload).
 #### `create_publisher() [overload 2]`
 
 ```cpp
-agnocast::Publisher<MessageT>::SharedPtr create_publisher(NodeT *node, std::string &topic_name, size_t qos_history_depth, agnocast::PublisherOptions &options)
+agnocast::Publisher<MessageT>::SharedPtr create_publisher(NodeT *node, const std::string &topic_name, const size_t qos_history_depth, const agnocast::PublisherOptions &options)
 ```
 
 Create an Agnocast publisher (Stage 1 free function, history-depth overload).
@@ -65,7 +65,7 @@ Create an Agnocast publisher (Stage 1 free function, history-depth overload).
 #### `create_subscription()`
 
 ```cpp
-agnocast::Subscription<MessageT>::SharedPtr create_subscription(NodeT *node, std::string &topic_name, rclcpp::QoS &qos, Func &&callback, agnocast::SubscriptionOptions options)
+agnocast::Subscription<MessageT>::SharedPtr create_subscription(NodeT *node, const std::string &topic_name, const rclcpp::QoS &qos, Func &&callback, agnocast::SubscriptionOptions options)
 ```
 
 Create an Agnocast subscription (Stage 1 free function, QoS overload).
@@ -94,7 +94,7 @@ Create an Agnocast subscription (Stage 1 free function, QoS overload).
 #### `create_subscription() [overload 2]`
 
 ```cpp
-agnocast::Subscription<MessageT>::SharedPtr create_subscription(NodeT *node, std::string &topic_name, size_t qos_history_depth, Func &&callback, agnocast::SubscriptionOptions options)
+agnocast::Subscription<MessageT>::SharedPtr create_subscription(NodeT *node, const std::string &topic_name, const size_t qos_history_depth, Func &&callback, agnocast::SubscriptionOptions options)
 ```
 
 Create an Agnocast subscription (Stage 1 free function, history-depth overload).
@@ -123,7 +123,7 @@ Create an Agnocast subscription (Stage 1 free function, history-depth overload).
 #### `create_subscription() [overload 3]`
 
 ```cpp
-agnocast::PollingSubscriber<MessageT>::SharedPtr create_subscription(NodeT *node, std::string &topic_name, size_t qos_history_depth)
+agnocast::PollingSubscriber<MessageT>::SharedPtr create_subscription(NodeT *node, const std::string &topic_name, const size_t qos_history_depth)
 ```
 
 Create an Agnocast polling subscription (Stage 1 free function, history-depth overload).
@@ -149,7 +149,7 @@ Create an Agnocast polling subscription (Stage 1 free function, history-depth ov
 #### `create_subscription() [overload 4]`
 
 ```cpp
-agnocast::PollingSubscriber<MessageT>::SharedPtr create_subscription(NodeT *node, std::string &topic_name, rclcpp::QoS &qos)
+agnocast::PollingSubscriber<MessageT>::SharedPtr create_subscription(NodeT *node, const std::string &topic_name, const rclcpp::QoS &qos)
 ```
 
 Create an Agnocast polling subscription (Stage 1 free function, QoS overload).
@@ -175,7 +175,7 @@ Create an Agnocast polling subscription (Stage 1 free function, QoS overload).
 #### `create_client()`
 
 ```cpp
-agnocast::Client<ServiceT>::SharedPtr create_client(NodeT *node, std::string &service_name, rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
+agnocast::Client<ServiceT>::SharedPtr create_client(NodeT *node, const std::string &service_name, const rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
 ```
 
 Create an Agnocast service client (Stage 1 free function).
@@ -202,7 +202,7 @@ Create an Agnocast service client (Stage 1 free function).
 #### `create_service()`
 
 ```cpp
-agnocast::Service<ServiceT>::SharedPtr create_service(NodeT *node, std::string &service_name, Func &&callback, rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
+agnocast::Service<ServiceT>::SharedPtr create_service(NodeT *node, const std::string &service_name, Func &&callback, const rclcpp::QoS &qos, rclcpp::CallbackGroup::SharedPtr group)
 ```
 
 Create an Agnocast service server (Stage 1 free function).
@@ -260,7 +260,7 @@ Create a timer with a given clock. This free function mirrors the `rclcpp::creat
 #### `init()`
 
 ```cpp
-void init(int argc, char **argv)
+void init(int argc, char const *const *argv)
 ```
 
 Initialize Agnocast. Must be called once before creating any `agnocast::Node`. This is the counterpart of `rclcpp::init()` for `agnocast::Node`.
