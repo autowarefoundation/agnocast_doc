@@ -4,3 +4,4 @@ site/
 doxygen_output/
 Doxyfile.generated
 __pycache__/
+.venv/
