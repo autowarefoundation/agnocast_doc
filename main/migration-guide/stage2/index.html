@@ -1632,13 +1632,16 @@
 <span class="w">  </span><span class="k">auto</span><span class="w"> </span><span class="n">node</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">MyNode</span><span class="o">&gt;</span><span class="p">();</span>
 <span class="w">  </span><span class="n">executor</span><span class="p">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
 <span class="w">  </span><span class="n">executor</span><span class="p">.</span><span class="n">spin</span><span class="p">();</span>
+<span class="w">  </span><span class="n">agnocast</span><span class="o">::</span><span class="n">shutdown</span><span class="p">();</span><span class="w">                                             </span><span class="c1">// (3)</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>Key changes:</p>
 <ol>
-<li><code>rclcpp::init()</code> → <code>agnocast::init()</code>, <code>rclcpp::shutdown()</code> no longer needed</li>
+<li><code>rclcpp::init()</code> → <code>agnocast::init()</code></li>
 <li>Executor changes to <code>AgnocastOnly*</code> variant</li>
+<li><code>rclcpp::shutdown()</code> → <code>agnocast::shutdown()</code></li>
 </ol>
+<p>Also replace any <code>rclcpp::ok()</code> calls in node logic with <code>agnocast::ok()</code>.</p>
 <p>Available executors for Stage 2:</p>
 <table>
 <thead>
@@ -1707,6 +1710,16 @@
 <td>Initialization</td>
 <td><code>rclcpp::init()</code></td>
 <td><code>agnocast::init()</code></td>
+</tr>
+<tr>
+<td>Context check</td>
+<td><code>rclcpp::ok()</code></td>
+<td><code>agnocast::ok()</code></td>
+</tr>
+<tr>
+<td>Shutdown</td>
+<td><code>rclcpp::shutdown()</code></td>
+<td><code>agnocast::shutdown()</code></td>
 </tr>
 <tr>
 <td>Executor</td>

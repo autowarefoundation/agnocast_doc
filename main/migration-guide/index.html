@@ -1311,6 +1311,8 @@
 <li><code>agnocast::Node</code> bypasses the rcl layer entirely — no RMW participant is created</li>
 <li>Publishers and subscriptions are created via member functions (<code>this-&gt;create_publisher(...)</code>) instead of free functions</li>
 <li>Initialization uses <code>agnocast::init()</code> instead of <code>rclcpp::init()</code></li>
+<li>Context check uses <code>agnocast::ok()</code> instead of <code>rclcpp::ok()</code></li>
+<li>Shutdown uses <code>agnocast::shutdown()</code> instead of <code>rclcpp::shutdown()</code></li>
 <li>Executors use <code>agnocast::AgnocastOnly*Executor</code> variants</li>
 </ul>
 <p><strong>What you gain:</strong> Reduced launch time, lower CPU usage, and elimination of the RMW overhead.</p>
@@ -1371,6 +1373,18 @@
 <td><code>rclcpp::init()</code></td>
 <td><code>rclcpp::init()</code></td>
 <td><code>agnocast::init()</code></td>
+</tr>
+<tr>
+<td>Context check</td>
+<td><code>rclcpp::ok()</code></td>
+<td><code>rclcpp::ok()</code></td>
+<td><code>agnocast::ok()</code></td>
+</tr>
+<tr>
+<td>Shutdown</td>
+<td><code>rclcpp::shutdown()</code></td>
+<td><code>rclcpp::shutdown()</code></td>
+<td><code>agnocast::shutdown()</code></td>
 </tr>
 <tr>
 <td>Executor</td>
