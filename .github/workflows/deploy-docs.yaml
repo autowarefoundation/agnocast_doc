@@ -69,3 +69,7 @@ jobs:
           git fetch origin gh-pages --depth=1 || true
           mike deploy --config-file mkdocs.yaml --push --update-aliases \
             "${{ steps.version.outputs.version }}"
+
+      - name: Set default version
+        if: steps.version.outputs.version == 'main'
+        run: mike set-default --config-file mkdocs.yaml --push main
