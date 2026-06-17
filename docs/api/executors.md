@@ -310,7 +310,7 @@ Remove a node from this executor.
 
 ### `agnocast::AgnocastOnlyExecutor`
 
-Base class for Stage 2 executors that handle only Agnocast callbacks (no RMW). Used with `agnocast::Node`. One-shot: once cancel() is called, spin() will not run again on the same instance  create a new executor instead. All current uses (clock executor, CIE child executors) are recreated. TODO: to support re-spin, replace the spinning_ / cancel_requested_ flags with one atomic state enum (Idle / Spinning / Cancelled) so spin() can re-arm to Idle on exit.
+Base class for Stage 2 executors that handle only Agnocast callbacks (no RMW). Used with `agnocast::Node`. One-shot: once cancel() is called, spin() will not run again on the same instance – create a new executor instead. All current uses (clock executor, CIE child executors) are recreated. TODO: to support re-spin, replace the spinning_ / cancel_requested_ flags with one atomic state enum (Idle / Spinning / Cancelled) so spin() can re-arm to Idle on exit.
 
 
 ---
@@ -343,7 +343,7 @@ Block the calling thread and process Agnocast callbacks in a loop until cancel()
 void AgnocastOnlyExecutor::cancel()
 ```
 
-Request the executor to stop spinning. Causes the current spin() call to return. One-shot: once called, the executor is permanently stopped  every subsequent spin() returns immediately. Create a new instance to spin again.
+Request the executor to stop spinning. Causes the current spin() call to return. One-shot: once called, the executor is permanently stopped – every subsequent spin() returns immediately. Create a new instance to spin again.
 
 
 ---
