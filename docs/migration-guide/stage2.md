@@ -172,13 +172,17 @@ int main(int argc, char * argv[])
   auto node = std::make_shared<MyNode>();
   executor.add_node(node);
   executor.spin();
+  agnocast::shutdown();                                             // (3)
 }
 ```
 
 Key changes:
 
-1. `rclcpp::init()` → `agnocast::init()`, `rclcpp::shutdown()` no longer needed
+1. `rclcpp::init()` → `agnocast::init()`
 2. Executor changes to `AgnocastOnly*` variant
+3. `rclcpp::shutdown()` → `agnocast::shutdown()`
+
+Also replace any `rclcpp::ok()` calls in node logic with `agnocast::ok()`.
 
 Available executors for Stage 2:
 
@@ -231,6 +235,8 @@ No launch file changes are needed from Stage 1 — `LD_PRELOAD` and the containe
 | Node class | `rclcpp::Node` | `agnocast::Node` |
 | Pub/sub creation | `agnocast::create_*(this, ...)` | `this->create_*(...)` |
 | Initialization | `rclcpp::init()` | `agnocast::init()` |
+| Context check | `rclcpp::ok()` | `agnocast::ok()` |
+| Shutdown | `rclcpp::shutdown()` | `agnocast::shutdown()` |
 | Executor | `agnocast::*AgnocastExecutor` | `agnocast::AgnocastOnly*Executor` |
 | rclcpp dependency | Required | Not required |
 | RMW participant | Created | Not created |
