@@ -34,6 +34,8 @@ graph LR
 - `agnocast::Node` bypasses the rcl layer entirely — no RMW participant is created
 - Publishers and subscriptions are created via member functions (`this->create_publisher(...)`) instead of free functions
 - Initialization uses `agnocast::init()` instead of `rclcpp::init()`
+- Context check uses `agnocast::ok()` instead of `rclcpp::ok()`
+- Shutdown uses `agnocast::shutdown()` instead of `rclcpp::shutdown()`
 - Executors use `agnocast::AgnocastOnly*Executor` variants
 
 **What you gain:** Reduced launch time, lower CPU usage, and elimination of the RMW overhead.
@@ -59,6 +61,8 @@ This is essential for gradual migration, where some nodes use Agnocast while oth
 | Callback argument | `T::SharedPtr` | `agnocast::ipc_shared_ptr<const T>` | `agnocast::ipc_shared_ptr<const T>` |
 | Publish pattern | `publisher->publish(msg)` | `borrow_loaned_message()` → `publish(move)` | `borrow_loaned_message()` → `publish(move)` |
 | Initialization | `rclcpp::init()` | `rclcpp::init()` | `agnocast::init()` |
+| Context check | `rclcpp::ok()` | `rclcpp::ok()` | `agnocast::ok()` |
+| Shutdown | `rclcpp::shutdown()` | `rclcpp::shutdown()` | `agnocast::shutdown()` |
 | Executor | `rclcpp::executors::*` | `agnocast::*AgnocastExecutor` | `agnocast::AgnocastOnly*Executor` |
 | LD_PRELOAD | Not required | Required | Required |
 | CMake dependency | `rclcpp` | `agnocastlib` | `agnocastlib` |
