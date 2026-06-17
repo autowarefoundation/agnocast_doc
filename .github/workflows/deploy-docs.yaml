@@ -4,18 +4,29 @@ on:
   push:
     branches:
       - main
+    tags:
+      - "v*"
   workflow_dispatch:
     inputs:
-      agnocast_branch:
-        description: "Agnocast branch to generate API reference from"
+      agnocast_ref:
+        description: "Agnocast branch or tag to generate API reference from"
         required: false
         default: "main"
+      version_name:
+        description: "mike version name to deploy under (e.g. main, v2.3.5)"
+        required: false
+        default: "main"
+
+permissions:
+  contents: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v4
         with:
@@ -26,10 +37,35 @@ jobs:
           pip install -r requirements.txt
           sudo apt-get update && sudo apt-get install -y doxygen
 
-      - name: Generate API Reference
+      - name: Resolve version name
+        id: version
         run: |
-          BRANCH="${{ github.event.inputs.agnocast_branch || 'main' }}"
-          ./generate_api.sh "$BRANCH"
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref_type }}" = "tag" ]; then
+            # Tag push, e.g. refs/tags/v2.3.5 -> version "v2.3.5"
+            VERSION="${{ github.ref_name }}"
+            AGNOCAST_REF="${{ github.ref_name }}"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version_name }}"
+            AGNOCAST_REF="${{ github.event.inputs.agnocast_ref }}"
+          else
+            # Push to main
+            VERSION="main"
+            AGNOCAST_REF="main"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "agnocast_ref=$AGNOCAST_REF" >> "$GITHUB_OUTPUT"
+          echo "Deploying docs version '$VERSION' from agnocast ref '$AGNOCAST_REF'"
 
-      - name: Deploy to GitHub Pages
-        run: mkdocs gh-deploy --force
+      - name: Generate API Reference
+        run: ./generate_api.sh "${{ steps.version.outputs.agnocast_ref }}"
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy with mike
+        run: |
+          git fetch origin gh-pages --depth=1 || true
+          mike deploy --config-file mkdocs.yaml --push --update-aliases \
+            "${{ steps.version.outputs.version }}"
