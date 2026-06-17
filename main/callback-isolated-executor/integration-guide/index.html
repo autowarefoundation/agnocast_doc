@@ -17,7 +17,7 @@
         <link rel="next" href="../yaml-specification/">
       
       <link rel="icon" href="../../assets/images/tier4.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.1.21">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.1.21">
     
     
       
@@ -809,6 +809,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#step-6-tune-the-configuration-with-the-reload-service-optional" class="md-nav__link">
+    Step 6: Tune the Configuration with the Reload Service (Optional)
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1450,6 +1457,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#step-6-tune-the-configuration-with-the-reload-service-optional" class="md-nav__link">
+    Step 6: Tune the Configuration with the Reload Service (Optional)
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1476,6 +1490,7 @@
 <li><strong>Generate a YAML template</strong> by running the configurator in the prerun mode</li>
 <li><strong>Edit the YAML</strong> to assign scheduling policies, priorities, and CPU affinities</li>
 <li><strong>Launch the configurator</strong> with your config file, then start your application</li>
+<li><em>(Optional)</em> <strong>Tune at runtime</strong> by editing the YAML and re-applying it through the <code>reapply_config</code> reload service, without restarting</li>
 </ol>
 <p>See the <a href="../tutorial/">Tutorial</a> for a concrete walkthrough with a sample application.</p>
 <h2 id="step-1-switch-the-executor">Step 1: Switch the Executor<a class="headerlink" href="#step-1-switch-the-executor" title="Permanent link">#</a></h2>
@@ -1576,6 +1591,50 @@ ros2<span class="w"> </span>launch<span class="w"> </span>your_package<span clas
 <p class="admonition-title">Note</p>
 <p>The configurator automatically subscribes to all ROS domains referenced by <code>domain_id</code> in the YAML configuration. For the prerun mode, use the <code>domains</code> parameter to specify which domains to discover.</p>
 </div>
+<h2 id="step-6-tune-the-configuration-with-the-reload-service-optional">Step 6: Tune the Configuration with the Reload Service (Optional)<a class="headerlink" href="#step-6-tune-the-configuration-with-the-reload-service-optional" title="Permanent link">#</a></h2>
+<p>Finding the right scheduling parameters is usually iterative. Instead of restarting the configurator and your application on every change, you can edit the YAML and re-apply it at runtime through the <code>reapply_config</code> service. This lets you tune priorities, CPU affinities, and policies in place while everything keeps running.</p>
+<p>After editing the file you passed as <code>config_file</code> (edit that same path in place), call the service:</p>
+<div class="highlight"><pre><span></span><code>ros2<span class="w"> </span>service<span class="w"> </span>call<span class="w"> </span>/thread_configurator_node/reapply_config<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>agnocast_cie_config_msgs/srv/ReapplyConfig<span class="w"> </span><span class="s2">&quot;{}&quot;</span>
+</code></pre></div>
+<p>The configurator re-reads the file at its <code>config_file</code> parameter and re-applies the scheduling parameters to every thread that has already announced itself. A typical tuning loop is therefore: edit the YAML, call the service, verify with <code>chrt</code> / <code>taskset</code>, and repeat.</p>
+<ul>
+<li><strong>Added entries</strong> take effect as soon as the corresponding thread announces itself.</li>
+<li><strong>Removed entries</strong> drop out of the configurator's in-memory state. Scheduling already applied to a running thread is not reverted.</li>
+<li><strong><code>hardware_info</code> and <code>rt_throttling</code> are not re-evaluated.</strong> Changing those sections requires restarting the configurator.</li>
+</ul>
+<p>If the YAML fails to parse or a per-entry validation check fails, the request is rejected, no state is changed, <code>success</code> is <code>false</code>, and <code>error_message</code> explains why.</p>
+<p>The response reports the outcome per thread:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>success</code></td>
+<td><code>true</code> if parsing and validation passed</td>
+</tr>
+<tr>
+<td><code>error_message</code></td>
+<td>Failure reason (empty on success)</td>
+</tr>
+<tr>
+<td><code>applied_callback_groups</code> / <code>applied_non_ros_threads</code></td>
+<td>Scheduling syscalls succeeded</td>
+</tr>
+<tr>
+<td><code>failed_callback_groups</code> / <code>failed_non_ros_threads</code></td>
+<td>Syscall failed (see the configurator log for details)</td>
+</tr>
+<tr>
+<td><code>skipped_callback_groups</code> / <code>skipped_non_ros_threads</code></td>
+<td>Thread not yet announced; will apply on the next announcement</td>
+</tr>
+</tbody>
+</table>
 
 
 

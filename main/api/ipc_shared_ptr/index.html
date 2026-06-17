@@ -17,7 +17,7 @@
         <link rel="next" href="../client/">
       
       <link rel="icon" href="../../assets/images/tier4.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.1.21">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.1.21">
     
     
       
@@ -1541,7 +1541,7 @@
 <p>Copy constructor. Creates a new reference to the same message. The reference count is incremented atomically, so it is safe to copy from an instance that another thread also copies from. However, two threads must not copy-from and write-to the same instance concurrently.</p>
 <hr />
 <h4 id="operator"><code>operator=()</code><a class="headerlink" href="#operator" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">&amp;</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="w"> </span><span class="o">&amp;</span><span class="n">r</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="w"> </span><span class="o">&amp;</span><span class="n">r</span><span class="p">)</span>
 </code></pre></div>
 <p>Copy assignment. Releases the current reference and shares ownership with r. Same thread-safety guarantees as the copy constructor.</p>
 <table>
@@ -1565,7 +1565,7 @@
 <p>Move constructor. Transfers ownership from r without changing the reference count. Not thread-safe: the caller must ensure no other thread accesses r concurrently.</p>
 <hr />
 <h4 id="operator-overload-2"><code>operator=() [overload 2]</code><a class="headerlink" href="#operator-overload-2" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">&amp;</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="k">noexcept</span>
+<div class="highlight"><pre><span></span><code><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="k">noexcept</span>
 </code></pre></div>
 <p>Move assignment. Releases the current reference and takes ownership from r. Not thread-safe: the caller must ensure no other thread accesses r concurrently.</p>
 <table>
@@ -1594,7 +1594,7 @@
 <p>Converting move constructor (e.g., ipc_shared_ptr<T> to ipc_shared_ptr<const T>). Enabled only when U<em> is implicitly convertible to T</em>.</p>
 <hr />
 <h4 id="operator-overload-3"><code>operator=() [overload 3]</code><a class="headerlink" href="#operator-overload-3" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">&amp;</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">&lt;</span><span class="n">U</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">r</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">&lt;</span><span class="n">U</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">r</span><span class="p">)</span>
 </code></pre></div>
 <p>Converting copy assignment (e.g., ipc_shared_ptr<T> to ipc_shared_ptr<const T>). Enabled only when U<em> is implicitly convertible to T</em>.</p>
 <table>
@@ -1613,7 +1613,7 @@
 </table>
 <hr />
 <h4 id="operator-overload-4"><code>operator=() [overload 4]</code><a class="headerlink" href="#operator-overload-4" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">&amp;</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">&lt;</span><span class="n">U</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="n">r</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">&lt;</span><span class="n">U</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="n">r</span><span class="p">)</span>
 </code></pre></div>
 <p>Converting move assignment (e.g., ipc_shared_ptr<T> to ipc_shared_ptr<const T>). Enabled only when U<em> is implicitly convertible to T</em>.</p>
 <table>
@@ -1632,7 +1632,7 @@
 </table>
 <hr />
 <h4 id="operator_1"><code>operator*()</code><a class="headerlink" href="#operator_1" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">T</span><span class="o">&amp;</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="k">operator</span><span class="o">*</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">noexcept</span>
+<div class="highlight"><pre><span></span><code><span class="n">T</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="k">operator</span><span class="o">*</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">noexcept</span>
 </code></pre></div>
 <p>Dereference the managed message. Calls <code>std::terminate()</code> if the pointer has been invalidated by publish().</p>
 <table>
@@ -1651,7 +1651,7 @@
 </table>
 <hr />
 <h4 id="operator-"><code>operator-&gt;()</code><a class="headerlink" href="#operator-" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="k">operator</span><span class="o">-&gt;</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">noexcept</span>
+<div class="highlight"><pre><span></span><code><span class="n">T</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="k">operator</span><span class="o">-&gt;</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">noexcept</span>
 </code></pre></div>
 <p>Access a member of the managed message. Calls <code>std::terminate()</code> if the pointer has been invalidated by publish().</p>
 <table>
@@ -1689,7 +1689,7 @@
 </table>
 <hr />
 <h4 id="get"><code>get()</code><a class="headerlink" href="#get" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">T</span><span class="o">*</span><span class="w"> </span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="n">get</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">noexcept</span>
+<div class="highlight"><pre><span></span><code><span class="n">T</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">ipc_shared_ptr</span><span class="o">::</span><span class="n">get</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">noexcept</span>
 </code></pre></div>
 <p>Return the raw pointer, or nullptr if empty or invalidated.</p>
 <table>

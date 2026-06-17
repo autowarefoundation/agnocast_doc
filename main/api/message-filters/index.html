@@ -17,7 +17,7 @@
         <link rel="next" href="../environment-variables/">
       
       <link rel="icon" href="../../assets/images/tier4.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.1.21">
+      <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.1.21">
     
     
       
@@ -2352,17 +2352,17 @@
 <p>Construct from a message pointer and an explicit receipt time.</p>
 <hr />
 <h4 id="operator"><code>operator=()</code><a class="headerlink" href="#operator" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">MessageEvent</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">MessageEvent</span><span class="o">&lt;</span><span class="n">M</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">MessageEvent</span><span class="w"> </span><span class="o">&amp;</span><span class="n">rhs</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">MessageEvent</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">MessageEvent</span><span class="o">&lt;</span><span class="n">M</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">MessageEvent</span><span class="w"> </span><span class="o">&amp;</span><span class="n">rhs</span><span class="p">)</span>
 </code></pre></div>
 <p>Copy assignment operator.</p>
 <hr />
 <h4 id="getmessage"><code>getMessage()</code><a class="headerlink" href="#getmessage" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="n">ConstMessagePtr</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">MessageEvent</span><span class="o">&lt;</span><span class="n">M</span><span class="o">&gt;::</span><span class="n">getMessage</span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="highlight"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="n">ConstMessagePtr</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">MessageEvent</span><span class="o">&lt;</span><span class="n">M</span><span class="o">&gt;::</span><span class="n">getMessage</span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </code></pre></div>
 <p>Retrieve the message. Returns ipc_shared_ptr<M const> pointing to shared memory.</p>
 <hr />
 <h4 id="getconstmessage"><code>getConstMessage()</code><a class="headerlink" href="#getconstmessage" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="n">ConstMessagePtr</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">MessageEvent</span><span class="o">&lt;</span><span class="n">M</span><span class="o">&gt;::</span><span class="n">getConstMessage</span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="highlight"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="n">ConstMessagePtr</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">MessageEvent</span><span class="o">&lt;</span><span class="n">M</span><span class="o">&gt;::</span><span class="n">getConstMessage</span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </code></pre></div>
 <p>Retrieve a const version of the message (same as getMessage() in agnocast)</p>
 <hr />
@@ -2431,7 +2431,7 @@
 </table>
 <hr />
 <h4 id="getname"><code>getName()</code><a class="headerlink" href="#getname" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">SimpleFilter</span><span class="o">&lt;</span><span class="n">M</span><span class="o">&gt;::</span><span class="n">getName</span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
+<div class="highlight"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">SimpleFilter</span><span class="o">&lt;</span><span class="n">M</span><span class="o">&gt;::</span><span class="n">getName</span><span class="p">()</span><span class="w"> </span><span class="k">const</span>
 </code></pre></div>
 <p>Return the name of this filter.</p>
 <table>
@@ -3065,7 +3065,7 @@
 </table>
 <hr />
 <h4 id="getname_1"><code>getName()</code><a class="headerlink" href="#getname_1" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">Synchronizer</span><span class="o">&lt;</span><span class="n">Policy</span><span class="o">&gt;::</span><span class="n">getName</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">Synchronizer</span><span class="o">&lt;</span><span class="n">Policy</span><span class="o">&gt;::</span><span class="n">getName</span><span class="p">()</span>
 </code></pre></div>
 <p>Return the name of this synchronizer.</p>
 <table>
@@ -3084,7 +3084,7 @@
 </table>
 <hr />
 <h4 id="getpolicy"><code>getPolicy()</code><a class="headerlink" href="#getpolicy" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">Policy</span><span class="o">*</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">Synchronizer</span><span class="o">&lt;</span><span class="n">Policy</span><span class="o">&gt;::</span><span class="n">getPolicy</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><span class="n">Policy</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">Synchronizer</span><span class="o">&lt;</span><span class="n">Policy</span><span class="o">&gt;::</span><span class="n">getPolicy</span><span class="p">()</span>
 </code></pre></div>
 <p>Return a pointer to the sync policy. Use this to configure policy parameters after construction (e.g., sync.getPolicy()-&gt;setAgePenalty(0.5)).</p>
 <table>
@@ -3213,7 +3213,7 @@
 <p>Copy constructor.</p>
 <hr />
 <h4 id="operator_2"><code>operator=()</code><a class="headerlink" href="#operator_2" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">ExactTime</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">sync_policies</span><span class="o">::</span><span class="n">ExactTime</span><span class="o">&lt;</span><span class="n">M0</span><span class="p">,</span><span class="w"> </span><span class="n">M1</span><span class="p">,</span><span class="w"> </span><span class="n">M2</span><span class="p">,</span><span class="w"> </span><span class="n">M3</span><span class="p">,</span><span class="w"> </span><span class="n">M4</span><span class="p">,</span><span class="w"> </span><span class="n">M5</span><span class="p">,</span><span class="w"> </span><span class="n">M6</span><span class="p">,</span><span class="w"> </span><span class="n">M7</span><span class="p">,</span><span class="w"> </span><span class="n">M8</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ExactTime</span><span class="w"> </span><span class="o">&amp;</span><span class="n">rhs</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">ExactTime</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">sync_policies</span><span class="o">::</span><span class="n">ExactTime</span><span class="o">&lt;</span><span class="n">M0</span><span class="p">,</span><span class="w"> </span><span class="n">M1</span><span class="p">,</span><span class="w"> </span><span class="n">M2</span><span class="p">,</span><span class="w"> </span><span class="n">M3</span><span class="p">,</span><span class="w"> </span><span class="n">M4</span><span class="p">,</span><span class="w"> </span><span class="n">M5</span><span class="p">,</span><span class="w"> </span><span class="n">M6</span><span class="p">,</span><span class="w"> </span><span class="n">M7</span><span class="p">,</span><span class="w"> </span><span class="n">M8</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ExactTime</span><span class="w"> </span><span class="o">&amp;</span><span class="n">rhs</span><span class="p">)</span>
 </code></pre></div>
 <p>Copy assignment.</p>
 <table>
@@ -3291,7 +3291,7 @@
 <p>Copy constructor.</p>
 <hr />
 <h4 id="operator_3"><code>operator=()</code><a class="headerlink" href="#operator_3" title="Permanent link">#</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">ApproximateTime</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">sync_policies</span><span class="o">::</span><span class="n">ApproximateTime</span><span class="o">&lt;</span><span class="n">M0</span><span class="p">,</span><span class="w"> </span><span class="n">M1</span><span class="p">,</span><span class="w"> </span><span class="n">M2</span><span class="p">,</span><span class="w"> </span><span class="n">M3</span><span class="p">,</span><span class="w"> </span><span class="n">M4</span><span class="p">,</span><span class="w"> </span><span class="n">M5</span><span class="p">,</span><span class="w"> </span><span class="n">M6</span><span class="p">,</span><span class="w"> </span><span class="n">M7</span><span class="p">,</span><span class="w"> </span><span class="n">M8</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ApproximateTime</span><span class="w"> </span><span class="o">&amp;</span><span class="n">rhs</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">ApproximateTime</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">message_filters</span><span class="o">::</span><span class="n">sync_policies</span><span class="o">::</span><span class="n">ApproximateTime</span><span class="o">&lt;</span><span class="n">M0</span><span class="p">,</span><span class="w"> </span><span class="n">M1</span><span class="p">,</span><span class="w"> </span><span class="n">M2</span><span class="p">,</span><span class="w"> </span><span class="n">M3</span><span class="p">,</span><span class="w"> </span><span class="n">M4</span><span class="p">,</span><span class="w"> </span><span class="n">M5</span><span class="p">,</span><span class="w"> </span><span class="n">M6</span><span class="p">,</span><span class="w"> </span><span class="n">M7</span><span class="p">,</span><span class="w"> </span><span class="n">M8</span><span class="o">&gt;::</span><span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ApproximateTime</span><span class="w"> </span><span class="o">&amp;</span><span class="n">rhs</span><span class="p">)</span>
 </code></pre></div>
 <p>Copy assignment.</p>
 <table>
