@@ -7,6 +7,7 @@
 3. **Generate a YAML template** by running the configurator in the prerun mode
 4. **Edit the YAML** to assign scheduling policies, priorities, and CPU affinities
 5. **Launch the configurator** with your config file, then start your application
+6. *(Optional)* **Tune at runtime** by editing the YAML and re-applying it through the `reapply_config` reload service, without restarting
 
 See the [Tutorial](tutorial.md) for a concrete walkthrough with a sample application.
 
@@ -154,3 +155,32 @@ The configurator keeps running after all configurations have been applied. If th
 
 !!! note
     The configurator automatically subscribes to all ROS domains referenced by `domain_id` in the YAML configuration. For the prerun mode, use the `domains` parameter to specify which domains to discover.
+
+## Step 6: Tune the Configuration with the Reload Service (Optional)
+
+Finding the right scheduling parameters is usually iterative. Instead of restarting the configurator and your application on every change, you can edit the YAML and re-apply it at runtime through the `reapply_config` service. This lets you tune priorities, CPU affinities, and policies in place while everything keeps running.
+
+After editing the file you passed as `config_file` (edit that same path in place), call the service:
+
+```bash
+ros2 service call /thread_configurator_node/reapply_config \
+  agnocast_cie_config_msgs/srv/ReapplyConfig "{}"
+```
+
+The configurator re-reads the file at its `config_file` parameter and re-applies the scheduling parameters to every thread that has already announced itself. A typical tuning loop is therefore: edit the YAML, call the service, verify with `chrt` / `taskset`, and repeat.
+
+- **Added entries** take effect as soon as the corresponding thread announces itself.
+- **Removed entries** drop out of the configurator's in-memory state. Scheduling already applied to a running thread is not reverted.
+- **`hardware_info` and `rt_throttling` are not re-evaluated.** Changing those sections requires restarting the configurator.
+
+If the YAML fails to parse or a per-entry validation check fails, the request is rejected, no state is changed, `success` is `false`, and `error_message` explains why.
+
+The response reports the outcome per thread:
+
+| Field | Meaning |
+|-------|---------|
+| `success` | `true` if parsing and validation passed |
+| `error_message` | Failure reason (empty on success) |
+| `applied_callback_groups` / `applied_non_ros_threads` | Scheduling syscalls succeeded |
+| `failed_callback_groups` / `failed_non_ros_threads` | Syscall failed (see the configurator log for details) |
+| `skipped_callback_groups` / `skipped_non_ros_threads` | Thread not yet announced; will apply on the next announcement |
