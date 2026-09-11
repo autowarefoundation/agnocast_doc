@@ -2,6 +2,11 @@
 
 The domain bridge connects Agnocast publishers and subscribers that run under **different `ROS_DOMAIN_ID`s** on the same machine — with **zero copy**. You register a rule for a topic, and Agnocast delivers that topic across the two domains by sharing the publisher's shared-memory message directly: no serialization, no relay process.
 
+!!! warning "Registering rules is unsupported"
+    The zero-copy cross-domain path is incomplete and not supported. Relay between domains with the external [ROS 2 `domain_bridge`](https://github.com/ros2/domain_bridge) node instead; the kernel module and `register_domain_bridge` both warn if you register a rule anyway.
+
+    The rule file itself is still needed in that setup: the discovery agent reads it to bring up the Agnocast→ROS 2 bridge the external node relays from. See [Configuration](configuration.md).
+
 !!! note "This is not the Agnocast–ROS 2 Bridge"
     The [**Bridge**](../migration-guide/bridge.md) connects Agnocast nodes to standard ROS 2 (RMW) nodes. The **domain bridge** on this page connects Agnocast nodes in one `ROS_DOMAIN_ID` to Agnocast nodes in another. They are independent features that happen to share the word "bridge".
 

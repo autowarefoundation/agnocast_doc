@@ -6,10 +6,10 @@ The Agnocast domain bridge reuses the ROS 2 [`domain_bridge`](https://github.com
 
 | | ROS 2 `domain_bridge` | Agnocast domain bridge |
 | --- | --- | --- |
-| Topic renaming (`remap`) | Supported | **Not supported** — the topic must have the same name in both domains |
+| Topic renaming (`remap`) | Supported | Supported |
 | When a rule can be registered | Any time (dynamic relay node) | **Before any publisher or subscriber for that topic exists** in either domain — otherwise rejected |
 | Domains per topic | Multiple | **One domain pair** per topic (no fan-out to a third domain) |
-| Direction (`bidirectional` / `reversed`) | Two-way per topic | **One-directional** — `bidirectional` / `reversed` are ignored; register the reverse rule separately |
+| Direction (`bidirectional` / `reversed`) | Both supported | `bidirectional` supported; **`reversed` is ignored** |
 | Per-topic QoS | Can be overridden | **Not supported** — each endpoint keeps its own QoS (the `type` and QoS fields in the config are ignored) |
 | Services | Bridged | **Pub/sub only** |
 
