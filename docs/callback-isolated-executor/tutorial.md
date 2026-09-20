@@ -56,7 +56,22 @@ callback_groups:
     nice: 0
 
 non_ros_threads: []
+
+kernel_threads:
+  - comm: ksoftirqd/0
+    policy: SCHED_OTHER
+    nice: 0
+    affinity: UNMANAGEABLE
+  # ... one entry per kernel thread on this machine
+
+irqs:
+  - irq: 103
+    name: nvidia
+    affinity: [4]
+  # ... one entry per interrupt claimed by a device
 ```
+
+The `kernel_threads` and `irqs` sections hold what the prerun mode observed on the machine. This tutorial does not change them, so the steps below leave them out.
 
 Stop the sample application (Ctrl+C).
 
