@@ -41,22 +41,37 @@ rt_throttling:
 
 callback_groups:
   - id: /cie_tutorial_node@Timer(100000000)
-    affinity: ~
+    affinity: []
     policy: SCHED_OTHER
     nice: 0
 
   - id: /cie_tutorial_node@Timer(200000000)
-    affinity: ~
+    affinity: []
     policy: SCHED_OTHER
     nice: 0
 
   - id: /cie_tutorial_node@Timer(1000000000)
-    affinity: ~
+    affinity: []
     policy: SCHED_OTHER
     nice: 0
 
 non_ros_threads: []
+
+kernel_threads:
+  - comm: ksoftirqd/0
+    policy: SCHED_OTHER
+    nice: 0
+    affinity: UNMANAGEABLE
+  # ... one entry per kernel thread name (comm) on this machine
+
+irqs:
+  - irq: 103
+    name: nvidia
+    affinity: [4]
+  # ... one entry per interrupt claimed by a device
 ```
+
+The `kernel_threads` and `irqs` sections hold what the prerun mode observed on the machine. This tutorial does not change them, so the steps below leave them out.
 
 Stop the sample application (Ctrl+C).
 

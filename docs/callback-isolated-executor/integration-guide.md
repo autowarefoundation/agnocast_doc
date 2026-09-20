@@ -81,8 +81,10 @@ For multiple ROS domains, launch one container process per domain and set
 ### Grant capabilities
 
 ```bash
-sudo setcap cap_sys_nice=eip $(readlink -f $(ros2 pkg prefix agnocast_cie_thread_configurator)/lib/agnocast_cie_thread_configurator/thread_configurator_node)
+sudo setcap cap_sys_nice,cap_dac_override=eip $(readlink -f $(ros2 pkg prefix agnocast_cie_thread_configurator)/lib/agnocast_cie_thread_configurator/thread_configurator_node)
 ```
+
+`CAP_SYS_NICE` covers the scheduling syscalls. `CAP_DAC_OVERRIDE` covers writes to the root-owned `/proc/irq/<N>/smp_affinity_list`, which only the [`irqs`](yaml-specification.md#irqs) section needs.
 
 !!! note
     `setcap` does not work on symlinks. `readlink -f` resolves to the actual binary, which is needed when using `colcon build --symlink-install`.
@@ -103,6 +105,14 @@ Apply:
 
 ```bash
 sudo ldconfig
+```
+
+### Stop irqbalance (irqs section only)
+
+`irqbalance` rewrites interrupt affinity periodically and undoes what the configurator writes. Stop it before you use the [`irqs`](yaml-specification.md#irqs) section.
+
+```bash
+sudo systemctl disable --now irqbalance
 ```
 
 ### Kernel boot parameter (SCHED_DEADLINE only)
@@ -141,6 +151,8 @@ Edit the template to assign scheduling parameters. See the [YAML Specification](
 
 For callback groups that don't need configuration, delete the entry or leave the defaults.
 
+The template also lists the machine's kernel threads and hardware interrupts, with the values observed when it was generated. The configurator applies nothing for an entry you do not edit. This holds while the thread or interrupt is still in the recorded state. See [kernel_threads](yaml-specification.md#kernel_threads) and [irqs](yaml-specification.md#irqs).
+
 ## Step 5: Launch with Configuration
 
 Start the configurator **before** the target application:
@@ -173,6 +185,8 @@ The configurator re-reads the file at its `config_file` parameter and re-applies
 - **Removed entries** drop out of the configurator's in-memory state. Scheduling already applied to a running thread is not reverted.
 - **`hardware_info` and `rt_throttling` are not re-evaluated.** Changing those sections requires restarting the configurator.
 
+`kernel_threads` and `irqs` entries never wait for an announcement. Every call re-scans the system and matches the entries again.
+
 If the YAML fails to parse or a per-entry validation check fails, the request is rejected, no state is changed, `success` is `false`, and `error_message` explains why.
 
 The response reports the outcome per thread:
@@ -184,3 +198,10 @@ The response reports the outcome per thread:
 | `applied_callback_groups` / `applied_non_ros_threads` | Scheduling syscalls succeeded |
 | `failed_callback_groups` / `failed_non_ros_threads` | Syscall failed (see the configurator log for details) |
 | `skipped_callback_groups` / `skipped_non_ros_threads` | Thread not yet announced; will apply on the next announcement |
+| `applied_kernel_threads` / `applied_irqs` | Entry is in the desired state, whether the configurator changed it or found it that way |
+| `failed_kernel_threads` / `failed_irqs` | Entry did not reach the desired state (see the configurator log for details) |
+| `skipped_kernel_threads` | No running kernel thread matched the `comm` |
+
+The `kernel_threads` arrays hold one `<comm>:<tid>` per matched thread, `skipped_kernel_threads` holds the `<comm>`, and the `irqs` arrays hold the decimal interrupt number.
+
+There is no `skipped_irqs`. An interrupt never waits for an announcement, so one that no longer exists is reported in `failed_irqs`.

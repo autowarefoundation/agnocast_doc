@@ -11,7 +11,7 @@ Neither script requires `agnocast.ko` to be loaded or `libagnocast_heaphook.so` 
 | Script | Purpose |
 |---|---|
 | `dds_config.bash` | Apply CycloneDDS runtime settings (`net.core.rmem_max`, loopback multicast) required for Agnocast over CycloneDDS. Guarded by `/tmp/cycloneDDS_configured` so it runs only once per boot. |
-| `setup_thread_configurator.bash` | Grant `CAP_SYS_NICE` to `thread_configurator_node` and register library paths in `/etc/ld.so.conf.d/agnocast-cie.conf`. Automates the manual steps described in [CallbackIsolatedExecutor → Integration Guide, Step 2](../callback-isolated-executor/integration-guide.md#step-2-set-up-the-thread-configurator). |
+| `setup_thread_configurator.bash` | Grant `CAP_SYS_NICE` and `CAP_DAC_OVERRIDE` to `thread_configurator_node` and register library paths in `/etc/ld.so.conf.d/agnocast-cie.conf`. Automates the manual steps described in [CallbackIsolatedExecutor → Integration Guide, Step 2](../callback-isolated-executor/integration-guide.md#step-2-set-up-the-thread-configurator). |
 
 ## Kernel module management
 
