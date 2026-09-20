@@ -151,7 +151,7 @@ Edit the template to assign scheduling parameters. See the [YAML Specification](
 
 For callback groups that don't need configuration, delete the entry or leave the defaults.
 
-The template also lists the machine's kernel threads and hardware interrupts, with the values observed when it was generated. The configurator applies nothing for an entry you do not edit. See [kernel_threads](yaml-specification.md#kernel_threads) and [irqs](yaml-specification.md#irqs).
+The template also lists the machine's kernel threads and hardware interrupts, with the values observed when it was generated. The configurator applies nothing for an entry you do not edit. This holds while the thread or interrupt is still in the recorded state. See [kernel_threads](yaml-specification.md#kernel_threads) and [irqs](yaml-specification.md#irqs).
 
 ## Step 5: Launch with Configuration
 
@@ -201,3 +201,7 @@ The response reports the outcome per thread:
 | `applied_kernel_threads` / `applied_irqs` | Entry is in the desired state, whether the configurator changed it or found it that way |
 | `failed_kernel_threads` / `failed_irqs` | Entry did not reach the desired state (see the configurator log for details) |
 | `skipped_kernel_threads` | No running kernel thread matched the `comm` |
+
+The `kernel_threads` arrays hold one `<comm>:<tid>` per matched thread, `skipped_kernel_threads` holds the `<comm>`, and the `irqs` arrays hold the decimal interrupt number.
+
+There is no `skipped_irqs`. An interrupt never waits for an announcement, so one that no longer exists is reported in `failed_irqs`.

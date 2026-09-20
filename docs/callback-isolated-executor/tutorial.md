@@ -41,17 +41,17 @@ rt_throttling:
 
 callback_groups:
   - id: /cie_tutorial_node@Timer(100000000)
-    affinity: ~
+    affinity: []
     policy: SCHED_OTHER
     nice: 0
 
   - id: /cie_tutorial_node@Timer(200000000)
-    affinity: ~
+    affinity: []
     policy: SCHED_OTHER
     nice: 0
 
   - id: /cie_tutorial_node@Timer(1000000000)
-    affinity: ~
+    affinity: []
     policy: SCHED_OTHER
     nice: 0
 
@@ -62,7 +62,7 @@ kernel_threads:
     policy: SCHED_OTHER
     nice: 0
     affinity: UNMANAGEABLE
-  # ... one entry per kernel thread on this machine
+  # ... one entry per kernel thread name (comm) on this machine
 
 irqs:
   - irq: 103

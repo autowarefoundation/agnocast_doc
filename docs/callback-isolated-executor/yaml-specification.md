@@ -108,7 +108,7 @@ Threads not managed by the executor can also be configured. See [Non-ROS Threads
 
 Scheduling attributes for kernel threads. A kernel thread is a thread that the kernel itself runs, such as `ksoftirqd/0` or a threaded interrupt handler.
 
-The prerun mode lists every kernel thread it finds, one entry per `comm`, and fills each entry with the values it observed. An unedited entry therefore asks for the state the thread is already in, and the configurator applies nothing to it.
+The prerun mode lists every kernel thread it finds, one entry per `comm`, and fills each entry with the values it observed. An unedited entry therefore asks for the state the thread was in at generation time. The configurator applies nothing while the thread is still in that state. For a pool that shares one `comm`, the recorded values are those of the lowest thread id.
 
 | Field | Required | Description |
 |-------|----------|-------------|
@@ -119,23 +119,25 @@ The prerun mode lists every kernel thread it finds, one entry per `comm`, and fi
 | `affinity` | No | List of CPU cores |
 | `runtime`, `period`, `deadline` | `SCHED_DEADLINE` only | Same meaning as in callback_groups, in nanoseconds |
 
-`policy` and its scheduling parameter go together. An entry that carries `nice`, `priority`, `runtime`, `period` or `deadline` without `policy` is rejected at startup.
+`policy` and its scheduling parameter go together. An entry that carries `nice`, `priority`, `runtime`, `period` or `deadline` without `policy` is rejected at startup and on every reload.
 
 Thread names are not unique. One entry configures every running kernel thread whose `comm` matches. A pool of eight `nfsd` threads therefore takes eight sets of syscalls from one entry.
+
+Each `comm` appears at most once in `kernel_threads`, and each `irq` at most once in `irqs`. A duplicate is rejected.
 
 `kworker/*` threads stay out of the template, and the configurator rejects an entry for one. Those names carry worker-pool and CPU state that changes at runtime, so they never match a thread reliably.
 
 If no running kernel thread matches a `comm`, the configurator logs a warning and skips the entry. Call the [reload service](integration-guide.md#step-6-tune-the-configuration-with-the-reload-service-optional) once the thread appears.
 
 !!! warning
-    The kernel fixes the affinity of a per-CPU kernel thread, which carries the `PF_NO_SETAFFINITY` flag. The prerun mode writes `UNMANAGEABLE` for such a thread. A different CPU list in its place fails at startup.
+    The kernel fixes the affinity of a per-CPU kernel thread, which carries the `PF_NO_SETAFFINITY` flag. The prerun mode writes `UNMANAGEABLE` for such a thread. A different CPU list in its place fails on every apply pass.
 
 !!! note
-    The prerun mode never writes `SCHED_DEADLINE`, because `/proc` does not report `runtime`, `period` and `deadline`. A hand-written `SCHED_DEADLINE` entry works, but the configurator cannot tell whether it is already in effect, so it re-applies the entry on every pass.
+    The prerun mode never writes `SCHED_DEADLINE`, because `/proc` does not report `runtime`, `period` and `deadline`. A thread whose policy the template cannot represent appears as `policy: UNMANAGEABLE` and `priority: UNMANAGEABLE`. A hand-written `SCHED_DEADLINE` entry works, but the configurator cannot tell whether it is already in effect, so it re-applies the entry on every pass.
 
 ### Unset values
 
-Three forms tell the configurator to leave an attribute alone. They apply to `kernel_threads` and `irqs` alike.
+Three forms tell the configurator to leave an attribute alone. They apply to the scheduling attributes of `kernel_threads` and to `affinity` in `irqs`.
 
 | Form | Meaning |
 |------|---------|
@@ -152,10 +154,10 @@ CPU affinity for hardware interrupts, which is the only attribute a hardware int
 | Field | Required | Description |
 |-------|----------|-------------|
 | `irq` | Yes | Interrupt number in decimal, as listed under `/proc/irq/` |
-| `name` | No | Expected content of `/sys/kernel/irq/<N>/actions`, compared before any write |
+| `name` | No | Expected content of `/sys/kernel/irq/<N>/actions`, compared before any write. Omit the key or write `~` to skip the check |
 | `affinity` | No | List of CPU cores |
 
-The prerun mode lists every interrupt that a device claims, read from `/sys/kernel/irq/` (Linux 4.12 and later), and fills `affinity` with the value it observed. An unedited entry causes no write.
+The prerun mode lists every interrupt that a device claims, read from `/sys/kernel/irq/`, and fills `affinity` with the value it observed. An unedited entry causes no write while the interrupt still has that affinity.
 
 Interrupt numbers are assigned at boot and change when hardware or drivers change. `name` guards against that. If the current `actions` content differs from `name`, the configurator reports an error and leaves the interrupt alone. Re-run the prerun mode. Then update the file.
 
