@@ -1403,22 +1403,36 @@
 
 <span class="nt">callback_groups</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/cie_tutorial_node@Timer(100000000)</span>
-<span class="w">    </span><span class="nt">affinity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">~</span>
+<span class="w">    </span><span class="nt">affinity</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
 <span class="w">    </span><span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SCHED_OTHER</span>
 <span class="w">    </span><span class="nt">nice</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
 
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/cie_tutorial_node@Timer(200000000)</span>
-<span class="w">    </span><span class="nt">affinity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">~</span>
+<span class="w">    </span><span class="nt">affinity</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
 <span class="w">    </span><span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SCHED_OTHER</span>
 <span class="w">    </span><span class="nt">nice</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
 
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/cie_tutorial_node@Timer(1000000000)</span>
-<span class="w">    </span><span class="nt">affinity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">~</span>
+<span class="w">    </span><span class="nt">affinity</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
 <span class="w">    </span><span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SCHED_OTHER</span>
 <span class="w">    </span><span class="nt">nice</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
 
 <span class="nt">non_ros_threads</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+
+<span class="nt">kernel_threads</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">comm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ksoftirqd/0</span>
+<span class="w">    </span><span class="nt">policy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SCHED_OTHER</span>
+<span class="w">    </span><span class="nt">nice</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">    </span><span class="nt">affinity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">UNMANAGEABLE</span>
+<span class="w">  </span><span class="c1"># ... one entry per kernel thread name (comm) on this machine</span>
+
+<span class="nt">irqs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">irq</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">103</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nvidia</span>
+<span class="w">    </span><span class="nt">affinity</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="c1"># ... one entry per interrupt claimed by a device</span>
 </code></pre></div>
+<p>The <code>kernel_threads</code> and <code>irqs</code> sections hold what the prerun mode observed on the machine. This tutorial does not change them, so the steps below leave them out.</p>
 <p>Stop the sample application (Ctrl+C).</p>
 <h2 id="step-3-edit-the-configuration">Step 3: Edit the configuration<a class="headerlink" href="#step-3-edit-the-configuration" title="Permanent link">#</a></h2>
 <p>Copy and edit the template to assign real-time priorities:</p>

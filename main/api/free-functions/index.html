@@ -1050,6 +1050,20 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#create_take_subscription" class="md-nav__link">
+    create_take_subscription()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create_take_subscription-overload-2" class="md-nav__link">
+    create_take_subscription() [overload 2]
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#create_subscription-overload-3" class="md-nav__link">
     create_subscription() [overload 3]
   </a>
@@ -1422,6 +1436,20 @@
         <li class="md-nav__item">
   <a href="#create_subscription-overload-2" class="md-nav__link">
     create_subscription() [overload 2]
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create_take_subscription" class="md-nav__link">
+    create_take_subscription()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create_take_subscription-overload-2" class="md-nav__link">
+    create_take_subscription() [overload 2]
   </a>
   
 </li>
@@ -1943,6 +1971,142 @@
 <tr>
 <td><strong>Returns</strong></td>
 <td>Shared pointer to the created subscription.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4 id="create_take_subscription"><code>create_take_subscription()</code><a class="headerlink" href="#create_take_subscription" title="Permanent link">#</a></h4>
+<div class="highlight"><pre><span></span><code><span class="n">agnocast</span><span class="o">::</span><span class="n">TakeSubscription</span><span class="o">&lt;</span><span class="n">MessageT</span><span class="o">&gt;::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">create_take_subscription</span><span class="p">(</span><span class="n">NodeT</span><span class="w"> </span><span class="o">*</span><span class="n">node</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">topic_name</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">rclcpp</span><span class="o">::</span><span class="n">QoS</span><span class="w"> </span><span class="o">&amp;</span><span class="n">qos</span><span class="p">,</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">SubscriptionOptions</span><span class="w"> </span><span class="n">options</span><span class="p">)</span>
+</code></pre></div>
+<p>Create an Agnocast take-subscription (Stage 1 free function, QoS overload).</p>
+<table>
+<thead>
+<tr>
+<th>Template Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MessageT</code></td>
+<td>ROS message type.</td>
+</tr>
+<tr>
+<td><code>NodeT</code></td>
+<td>Node type (<code>rclcpp::Node</code> or <code>agnocast::Node</code>).</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>node</code></td>
+<td>—</td>
+<td>Pointer to the node.</td>
+</tr>
+<tr>
+<td><code>topic_name</code></td>
+<td>—</td>
+<td>Topic name.</td>
+</tr>
+<tr>
+<td><code>qos</code></td>
+<td>—</td>
+<td>Quality of service profile.</td>
+</tr>
+<tr>
+<td><code>options</code></td>
+<td><code>agnocast::SubscriptionOptions{}</code></td>
+<td>Subscription options.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Returns</strong></td>
+<td>Shared pointer to the created take-subscription.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h4 id="create_take_subscription-overload-2"><code>create_take_subscription() [overload 2]</code><a class="headerlink" href="#create_take_subscription-overload-2" title="Permanent link">#</a></h4>
+<div class="highlight"><pre><span></span><code><span class="n">agnocast</span><span class="o">::</span><span class="n">TakeSubscription</span><span class="o">&lt;</span><span class="n">MessageT</span><span class="o">&gt;::</span><span class="n">SharedPtr</span><span class="w"> </span><span class="n">create_take_subscription</span><span class="p">(</span><span class="n">NodeT</span><span class="w"> </span><span class="o">*</span><span class="n">node</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="o">&amp;</span><span class="n">topic_name</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">qos_history_depth</span><span class="p">,</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">SubscriptionOptions</span><span class="w"> </span><span class="n">options</span><span class="p">)</span>
+</code></pre></div>
+<p>Create an Agnocast take-subscription (Stage 1 free function, history-depth overload).</p>
+<table>
+<thead>
+<tr>
+<th>Template Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MessageT</code></td>
+<td>ROS message type.</td>
+</tr>
+<tr>
+<td><code>NodeT</code></td>
+<td>Node type (<code>rclcpp::Node</code> or <code>agnocast::Node</code>).</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>node</code></td>
+<td>—</td>
+<td>Pointer to the node.</td>
+</tr>
+<tr>
+<td><code>topic_name</code></td>
+<td>—</td>
+<td>Topic name.</td>
+</tr>
+<tr>
+<td><code>qos_history_depth</code></td>
+<td>—</td>
+<td>History depth for the QoS profile.</td>
+</tr>
+<tr>
+<td><code>options</code></td>
+<td><code>agnocast::SubscriptionOptions{}</code></td>
+<td>Subscription options.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Returns</strong></td>
+<td>Shared pointer to the created take-subscription.</td>
 </tr>
 </tbody>
 </table>

@@ -777,6 +777,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#stop-irqbalance-irqs-section-only" class="md-nav__link">
+    Stop irqbalance (irqs section only)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#kernel-boot-parameter-sched_deadline-only" class="md-nav__link">
     Kernel boot parameter (SCHED_DEADLINE only)
   </a>
@@ -1425,6 +1432,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#stop-irqbalance-irqs-section-only" class="md-nav__link">
+    Stop irqbalance (irqs section only)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#kernel-boot-parameter-sched_deadline-only" class="md-nav__link">
     Kernel boot parameter (SCHED_DEADLINE only)
   </a>
@@ -1542,8 +1556,9 @@
 </div>
 <h2 id="step-2-set-up-the-thread-configurator">Step 2: Set Up the Thread Configurator<a class="headerlink" href="#step-2-set-up-the-thread-configurator" title="Permanent link">#</a></h2>
 <h3 id="grant-capabilities">Grant capabilities<a class="headerlink" href="#grant-capabilities" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>setcap<span class="w"> </span><span class="nv">cap_sys_nice</span><span class="o">=</span>eip<span class="w"> </span><span class="k">$(</span>readlink<span class="w"> </span>-f<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>agnocast_cie_thread_configurator<span class="k">)</span>/lib/agnocast_cie_thread_configurator/thread_configurator_node<span class="k">)</span>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>setcap<span class="w"> </span>cap_sys_nice,cap_dac_override<span class="o">=</span>eip<span class="w"> </span><span class="k">$(</span>readlink<span class="w"> </span>-f<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>agnocast_cie_thread_configurator<span class="k">)</span>/lib/agnocast_cie_thread_configurator/thread_configurator_node<span class="k">)</span>
 </code></pre></div>
+<p><code>CAP_SYS_NICE</code> covers the scheduling syscalls. <code>CAP_DAC_OVERRIDE</code> covers writes to the root-owned <code>/proc/irq/&lt;N&gt;/smp_affinity_list</code>, which only the <a href="../yaml-specification/#irqs"><code>irqs</code></a> section needs.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><code>setcap</code> does not work on symlinks. <code>readlink -f</code> resolves to the actual binary, which is needed when using <code>colcon build --symlink-install</code>.</p>
@@ -1557,6 +1572,10 @@
 </code></pre></div>
 <p>Apply:</p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>ldconfig
+</code></pre></div>
+<h3 id="stop-irqbalance-irqs-section-only">Stop irqbalance (irqs section only)<a class="headerlink" href="#stop-irqbalance-irqs-section-only" title="Permanent link">#</a></h3>
+<p><code>irqbalance</code> rewrites interrupt affinity periodically and undoes what the configurator writes. Stop it before you use the <a href="../yaml-specification/#irqs"><code>irqs</code></a> section.</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>systemctl<span class="w"> </span>disable<span class="w"> </span>--now<span class="w"> </span>irqbalance
 </code></pre></div>
 <h3 id="kernel-boot-parameter-sched_deadline-only">Kernel boot parameter (SCHED_DEADLINE only)<a class="headerlink" href="#kernel-boot-parameter-sched_deadline-only" title="Permanent link">#</a></h3>
 <p>If using <code>SCHED_DEADLINE</code>, CPU affinity requires cgroup v1:</p>
@@ -1581,6 +1600,7 @@ ros2<span class="w"> </span>launch<span class="w"> </span>your_package<span clas
 <h2 id="step-4-edit-the-yaml">Step 4: Edit the YAML<a class="headerlink" href="#step-4-edit-the-yaml" title="Permanent link">#</a></h2>
 <p>Edit the template to assign scheduling parameters. See the <a href="../yaml-specification/">YAML Specification</a> for all options.</p>
 <p>For callback groups that don't need configuration, delete the entry or leave the defaults.</p>
+<p>The template also lists the machine's kernel threads and hardware interrupts, with the values observed when it was generated. The configurator applies nothing for an entry you do not edit. This holds while the thread or interrupt is still in the recorded state. See <a href="../yaml-specification/#kernel_threads">kernel_threads</a> and <a href="../yaml-specification/#irqs">irqs</a>.</p>
 <h2 id="step-5-launch-with-configuration">Step 5: Launch with Configuration<a class="headerlink" href="#step-5-launch-with-configuration" title="Permanent link">#</a></h2>
 <p>Start the configurator <strong>before</strong> the target application:</p>
 <div class="highlight"><pre><span></span><code>ros2<span class="w"> </span>launch<span class="w"> </span>agnocast_cie_thread_configurator<span class="w"> </span>thread_configurator.launch.xml<span class="w"> </span>config_file:<span class="o">=</span>/path/to/config.yaml
@@ -1603,6 +1623,7 @@ ros2<span class="w"> </span>launch<span class="w"> </span>your_package<span clas
 <li><strong>Removed entries</strong> drop out of the configurator's in-memory state. Scheduling already applied to a running thread is not reverted.</li>
 <li><strong><code>hardware_info</code> and <code>rt_throttling</code> are not re-evaluated.</strong> Changing those sections requires restarting the configurator.</li>
 </ul>
+<p><code>kernel_threads</code> and <code>irqs</code> entries never wait for an announcement. Every call re-scans the system and matches the entries again.</p>
 <p>If the YAML fails to parse or a per-entry validation check fails, the request is rejected, no state is changed, <code>success</code> is <code>false</code>, and <code>error_message</code> explains why.</p>
 <p>The response reports the outcome per thread:</p>
 <table>
@@ -1633,8 +1654,22 @@ ros2<span class="w"> </span>launch<span class="w"> </span>your_package<span clas
 <td><code>skipped_callback_groups</code> / <code>skipped_non_ros_threads</code></td>
 <td>Thread not yet announced; will apply on the next announcement</td>
 </tr>
+<tr>
+<td><code>applied_kernel_threads</code> / <code>applied_irqs</code></td>
+<td>Entry is in the desired state, whether the configurator changed it or found it that way</td>
+</tr>
+<tr>
+<td><code>failed_kernel_threads</code> / <code>failed_irqs</code></td>
+<td>Entry did not reach the desired state (see the configurator log for details)</td>
+</tr>
+<tr>
+<td><code>skipped_kernel_threads</code></td>
+<td>No running kernel thread matched the <code>comm</code></td>
+</tr>
 </tbody>
 </table>
+<p>The <code>kernel_threads</code> arrays hold one <code>&lt;comm&gt;:&lt;tid&gt;</code> per matched thread, <code>skipped_kernel_threads</code> holds the <code>&lt;comm&gt;</code>, and the <code>irqs</code> arrays hold the decimal interrupt number.</p>
+<p>There is no <code>skipped_irqs</code>. An interrupt never waits for an announcement, so one that no longer exists is reported in <code>failed_irqs</code>.</p>
 
 
 
