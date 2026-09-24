@@ -72,7 +72,7 @@ In practice this holds automatically when all nodes are built against the same R
 
 Agnocast pub/sub is zero copy only between processes that share the same Linux IPC namespace on the same machine.
 
-- **Cross-IPC-namespace and cross-ECU communication** goes through the [Bridge](migration-guide/bridge.md) over ROS 2 (DDS), with serialization. The Agnocast discovery agent, which each Agnocast process starts automatically, requests a bridge when a topic's publisher and subscriber are in different IPC namespaces or on different ECUs under the same `ROS_DOMAIN_ID`. This needs the Bridge on (the default), `ros2agnocast_discovery_agent` installed in the sourced workspace, and `AGNOCAST_NO_DISCOVERY_AGENT` unset. For zero copy between containers, share an IPC namespace — see [Running in Containers](tips/containers.md).
+Across IPC namespaces or ECUs on the same `ROS_DOMAIN_ID`, topics and services go through the [Bridge](migration-guide/bridge.md) over ROS 2 (DDS), with serialization. The Agnocast discovery agent (one per IPC namespace and `ROS_DOMAIN_ID`, started automatically by Agnocast processes) requests the bridge on each side. This requires the Bridge on both sides (the default) and `AGNOCAST_NO_DISCOVERY_AGENT` unset. For zero copy between containers, share an IPC namespace — see [Running in Containers](tips/containers.md).
 
 ### Cross-domain communication is opt-in
 
