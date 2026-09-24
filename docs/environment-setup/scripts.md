@@ -29,8 +29,10 @@ Each `sample_application/run_*.bash` script is a thin wrapper that runs `source 
 |---|---|
 | `run_talker.bash` | `talker.launch.xml` |
 | `run_listener.bash` | `listener.launch.xml` |
+| `run_generic_talker.bash` | `generic_talker.launch.xml` (`agnocast::GenericPublisher`) |
+| `run_generic_listener.bash` | `generic_listener.launch.xml` (`agnocast::GenericSubscription`) |
 | `run_cie_talker.bash` | `cie_talker.launch.xml` (`CallbackIsolatedAgnocastExecutor`) |
-| `run_cie_listener.bash` | `cie_listener.launch.xml` (`CallbackIsolatedAgnocastExecutor`) |
+| `run_cie_listener.bash` | `cie_listener.launch.xml` (`agnocast_component_container_cie`) |
 | `run_client.bash` | `client.launch.xml` (service client) |
 | `run_server.bash` | `server.launch.xml` (service server) |
 
