@@ -236,7 +236,7 @@ No launch file changes are needed from Stage 1 — `LD_PRELOAD` and the containe
 
 The following `rclcpp::Node` APIs are **not supported** by `agnocast::Node` (they either do not exist or throw an exception):
 
-- Graph APIs: `get_node_names()`, `get_topic_names_and_types()`, `get_service_names_and_types()`, `get_publishers_info_by_topic()`, `get_subscriptions_info_by_topic()`, `get_graph_event()`, `wait_for_graph_change()`. Note that `count_publishers()` and `count_subscribers()` **are** supported.
+- Graph APIs: `get_topic_names_and_types()`, `get_service_names_and_types()`, `get_publishers_info_by_topic()`, `get_subscriptions_info_by_topic()`, `get_graph_event()`, `wait_for_graph_change()`. Note that `count_publishers()`, `count_subscribers()`, and `get_node_names()` **are** supported (`get_node_names()` reports only the nodes in the same IPC namespace and `ROS_DOMAIN_ID` that own an Agnocast endpoint, plus the calling node).
 - `get_rcl_node_handle()` / `get_shared_rcl_node_handle()`: throw `std::runtime_error` because DDS is not used.
 - `create_generic_publisher()` / `create_generic_subscription()` as node members. The free functions `agnocast::create_generic_publisher()` and `agnocast::create_generic_subscription()` support `agnocast::Node`.
 - `declare_parameters()` / `get_parameter_or()`
