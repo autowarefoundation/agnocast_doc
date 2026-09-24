@@ -28,7 +28,7 @@ Start the prerun node **before** launching your application:
 ros2 launch agnocast_cie_thread_configurator thread_configurator.launch.xml prerun:=true
 ```
 
-Wait until the log output settles (all three CallbackGroups are discovered), then press Ctrl+C. A `template.yaml` is created in the current directory:
+Wait until the log output settles (the three timer CallbackGroups and the node's default CallbackGroup are discovered), then press Ctrl+C. A `template.yaml` is created in the current directory:
 
 ```yaml
 hardware_info:
@@ -40,17 +40,26 @@ rt_throttling:
   period_us: 1000000
 
 callback_groups:
-  - id: /cie_tutorial_node@Timer(100000000)
+  - id: /cie_tutorial_node@Service(/cie_tutorial_node/describe_parameters)@Service(/cie_tutorial_node/get_parameter_types)@Service(/cie_tutorial_node/get_parameters)@Service(/cie_tutorial_node/list_parameters)@Service(/cie_tutorial_node/set_parameters)@Service(/cie_tutorial_node/set_parameters_atomically)@Subscription(/parameter_events)
+    domain_id: 0
     affinity: []
     policy: SCHED_OTHER
     nice: 0
 
-  - id: /cie_tutorial_node@Timer(200000000)
+  - id: /cie_tutorial_node@Timer(100000000)
+    domain_id: 0
     affinity: []
     policy: SCHED_OTHER
     nice: 0
 
   - id: /cie_tutorial_node@Timer(1000000000)
+    domain_id: 0
+    affinity: []
+    policy: SCHED_OTHER
+    nice: 0
+
+  - id: /cie_tutorial_node@Timer(200000000)
+    domain_id: 0
     affinity: []
     policy: SCHED_OTHER
     nice: 0
@@ -70,6 +79,8 @@ irqs:
     affinity: [4]
   # ... one entry per interrupt claimed by a device
 ```
+
+The first `callback_groups` entry is the node's default CallbackGroup, which holds the parameter services and the `/parameter_events` subscription. `domain_id` is the ROS domain the CallbackGroup was discovered in (`ROS_DOMAIN_ID`, or `0` if unset).
 
 The `kernel_threads` and `irqs` sections hold what the prerun mode observed on the machine. This tutorial does not change them, so the steps below leave them out.
 
@@ -108,7 +119,7 @@ callback_groups:
 non_ros_threads: []
 ```
 
-This gives the sensor timer the highest real-time priority on CPU 0, the processing timer a lower real-time priority on CPU 1, and leaves the logging timer on the default CFS scheduler.
+This gives the sensor timer the highest real-time priority on CPU 0, the processing timer a lower real-time priority on CPU 1, and leaves the logging timer on the default CFS scheduler. The default CallbackGroup entry and the `domain_id` keys are removed: a CallbackGroup with no entry is left unchanged, and `domain_id` defaults to the current domain.
 
 ## Step 4: Launch with configuration
 
