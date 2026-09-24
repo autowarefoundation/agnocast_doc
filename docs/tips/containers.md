@@ -13,7 +13,7 @@ The Agnocast kernel module (`agnocast-kmod`) must be installed on the **host** s
 **Non-Ubuntu hosts** (or environments where `apt` is not available) — Build the kernel module from source:
 
 ```bash
-git clone --branch 2.3.5 https://github.com/autowarefoundation/agnocast.git
+git clone --branch 2.4.0 https://github.com/autowarefoundation/agnocast.git
 cd agnocast/agnocast_kmod
 make
 sudo insmod agnocast.ko
@@ -119,7 +119,7 @@ The script unloads the current module, purges every installed `agnocast-kmod-v*`
     All Agnocast containers and ROS nodes must be stopped before running this script — the module cannot be unloaded while `/dev/agnocast` is held open.
 
 !!! warning
-    The kmod version on the host and the `libagnocast_heaphook.so` version inside the container must share the same ioctl ABI. Mismatched versions cause runtime errors. This script does not touch the container; it is the operator's responsibility to roll the container to a matching version.
+    The kmod version on the host must match the major and minor version of `agnocastlib` inside the container, and `libagnocast_heaphook.so` must match `agnocastlib` exactly. On a mismatch, Agnocast processes exit at startup. This script does not touch the container; it is the operator's responsibility to roll the container to a matching version.
 
 After the swap, verify that the host kmod, the in-container `libagnocast_heaphook.so`, and the in-container `agnocastlib` are on compatible versions by running
 
