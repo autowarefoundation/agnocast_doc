@@ -75,9 +75,9 @@ Agnocast pub/sub only works between processes that share the same Linux IPC name
 - **Cross-ECU communication:** When an Agnocast publisher and subscriber on the same topic live on different ECUs, the Bridge is **not** automatically started to connect them. Each side will only see local endpoints. Automatic discovery of remote Agnocast endpoints and on-demand Bridge creation is on the roadmap.
 - **Cross-IPC-namespace communication** is not supported. Containers must share an IPC namespace to communicate via Agnocast — see [Running in Containers](tips/containers.md). Native cross-namespace support is on the roadmap.
 
-### Cross-domain zero copy is unsupported
+### Cross-domain communication goes through DDS
 
-Agnocast honors `ROS_DOMAIN_ID`: publishers and subscribers connect only within the same domain. A zero-copy [domain bridge](domain-bridge/index.md) can reconnect a topic across two domains on the same machine, but it is incomplete and unsupported — relay between domains with the external ROS 2 `domain_bridge` node instead. There is no zero-copy path across ECUs or IPC namespaces either; that goes through the [Agnocast–ROS 2 Bridge](migration-guide/bridge.md).
+Agnocast honors `ROS_DOMAIN_ID`: publishers and subscribers connect only within the same domain. To connect a topic across two domains, relay it with the external ROS 2 `domain_bridge` node — see [Domain Bridge](domain-bridge/index.md). Messages are copied through DDS on that path; Agnocast's zero-copy cross-domain path is incomplete and unsupported.
 
 ### One message type per topic
 

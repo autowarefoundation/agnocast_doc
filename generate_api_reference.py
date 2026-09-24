@@ -1048,11 +1048,11 @@ def main():
 
         f.write("---\n\n")
         f.write("#### `AGNOCAST_DOMAIN_BRIDGE_CONFIG`\n\n")
-        f.write("Path to a [`domain_bridge` rule file](../domain-bridge/configuration.md), or "
-                "several separated by `:`. Both the discovery agent and `register_domain_bridge` "
-                "read it; without it they read `/etc/agnocast/domain_bridge.yaml` and "
-                "`/etc/agnocast/domain_bridge.d/*.yaml`. Export it to the application processes, "
-                "since the discovery agent inherits their environment.\n\n")
+        f.write("Path to the [`domain_bridge` config](../domain-bridge/configuration.md) the discovery "
+                "agent reads to bring up the Agnocast→ROS 2 bridge for topics relayed across domains, or "
+                "several paths separated by `:`. Without it, the agent reads "
+                "`/etc/agnocast/domain_bridge.yaml` and `/etc/agnocast/domain_bridge.d/*.yaml`. Export it "
+                "to the application processes, since the discovery agent inherits their environment.\n\n")
         f.write("```bash\nexport AGNOCAST_DOMAIN_BRIDGE_CONFIG="
                 "/etc/agnocast/base.yaml:/etc/agnocast/lidar.yaml\n```\n\n")
 
