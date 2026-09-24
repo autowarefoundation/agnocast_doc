@@ -48,7 +48,7 @@ Each entry configures one CallbackGroup's thread:
 
 ### CallbackGroup ID Format
 
-The `id` is auto-generated and composed of the fully qualified node name (including the namespace) followed by callback identifiers, sorted and separated by `@`:
+The `id` is auto-generated and composed of the fully qualified node name followed by the callback identifiers, sorted lexicographically and joined with `@`:
 
 ```text
 <fully_qualified_node_name>@<Callback1>@<Callback2>...
@@ -180,7 +180,7 @@ Optional section to validate that the kernel's RT throttling settings match expe
 | `period_us` | Expected value of `kernel.sched_rt_period_us` |
 | `runtime_us` | Expected value of `kernel.sched_rt_runtime_us` |
 
-The configurator reports an error at startup if the current kernel values don't match. These values must be pre-configured via `/etc/sysctl.d/` (see [RT Throttling](../environment-setup/configuration.md#rt-throttling-for-callbackisolatedexecutor)).
+The configurator logs an error at startup (and keeps running) if the current kernel values don't match. These values must be pre-configured via `/etc/sysctl.d/` (see [RT Throttling](../environment-setup/configuration.md#rt-throttling-for-callbackisolatedexecutor)).
 
 ## hardware_info
 
