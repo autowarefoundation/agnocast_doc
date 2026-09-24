@@ -181,7 +181,7 @@ ros2 service call /thread_configurator_node/reapply_config \
 
 The configurator re-reads the file at its `config_file` parameter and re-applies the scheduling parameters to every thread that has already announced itself. A typical tuning loop is therefore: edit the YAML, call the service, verify with `chrt` / `taskset`, and repeat.
 
-- **Added entries** take effect as soon as the corresponding thread announces itself.
+- **Added entries** take effect as soon as the corresponding thread announces itself. The configurator subscribes to ROS domains only at startup, so an entry whose `domain_id` was not in the YAML at startup requires restarting the configurator.
 - **Removed entries** drop out of the configurator's in-memory state. Scheduling already applied to a running thread is not reverted.
 - **`hardware_info` and `rt_throttling` are not re-evaluated.** Changing those sections requires restarting the configurator.
 
