@@ -1048,12 +1048,13 @@ def main():
 
         f.write("---\n\n")
         f.write("#### `AGNOCAST_DOMAIN_BRIDGE_CONFIG`\n\n")
-        f.write("Default path to a [`domain_bridge` rule file](../domain-bridge/configuration.md) for "
-                "the standalone `register_domain_bridge` tool: "
-                "`ros2 run ros2agnocast_discovery_agent register_domain_bridge` reads it when "
-                "`--config` is not given. Register the rules **before** the nodes that use those "
-                "topics start.\n\n")
-        f.write("```bash\nexport AGNOCAST_DOMAIN_BRIDGE_CONFIG=/path/to/domain_bridge.yaml\n```\n\n")
+        f.write("Path to the [`domain_bridge` config](../domain-bridge/configuration.md) the discovery "
+                "agent reads to bring up the Agnocast→ROS 2 bridge for topics relayed across domains, or "
+                "several paths separated by `:`. Without it, the agent reads "
+                "`/etc/agnocast/domain_bridge.yaml` and `/etc/agnocast/domain_bridge.d/*.yaml`. Export it "
+                "to the application processes, since the discovery agent inherits their environment.\n\n")
+        f.write("```bash\nexport AGNOCAST_DOMAIN_BRIDGE_CONFIG="
+                "/etc/agnocast/base.yaml:/etc/agnocast/lidar.yaml\n```\n\n")
 
     write_page("environment-variables.md", write_env_vars)
     landing_entries.append(("Environment Variables", "environment-variables.md",

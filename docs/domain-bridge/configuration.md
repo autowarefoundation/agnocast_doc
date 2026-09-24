@@ -1,17 +1,6 @@
 # Configuring the Domain Bridge
 
-You declare which topics to bridge, and between which domains, in a YAML file. Agnocast reuses the [ROS 2 `domain_bridge`](https://github.com/ros2/domain_bridge) file format, so existing config is familiar — Agnocast simply ignores the fields it does not support (see [Constraints](constraints.md)).
-
-A small standalone tool, `register_domain_bridge`, reads this file and registers each rule with the kernel module. Run it once, **before the nodes that use those topics start**.
-
-## Register rules before your nodes start
-
-This is the most important rule to get right. A bridge rule can only be registered for a topic that has **no publisher or subscriber yet in either domain**. If an endpoint for the topic already exists when the rule is applied, the registration is **rejected**.
-
-So `register_domain_bridge` must run — and register the rules — **before** the nodes that use those topics come up. The discovery agent does **not** register rules; this is a separate, one-time step.
-
-!!! note "Boot-time loading is planned"
-    For now you arrange this ordering yourself (see [Applying the config](#applying-the-config)). Loading bridge rules automatically at module-load time, before any application starts, is on the roadmap.
+One [ROS 2 `domain_bridge`](https://github.com/ros2/domain_bridge) YAML config drives both sides: the `domain_bridge` node relays the topics it lists, and the Agnocast discovery agent reads the same file to bring up the Agnocast→ROS 2 bridge each of those topics needs. Keeping them in one file keeps the two in agreement.
 
 ## File format
 
@@ -23,29 +12,40 @@ to_domain: 2
 topics:
   # Bridge /chatter from domain 1 to domain 2 (uses the defaults above).
   chatter:
+    type: std_msgs/msg/String
 
-  # Override the direction for a single topic.
+  # Override the direction for a single topic, and rename it in the destination domain.
   image:
+    type: sensor_msgs/msg/Image
     from_domain: 3
     to_domain: 4
+    remap: image_raw
 ```
 
-- The map key (`chatter`, `image`) is the topic name. It is the **same name in both domains** — Agnocast does not rename topics.
-- `from_domain` / `to_domain` are `ROS_DOMAIN_ID` values. Give them at the top level as defaults, per topic, or both.
-- A topic with no resolved `from_domain` / `to_domain` (no default and no override) is skipped.
-- The ROS 2 `type` field is accepted but ignored — matching is type-independent.
+The discovery agent reads these fields, with the same meaning as in `domain_bridge`:
 
-Each rule is one-directional (`from_domain` → `to_domain`). ROS 2's `bidirectional` / `reversed` options are ignored — to bridge both ways, register the reverse `to_domain` → `from_domain` rule as well (a separate config or run, since one `topics:` map can't repeat a topic name).
+- The map key (`chatter`, `image`) is the topic name in the source domain. `remap` gives it a different name in the destination domain.
+- `from_domain` / `to_domain` are `ROS_DOMAIN_ID` values. Give them at the top level as defaults, per topic, or both. A topic with no resolved `from_domain` / `to_domain` is skipped, and the agent logs it.
+- `reversed: true` swaps `from_domain` and `to_domain` for that topic.
+- `bidirectional: true` bridges the topic in both directions.
 
-## Applying the config
+The agent ignores every other field, such as `type` and QoS. `domain_bridge` still needs `type`, so keep it in the file.
 
-Run `register_domain_bridge`, pointing it at your file:
+## Where the file goes
+
+The discovery agent is `execv`'d from an application process, so it has no command line of its own: it finds the config through the default location or through an environment variable it inherits from that process.
+
+- **Default location.** `/etc/agnocast/domain_bridge.yaml` is read, followed by every `*.yaml` in `/etc/agnocast/domain_bridge.d/` in name order.
+- **`AGNOCAST_DOMAIN_BRIDGE_CONFIG`.** One path, or several separated by `:`. Export it to your application processes — setting it only where `domain_bridge` runs does not reach the agent. Setting it replaces the default location, so the drop-in directory is not read; the agent warns if the directory still holds a `*.yaml`.
+
+Splitting the rules across files is the same merge the `domain_bridge` node performs: `topics` from every file accumulate, while `from_domain` / `to_domain` stay local to the file that sets them. A file that cannot be read is reported in the agent's log and skipped, so the rest still apply.
+
+## Running `domain_bridge`
+
+Pass the same files to the `domain_bridge` node:
 
 ```bash
-ros2 run ros2agnocast_discovery_agent register_domain_bridge --config /path/to/domain_bridge.yaml
-# or set AGNOCAST_DOMAIN_BRIDGE_CONFIG instead of passing --config
+ros2 run domain_bridge domain_bridge /etc/agnocast/domain_bridge.yaml /etc/agnocast/domain_bridge.d/*.yaml
 ```
 
-It registers every rule and exits. It is idempotent (re-running is safe) and exits non-zero if any rule is rejected — so a node that came up too early fails loudly instead of silently leaving a topic unbridged.
-
-For production, run it from a boot step ordered **after** the kernel module is loaded and **before** your application nodes — for example a systemd one-shot. The `ros2agnocast_discovery_agent` package ships a reference unit (`systemd/agnocast-domain-bridge.service.example`) that shows this ordering.
+Do not use `domain_bridge`'s `--from` / `--to` options. They override the domains in the file for the node only, and the discovery agent, which reads only the file, would then bring up the bridge in the wrong domain.
