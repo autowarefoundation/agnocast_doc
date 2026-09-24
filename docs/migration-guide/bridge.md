@@ -5,7 +5,7 @@ Message circulation (echo-back) is automatically prevented by the Bridge's inter
 The Bridge can be introduced at **either Stage 1 or Stage 2**. It is independent of which node class you use.
 
 !!! note
-    Native Agnocast pub/sub is limited to a single ECU and a single IPC namespace. Across IPC namespaces or ECUs on the same `ROS_DOMAIN_ID`, Agnocast endpoints are connected through the Bridge over ROS 2 (DDS), with serialization: the Agnocast discovery agent, which each Agnocast process starts automatically unless `AGNOCAST_NO_DISCOVERY_AGENT` is set, requests a bridge when a topic's publisher and subscriber are in different IPC namespaces or ECUs. See [Limitations](../index.md#limitations) for the full list.
+    Native Agnocast pub/sub is limited to a single IPC namespace on one ECU. Across IPC namespaces or ECUs on the same `ROS_DOMAIN_ID`, the Bridge carries topics and services over ROS 2 (DDS), with serialization, on request from the Agnocast discovery agent. See [Limitations](../index.md#limitations) for the conditions and the full list.
 
 ```mermaid
 graph LR
@@ -45,7 +45,7 @@ Agnocast supports the following bridge modes, controlled by the `AGNOCAST_BRIDGE
 
 | Mode | Value | Description |
 |------|-------|-------------|
-| **Off** | `0` or `off` | Bridge disabled. Agnocast and ROS 2 nodes cannot communicate. |
+| **Off** | `0` or `off` | Bridge disabled. Agnocast and ROS 2 nodes cannot communicate, and neither can Agnocast endpoints in different IPC namespaces or ECUs. |
 | **On** | `on` | Single bridge manager process per IPC namespace and `ROS_DOMAIN_ID`. **Default mode.** |
 
 Values are case-insensitive. If an unknown value is given, the Bridge falls back to `on` with a warning. `1` / `standard` and `2` / `performance` are accepted for backward compatibility but are deprecated aliases for `on`.
@@ -93,7 +93,7 @@ If the value would not form a valid ROS 2 node name, it is ignored with a warnin
 
 ## Bridge Architecture
 
-The Bridge uses a single bridge manager process per IPC namespace and `ROS_DOMAIN_ID`. A bridge for a topic is created **lazily** — only when both an Agnocast endpoint and an external ROS 2 endpoint exist for that topic, or when the discovery agent reports the opposite Agnocast endpoint in another IPC namespace or ECU — and destroyed when either endpoint disappears.
+The Bridge uses a single bridge manager process per IPC namespace and `ROS_DOMAIN_ID`. A bridge for a topic is created **lazily** — only when both an Agnocast endpoint and an external ROS 2 endpoint exist for that topic, or when the discovery agent requests one for an Agnocast endpoint in another IPC namespace or ECU — and destroyed when either endpoint disappears. A bridge the discovery agent requested is kept for up to 5 seconds after its last request.
 
 ```mermaid
 graph TD
@@ -152,7 +152,7 @@ source install/setup.bash
 !!! note
     If you add new custom message types later, regenerate and rebuild the plugins. To search additional plugin directories, set [`AGNOCAST_BRIDGE_PLUGINS_PATH`](../api/environment-variables.md#agnocast_bridge_plugins_path).
 
-For Agnocast-wide limitations (memory layout requirements, single-ECU scope, domain isolation), see [Limitations](../index.md#limitations).
+For Agnocast-wide limitations (memory layout requirements, zero copy only within one IPC namespace, domain isolation), see [Limitations](../index.md#limitations).
 
 ## QoS Behavior
 
