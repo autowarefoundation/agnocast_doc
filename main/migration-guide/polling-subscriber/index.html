@@ -1458,7 +1458,7 @@
 
 
 <h1 id="polling-subscriber">Polling Subscriber<a class="headerlink" href="#polling-subscriber" title="Permanent link">#</a></h1>
-<p>Agnocast provides <code>agnocast::PollingSubscriber</code>, a pull-based subscription that lets you fetch the latest message on demand rather than receiving it via a callback. This corresponds to the <code>subscription-&gt;take()</code> pattern in rclcpp, but returns a zero-copy shared pointer from shared memory instead of copying data into a provided message.</p>
+<p>Agnocast provides <code>agnocast::PollingSubscriber</code>, a pull-based subscription that lets you fetch a message on demand rather than receiving it via a callback. This corresponds to the <code>subscription-&gt;take()</code> pattern in rclcpp, but returns a zero-copy shared pointer from shared memory instead of copying data into a provided message.</p>
 <p><code>PollingSubscriber</code> is available at both Stage 1 (<code>rclcpp::Node</code>) and Stage 2 (<code>agnocast::Node</code>).</p>
 <h2 id="migration-from-rclcpp-take">Migration from rclcpp <code>take()</code><a class="headerlink" href="#migration-from-rclcpp-take" title="Permanent link">#</a></h2>
 <h3 id="before-rclcpp">Before (rclcpp)<a class="headerlink" href="#before-rclcpp" title="Permanent link">#</a></h3>
@@ -1519,6 +1519,32 @@
 <li><code>sub_-&gt;take(msg, msg_info)</code> → <code>sub_-&gt;take_data()</code> which returns an <code>agnocast::ipc_shared_ptr&lt;const T&gt;</code> (zero-copy)</li>
 <li>Use <code>agnocast::create_subscription</code> free function (no callback argument)</li>
 </ol>
+<div class="admonition warning">
+<p class="admonition-title">Use a history depth of 1</p>
+<p><code>take_data()</code> returns exactly one message per call, and reads are non-destructive: entries stay
+in shared memory while a per-subscriber watermark records how far this subscriber has read. The
+search starts at the newest entry and walks back at most <code>depth</code> deliverable entries, and the
+<strong>oldest</strong> entry within that window is returned.</p>
+<p>With a depth of 1 the window holds a single entry, so the most recent message is returned, and
+the same message is returned again when nothing newer has been published. With a greater depth,
+once at least <code>depth</code> messages have been published, the returned message lags the newest one by
+exactly <code>depth - 1</code> and the lag does not recover — so <code>take_data()</code> means "the latest value"
+only with a depth of 1.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Deprecated</p>
+<p><code>agnocast::PollingSubscriber</code> reproduces Autoware's polling subscriber, which is an
+Autoware-specific API that Agnocast does not intend to maintain as public API. The class is
+planned to move to <code>autoware_agnocast_wrapper</code> and be removed from Agnocast, so its entry
+points — the polling overloads of <code>create_subscription()</code>, <code>take_data()</code>, and <code>takeData()</code> —
+are marked <code>[[deprecated]]</code> and calling them emits a compiler warning. No removal version has
+been decided yet.</p>
+<p>For new code, use <a href="../../api/takesubscription/"><code>agnocast::TakeSubscription</code></a> directly: keep the
+last returned message on the caller side and call <a href="../../api/takesubscription/#take"><code>take(false)</code></a>,
+which returns the oldest entry within the window not yet received by this subscriber. <code>take(true)</code>
+— the mode <code>take_data()</code> uses — exists only for <code>PollingSubscriber</code> and is expected to go with
+it, so it logs a one-time warning at runtime.</p>
+</div>
 <h3 id="after-agnocast-stage-2">After (Agnocast Stage 2)<a class="headerlink" href="#after-agnocast-stage-2" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">MyPollingNode</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">agnocast</span><span class="o">::</span><span class="n">Node</span><span class="w">                            </span><span class="c1">// (1)</span>
 <span class="p">{</span>
