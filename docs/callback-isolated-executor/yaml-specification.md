@@ -17,7 +17,7 @@ callback_groups:     # Required: list of CallbackGroup configurations
   - id: ...
     ...
 
-non_ros_threads:     # Optional: list of non-ROS thread configurations
+non_ros_threads:     # Required: list of non-ROS thread configurations (may be empty: [])
   - name: ...
     ...
 
@@ -48,16 +48,18 @@ Each entry configures one CallbackGroup's thread:
 
 ### CallbackGroup ID Format
 
-The `id` is auto-generated and composed of the node name followed by callback identifiers separated by `@`:
+The `id` is auto-generated and composed of the fully qualified node name (including the namespace) followed by callback identifiers, sorted and separated by `@`:
 
 ```text
-/<node_name>@<Callback1>@<Callback2>...
+<fully_qualified_node_name>@<Callback1>@<Callback2>...
 ```
 
 Callback identifiers include: `Subscription(<topic>)`, `Timer(<period_ns>)`, `Service(<name>)`, `Client(<name>)`.
 
 !!! tip
     Use the prerun mode to discover the exact IDs for your application rather than constructing them manually.
+
+An `id` of the form `<fully_qualified_node_name>/*` (for example `/my_node/*`) matches every CallbackGroup of that node in the entry's domain. An entry with the exact `id` takes precedence over the wildcard. `*` is not allowed anywhere else in an `id`.
 
 !!! warning
     If a node has multiple CallbackGroups with timers of the same period, their auto-generated IDs will collide. To avoid this, slightly offset the timer periods (e.g., `100ms` and `100ms + 1ns`).
@@ -81,7 +83,7 @@ For `SCHED_DEADLINE`, specify `runtime`, `period`, and `deadline` (in nanosecond
 
 ```yaml
 callback_groups:
-  - id: /my_node/my_deadline_group@Timer
+  - id: /my_node@Timer(10000000)
     policy: SCHED_DEADLINE
     runtime: 1000000      # 1 ms
     period: 10000000       # 10 ms
@@ -103,6 +105,7 @@ Threads not managed by the executor can also be configured. See [Non-ROS Threads
 | `priority` | `SCHED_FIFO` / `SCHED_RR` only | Real-time priority (1–99, 99 = highest) |
 | `nice` | `SCHED_OTHER` / `SCHED_BATCH` / `SCHED_IDLE` only | Nice value (-20–19, lower = stronger) |
 | `affinity` | No | List of CPU cores |
+| `runtime`, `period`, `deadline` | `SCHED_DEADLINE` only | Same meaning as in callback_groups, in nanoseconds |
 
 ## kernel_threads
 
@@ -181,7 +184,7 @@ The configurator reports an error at startup if the current kernel values don't 
 
 ## hardware_info
 
-Optional section for hardware validation. If present, the configurator compares these values against the current system (via `lscpu`) and reports an error on mismatch. The prerun mode automatically populates this section.
+Optional section for hardware validation. If present, the configurator compares these values against the current system (via `lscpu`) and exits with an error on mismatch. The prerun mode automatically populates this section.
 
 | Field | Source (`lscpu` field) | Example |
 |-------|----------------------|---------|
