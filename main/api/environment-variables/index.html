@@ -274,6 +274,22 @@
   
   
     <li class="md-tabs__item">
+      <a href="../../domain-bridge/" class="md-tabs__link">
+        Domain Bridge
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
       <a href="../../ros2-cli/" class="md-tabs__link">
         ROS 2 CLI
       </a>
@@ -764,22 +780,58 @@
             
           
         
+          
+        
+          
+        
       
       
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../../ros2-cli/">ROS 2 CLI</a>
+          <a href="../../domain-bridge/">Domain Bridge</a>
+          
+            <label for="__nav_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
           
         </div>
       
       <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
-          ROS 2 CLI
+          Domain Bridge
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../domain-bridge/configuration/" class="md-nav__link">
+        Configuration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../domain-bridge/constraints/" class="md-nav__link">
+        Constraints & Differences
+      </a>
+    </li>
+  
+
             
           
         </ul>
@@ -811,6 +863,53 @@
             
           
         
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../ros2-cli/">ROS 2 CLI</a>
+          
+        </div>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          ROS 2 CLI
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+      
+      
+        
+          
+            
+          
+        
           
         
           
@@ -824,14 +923,14 @@
         <div class="md-nav__link md-nav__link--index ">
           <a href="../../tips/">Tips</a>
           
-            <label for="__nav_6">
+            <label for="__nav_7">
               <span class="md-nav__icon md-icon"></span>
             </label>
           
         </div>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-        <label class="md-nav__title" for="__nav_6">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_7">
           <span class="md-nav__icon md-icon"></span>
           Tips
         </label>
@@ -902,7 +1001,7 @@
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
       
       
         
@@ -951,14 +1050,14 @@
         <div class="md-nav__link md-nav__link--index ">
           <a href="../">API Reference</a>
           
-            <label for="__nav_7">
+            <label for="__nav_8">
               <span class="md-nav__icon md-icon"></span>
             </label>
           
         </div>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
-        <label class="md-nav__title" for="__nav_7">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_8">
           <span class="md-nav__icon md-icon"></span>
           API Reference
         </label>
@@ -1257,6 +1356,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#agnocast_domain_bridge_config" class="md-nav__link">
+    AGNOCAST_DOMAIN_BRIDGE_CONFIG
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1322,6 +1428,13 @@
         <li class="md-nav__item">
   <a href="#agnocast_bridge_plugins_path" class="md-nav__link">
     AGNOCAST_BRIDGE_PLUGINS_PATH
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agnocast_domain_bridge_config" class="md-nav__link">
+    AGNOCAST_DOMAIN_BRIDGE_CONFIG
   </a>
   
 </li>
@@ -1433,6 +1546,11 @@
 <h4 id="agnocast_bridge_plugins_path"><code>AGNOCAST_BRIDGE_PLUGINS_PATH</code><a class="headerlink" href="#agnocast_bridge_plugins_path" title="Permanent link">#</a></h4>
 <p>Colon-separated list of additional search paths for bridge plugin shared libraries (<code>.so</code> files). If not set, plugins are searched in the default package install location.</p>
 <div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">AGNOCAST_BRIDGE_PLUGINS_PATH</span><span class="o">=</span>/opt/my_plugins:/home/user/plugins
+</code></pre></div>
+<hr />
+<h4 id="agnocast_domain_bridge_config"><code>AGNOCAST_DOMAIN_BRIDGE_CONFIG</code><a class="headerlink" href="#agnocast_domain_bridge_config" title="Permanent link">#</a></h4>
+<p>Default path to a <a href="../../domain-bridge/configuration/"><code>domain_bridge</code> rule file</a> for the standalone <code>register_domain_bridge</code> tool: <code>ros2 run ros2agnocast_discovery_agent register_domain_bridge</code> reads it when <code>--config</code> is not given. Register the rules <strong>before</strong> the nodes that use those topics start.</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">AGNOCAST_DOMAIN_BRIDGE_CONFIG</span><span class="o">=</span>/path/to/domain_bridge.yaml
 </code></pre></div>
 
 

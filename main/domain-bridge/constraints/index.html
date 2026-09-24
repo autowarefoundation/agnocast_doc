@@ -8,27 +8,27 @@
       
       
       
-        <link rel="canonical" href="https://autowarefoundation.github.io/agnocast_doc/main/environment-setup/">
+        <link rel="canonical" href="https://autowarefoundation.github.io/agnocast_doc/main/domain-bridge/constraints/">
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../configuration/">
       
       
-        <link rel="next" href="configuration/">
+        <link rel="next" href="../../ros2-cli/">
       
-      <link rel="icon" href="../assets/images/tier4.png">
+      <link rel="icon" href="../../assets/images/tier4.png">
       <meta name="generator" content="mkdocs-ProperDocs 1.6.7, mkdocs-material-9.1.21">
     
     
       
-        <title>Environment Setup - Agnocast</title>
+        <title>Constraints & Differences - Agnocast</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.eebd395e.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.eebd395e.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ecc896b0.min.css">
       
       
 
@@ -46,11 +46,11 @@
     
       <link rel="stylesheet" href="https://unpkg.com/mermaid@8.13.10/dist/mermaid.css">
     
-      <link rel="stylesheet" href="../assets/css/extra.css">
+      <link rel="stylesheet" href="../../assets/css/extra.css">
     
       <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -79,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#environment-setup" class="md-skip">
+        <a href="#constraints-differences-from-ros-2-domain_bridge" class="md-skip">
           Skip to content
         </a>
       
@@ -99,7 +99,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="Agnocast" class="md-header__button md-logo" aria-label="Agnocast" data-md-component="logo">
+    <a href="../.." title="Agnocast" class="md-header__button md-logo" aria-label="Agnocast" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M135.2 117.4 109.1 192h293.8l-26.1-74.6c-4.5-12.8-16.6-21.4-30.2-21.4H165.4c-13.6 0-25.7 8.6-30.2 21.4zm-95.6 79.4L74.8 96.3C88.3 57.8 124.6 32 165.4 32h181.2c40.8 0 77.1 25.8 90.6 64.3l35.2 100.5c23.2 9.6 39.6 32.5 39.6 59.2v192c0 17.7-14.3 32-32 32h-32c-17.7 0-32-14.3-32-32v-48H96v48c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32V256c0-26.7 16.4-49.6 39.6-59.2zM128 288a32 32 0 1 0-64 0 32 32 0 1 0 64 0zm288 32a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"/></svg>
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Environment Setup
+              Constraints & Differences
             
           </span>
         </div>
@@ -213,7 +213,7 @@
 
 
   <li class="md-tabs__item">
-    <a href=".." class="md-tabs__link">
+    <a href="../.." class="md-tabs__link">
       Home
     </a>
   </li>
@@ -222,15 +222,13 @@
         
   
   
-    
-  
 
 
   
   
   
     <li class="md-tabs__item">
-      <a href="./" class="md-tabs__link md-tabs__link--active">
+      <a href="../../environment-setup/" class="md-tabs__link">
         Environment Setup
       </a>
     </li>
@@ -246,7 +244,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../migration-guide/" class="md-tabs__link">
+      <a href="../../migration-guide/" class="md-tabs__link">
         Migration Guide
       </a>
     </li>
@@ -262,7 +260,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../callback-isolated-executor/" class="md-tabs__link">
+      <a href="../../callback-isolated-executor/" class="md-tabs__link">
         CallbackIsolatedExecutor
       </a>
     </li>
@@ -272,13 +270,15 @@
         
   
   
+    
+  
 
 
   
   
   
     <li class="md-tabs__item">
-      <a href="../domain-bridge/" class="md-tabs__link">
+      <a href="../" class="md-tabs__link md-tabs__link--active">
         Domain Bridge
       </a>
     </li>
@@ -294,7 +294,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../ros2-cli/" class="md-tabs__link">
+      <a href="../../ros2-cli/" class="md-tabs__link">
         ROS 2 CLI
       </a>
     </li>
@@ -310,7 +310,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../tips/" class="md-tabs__link">
+      <a href="../../tips/" class="md-tabs__link">
         Tips
       </a>
     </li>
@@ -326,7 +326,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../api/" class="md-tabs__link">
+      <a href="../../api/" class="md-tabs__link">
         API Reference
       </a>
     </li>
@@ -360,7 +360,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Agnocast" class="md-nav__button md-logo" aria-label="Agnocast" data-md-component="logo">
+    <a href="../.." title="Agnocast" class="md-nav__button md-logo" aria-label="Agnocast" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M135.2 117.4 109.1 192h293.8l-26.1-74.6c-4.5-12.8-16.6-21.4-30.2-21.4H165.4c-13.6 0-25.7 8.6-30.2 21.4zm-95.6 79.4L74.8 96.3C88.3 57.8 124.6 32 165.4 32h181.2c40.8 0 77.1 25.8 90.6 64.3l35.2 100.5c23.2 9.6 39.6 32.5 39.6 59.2v192c0 17.7-14.3 32-32 32h-32c-17.7 0-32-14.3-32-32v-48H96v48c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32V256c0-26.7 16.4-49.6 39.6-59.2zM128 288a32 32 0 1 0-64 0 32 32 0 1 0 64 0zm288 32a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"/></svg>
@@ -391,7 +391,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         Home
       </a>
     </li>
@@ -404,16 +404,16 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
       
       
-      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
       
       
         
@@ -431,8 +431,8 @@
       
         
         
-        <div class="md-nav__link md-nav__link--index md-nav__link--active">
-          <a href="./">Environment Setup</a>
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../environment-setup/">Environment Setup</a>
           
             <label for="__nav_2">
               <span class="md-nav__icon md-icon"></span>
@@ -440,7 +440,7 @@
           
         </div>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2">
           <span class="md-nav__icon md-icon"></span>
           Environment Setup
@@ -455,7 +455,7 @@
   
   
     <li class="md-nav__item">
-      <a href="configuration/" class="md-nav__link">
+      <a href="../../environment-setup/configuration/" class="md-nav__link">
         System Configuration
       </a>
     </li>
@@ -469,7 +469,7 @@
   
   
     <li class="md-nav__item">
-      <a href="scripts/" class="md-nav__link">
+      <a href="../../environment-setup/scripts/" class="md-nav__link">
         Scripts
       </a>
     </li>
@@ -483,7 +483,7 @@
   
   
     <li class="md-nav__item">
-      <a href="upgrading/" class="md-nav__link">
+      <a href="../../environment-setup/upgrading/" class="md-nav__link">
         Upgrading
       </a>
     </li>
@@ -537,7 +537,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../migration-guide/">Migration Guide</a>
+          <a href="../../migration-guide/">Migration Guide</a>
           
             <label for="__nav_3">
               <span class="md-nav__icon md-icon"></span>
@@ -560,7 +560,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration-guide/stage1/" class="md-nav__link">
+      <a href="../../migration-guide/stage1/" class="md-nav__link">
         Stage 1: Agnocast Pub/Sub
       </a>
     </li>
@@ -574,7 +574,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration-guide/stage2/" class="md-nav__link">
+      <a href="../../migration-guide/stage2/" class="md-nav__link">
         Stage 2: agnocast::Node
       </a>
     </li>
@@ -588,7 +588,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration-guide/polling-subscriber/" class="md-nav__link">
+      <a href="../../migration-guide/polling-subscriber/" class="md-nav__link">
         Polling Subscriber
       </a>
     </li>
@@ -602,7 +602,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration-guide/services/" class="md-nav__link">
+      <a href="../../migration-guide/services/" class="md-nav__link">
         Services
       </a>
     </li>
@@ -616,7 +616,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration-guide/message-filters/" class="md-nav__link">
+      <a href="../../migration-guide/message-filters/" class="md-nav__link">
         Message Filters
       </a>
     </li>
@@ -630,7 +630,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../migration-guide/bridge/" class="md-nav__link">
+      <a href="../../migration-guide/bridge/" class="md-nav__link">
         Bridge
       </a>
     </li>
@@ -680,7 +680,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../callback-isolated-executor/">CallbackIsolatedExecutor</a>
+          <a href="../../callback-isolated-executor/">CallbackIsolatedExecutor</a>
           
             <label for="__nav_4">
               <span class="md-nav__icon md-icon"></span>
@@ -703,7 +703,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../callback-isolated-executor/integration-guide/" class="md-nav__link">
+      <a href="../../callback-isolated-executor/integration-guide/" class="md-nav__link">
         Integration Guide
       </a>
     </li>
@@ -717,7 +717,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../callback-isolated-executor/yaml-specification/" class="md-nav__link">
+      <a href="../../callback-isolated-executor/yaml-specification/" class="md-nav__link">
         YAML Specification
       </a>
     </li>
@@ -731,7 +731,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../callback-isolated-executor/non-ros-threads/" class="md-nav__link">
+      <a href="../../callback-isolated-executor/non-ros-threads/" class="md-nav__link">
         Non-ROS Threads
       </a>
     </li>
@@ -745,7 +745,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../callback-isolated-executor/tutorial/" class="md-nav__link">
+      <a href="../../callback-isolated-executor/tutorial/" class="md-nav__link">
         Tutorial
       </a>
     </li>
@@ -765,16 +765,16 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-        
-      
-      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
       
       
         
@@ -791,7 +791,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../domain-bridge/">Domain Bridge</a>
+          <a href="../">Domain Bridge</a>
           
             <label for="__nav_5">
               <span class="md-nav__icon md-icon"></span>
@@ -799,7 +799,7 @@
           
         </div>
       
-      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
           Domain Bridge
@@ -814,7 +814,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../domain-bridge/configuration/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         Configuration
       </a>
     </li>
@@ -826,11 +826,66 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../domain-bridge/constraints/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Constraints & Differences
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Constraints & Differences
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#functional-differences" class="md-nav__link">
+    Functional differences
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scope" class="md-nav__link">
+    Scope
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#behavior-to-be-aware-of" class="md-nav__link">
+    Behavior to be aware of
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -870,7 +925,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../ros2-cli/">ROS 2 CLI</a>
+          <a href="../../ros2-cli/">ROS 2 CLI</a>
           
         </div>
       
@@ -923,7 +978,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../tips/">Tips</a>
+          <a href="../../tips/">Tips</a>
           
             <label for="__nav_7">
               <span class="md-nav__icon md-icon"></span>
@@ -946,7 +1001,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tips/containers/" class="md-nav__link">
+      <a href="../../tips/containers/" class="md-nav__link">
         Running in Containers
       </a>
     </li>
@@ -960,7 +1015,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tips/caret/" class="md-nav__link">
+      <a href="../../tips/caret/" class="md-nav__link">
         CARET Support
       </a>
     </li>
@@ -974,7 +1029,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tips/troubleshooting/" class="md-nav__link">
+      <a href="../../tips/troubleshooting/" class="md-nav__link">
         Troubleshooting
       </a>
     </li>
@@ -1050,7 +1105,7 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../api/">API Reference</a>
+          <a href="../../api/">API Reference</a>
           
             <label for="__nav_8">
               <span class="md-nav__icon md-icon"></span>
@@ -1073,7 +1128,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/free-functions/" class="md-nav__link">
+      <a href="../../api/free-functions/" class="md-nav__link">
         Free Functions
       </a>
     </li>
@@ -1087,7 +1142,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/type-aliases/" class="md-nav__link">
+      <a href="../../api/type-aliases/" class="md-nav__link">
         Type Aliases
       </a>
     </li>
@@ -1101,7 +1156,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/node/" class="md-nav__link">
+      <a href="../../api/node/" class="md-nav__link">
         Node
       </a>
     </li>
@@ -1115,7 +1170,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/publisher/" class="md-nav__link">
+      <a href="../../api/publisher/" class="md-nav__link">
         Publisher
       </a>
     </li>
@@ -1129,7 +1184,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/subscription/" class="md-nav__link">
+      <a href="../../api/subscription/" class="md-nav__link">
         Subscription
       </a>
     </li>
@@ -1143,7 +1198,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/takesubscription/" class="md-nav__link">
+      <a href="../../api/takesubscription/" class="md-nav__link">
         TakeSubscription
       </a>
     </li>
@@ -1157,7 +1212,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/pollingsubscriber/" class="md-nav__link">
+      <a href="../../api/pollingsubscriber/" class="md-nav__link">
         PollingSubscriber
       </a>
     </li>
@@ -1171,7 +1226,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/ipc_shared_ptr/" class="md-nav__link">
+      <a href="../../api/ipc_shared_ptr/" class="md-nav__link">
         ipc_shared_ptr
       </a>
     </li>
@@ -1185,7 +1240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/client/" class="md-nav__link">
+      <a href="../../api/client/" class="md-nav__link">
         Client
       </a>
     </li>
@@ -1199,7 +1254,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/service/" class="md-nav__link">
+      <a href="../../api/service/" class="md-nav__link">
         Service
       </a>
     </li>
@@ -1213,7 +1268,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/timerbase/" class="md-nav__link">
+      <a href="../../api/timerbase/" class="md-nav__link">
         TimerBase
       </a>
     </li>
@@ -1227,7 +1282,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/generictimer/" class="md-nav__link">
+      <a href="../../api/generictimer/" class="md-nav__link">
         GenericTimer
       </a>
     </li>
@@ -1241,7 +1296,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/walltimer/" class="md-nav__link">
+      <a href="../../api/walltimer/" class="md-nav__link">
         WallTimer
       </a>
     </li>
@@ -1255,7 +1310,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/executors/" class="md-nav__link">
+      <a href="../../api/executors/" class="md-nav__link">
         Executors
       </a>
     </li>
@@ -1269,7 +1324,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/options/" class="md-nav__link">
+      <a href="../../api/options/" class="md-nav__link">
         Options
       </a>
     </li>
@@ -1283,7 +1338,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/message-filters/" class="md-nav__link">
+      <a href="../../api/message-filters/" class="md-nav__link">
         Message Filters
       </a>
     </li>
@@ -1297,7 +1352,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/environment-variables/" class="md-nav__link">
+      <a href="../../api/environment-variables/" class="md-nav__link">
         Environment Variables
       </a>
     </li>
@@ -1338,63 +1393,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
-    Prerequisites
+  <a href="#functional-differences" class="md-nav__link">
+    Functional differences
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    Installation
+  <a href="#scope" class="md-nav__link">
+    Scope
   </a>
-  
-    <nav class="md-nav" aria-label="Installation">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-add-the-agnocast-ppa" class="md-nav__link">
-    1. Add the Agnocast PPA
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-install-the-kernel-module-and-heaphook" class="md-nav__link">
-    2. Install the kernel module and heaphook
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-build-the-ros-packages-from-source" class="md-nav__link">
-    3. Build the ROS packages from source
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-load-the-kernel-module" class="md-nav__link">
-    4. Load the kernel module
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-verify-installation" class="md-nav__link">
-    5. Verify installation
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    Next Steps
+  <a href="#behavior-to-be-aware-of" class="md-nav__link">
+    Behavior to be aware of
   </a>
   
 </li>
@@ -1417,158 +1431,60 @@
   
 
 
-<h1 id="environment-setup">Environment Setup<a class="headerlink" href="#environment-setup" title="Permanent link">#</a></h1>
-<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">#</a></h2>
-<ul>
-<li><strong>ROS 2</strong> Humble or Jazzy installed (rclcpp)</li>
-<li><strong>Ubuntu</strong> 22.04 or 24.04</li>
-<li><strong>Linux kernel</strong> 5.x or 6.x series</li>
-</ul>
-<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
-<p>Agnocast consists of three components:</p>
+<h1 id="constraints-differences-from-ros-2-domain_bridge">Constraints &amp; Differences from ROS 2 <code>domain_bridge</code><a class="headerlink" href="#constraints-differences-from-ros-2-domain_bridge" title="Permanent link">#</a></h1>
+<p>The Agnocast domain bridge reuses the ROS 2 <a href="https://github.com/ros2/domain_bridge"><code>domain_bridge</code></a> YAML format, but it behaves differently in several ways.</p>
+<h2 id="functional-differences">Functional differences<a class="headerlink" href="#functional-differences" title="Permanent link">#</a></h2>
 <table>
 <thead>
 <tr>
-<th>Component</th>
-<th>Description</th>
-<th>Installation</th>
+<th></th>
+<th>ROS 2 <code>domain_bridge</code></th>
+<th>Agnocast domain bridge</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>agnocast-kmod</strong></td>
-<td>Linux kernel module for core metadata management</td>
-<td>apt (PPA)</td>
+<td>Topic renaming (<code>remap</code>)</td>
+<td>Supported</td>
+<td><strong>Not supported</strong> — the topic must have the same name in both domains</td>
 </tr>
 <tr>
-<td><strong>agnocast-heaphook</strong></td>
-<td>Custom heap allocator for shared memory allocation</td>
-<td>apt (PPA)</td>
+<td>When a rule can be registered</td>
+<td>Any time (dynamic relay node)</td>
+<td><strong>Before any publisher or subscriber for that topic exists</strong> in either domain — otherwise rejected</td>
 </tr>
 <tr>
-<td><strong>ROS packages</strong> (agnocastlib, etc.)</td>
-<td>Core library and rclcpp-compatible pub/sub API</td>
-<td>Source build</td>
+<td>Domains per topic</td>
+<td>Multiple</td>
+<td><strong>One domain pair</strong> per topic (no fan-out to a third domain)</td>
+</tr>
+<tr>
+<td>Direction (<code>bidirectional</code> / <code>reversed</code>)</td>
+<td>Two-way per topic</td>
+<td><strong>One-directional</strong> — <code>bidirectional</code> / <code>reversed</code> are ignored; register the reverse rule separately</td>
+</tr>
+<tr>
+<td>Per-topic QoS</td>
+<td>Can be overridden</td>
+<td><strong>Not supported</strong> — each endpoint keeps its own QoS (the <code>type</code> and QoS fields in the config are ignored)</td>
+</tr>
+<tr>
+<td>Services</td>
+<td>Bridged</td>
+<td><strong>Pub/sub only</strong></td>
 </tr>
 </tbody>
 </table>
-<p>The kernel module and heaphook are distributed via a Launchpad PPA with explicit version pinning.
-The ROS packages are not yet available from the ROS build farm and must be built from source for now.</p>
-<h3 id="1-add-the-agnocast-ppa">1. Add the Agnocast PPA<a class="headerlink" href="#1-add-the-agnocast-ppa" title="Permanent link">#</a></h3>
-<p>Import the GPG key and add the repository:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Download and install the GPG key</span>
-sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/etc/apt/keyrings
-curl<span class="w"> </span>-fsSL<span class="w"> </span><span class="s1">&#39;https://keyserver.ubuntu.com/pks/lookup?op=get&amp;search=0xCFDB1950382092423DF37D3E075CD8B5C91E5ACA&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>gpg<span class="w"> </span>--dearmor<span class="w"> </span>-o<span class="w"> </span>/etc/apt/keyrings/agnocast-ppa.gpg
-
-<span class="c1"># Add the repository (DEB822 format)</span>
-sudo<span class="w"> </span>tee<span class="w"> </span>/etc/apt/sources.list.d/agnocast.sources<span class="w"> </span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
-<span class="s">Types: deb</span>
-<span class="s">URIs: http://ppa.launchpad.net/t4-system-software/agnocast/ubuntu</span>
-<span class="s">Suites: jammy</span>
-<span class="s">Components: main</span>
-<span class="s">Signed-By: /etc/apt/keyrings/agnocast-ppa.gpg</span>
-<span class="s">EOF</span>
-
-sudo<span class="w"> </span>apt<span class="w"> </span>update
-</code></pre></div>
-<h3 id="2-install-the-kernel-module-and-heaphook">2. Install the kernel module and heaphook<a class="headerlink" href="#2-install-the-kernel-module-and-heaphook" title="Permanent link">#</a></h3>
-<p>Install kernel headers (required for DKMS to build the kernel module) and the Agnocast packages:</p>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>linux-headers-<span class="k">$(</span>uname<span class="w"> </span>-r<span class="k">)</span>
-sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>agnocast-kmod-v2.3.5<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>agnocast-heaphook-v2.3.5
-</code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you are running in a container environment, skip <code>agnocast-kmod</code> installation. The kernel module must be installed on the <strong>host</strong> system instead.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If <code>linux-headers-$(uname -r)</code> is not available (e.g., custom-built kernels), you must ensure the kernel headers matching your running kernel are installed manually before installing <code>agnocast-kmod</code>. DKMS requires them to compile the kernel module.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Versioning rules</p>
-<p>Agnocast follows semantic versioning (<code>major.minor.patch</code>):</p>
+<h2 id="scope">Scope<a class="headerlink" href="#scope" title="Permanent link">#</a></h2>
 <ul>
-<li><strong>major</strong> — Incremented when backward compatibility of the user-facing API is broken. The major version should not change within the same ROS 2 distribution (e.g., Humble or Jazzy).</li>
-<li><strong>minor</strong> — Incremented when the kmod syscall API changes. <code>agnocastlib</code> and <code>agnocast-kmod</code> with matching major and minor versions are guaranteed to work correctly together.</li>
-<li><strong>patch</strong> — Incremented for all other changes.</li>
+<li><strong>Zero copy only within one IPC namespace</strong> (same machine) and only between <strong>Agnocast endpoints</strong>. Cross-ECU, cross-IPC-namespace, or Agnocast ↔ ROS 2 traffic goes through the <a href="../../migration-guide/bridge/">Agnocast–ROS 2 Bridge</a> over DDS, with a copy. See <a href="../../#limitations">Limitations</a>.</li>
+<li><strong>Performance mode only.</strong></li>
 </ul>
-<p>Packages use version-pinned names (e.g., <code>agnocast-kmod-v2.3.5</code>) to ensure all components are at exactly the same version.</p>
-</div>
-<h3 id="3-build-the-ros-packages-from-source">3. Build the ROS packages from source<a class="headerlink" href="#3-build-the-ros-packages-from-source" title="Permanent link">#</a></h3>
-<p>Since the ROS packages are not yet distributed from the ROS build farm, build them from source:</p>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>--branch<span class="w"> </span><span class="m">2</span>.3.5<span class="w"> </span>https://github.com/autowarefoundation/agnocast.git
-<span class="nb">cd</span><span class="w"> </span>agnocast
-rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span>src<span class="w"> </span>--ignore-src<span class="w"> </span>-y
-colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--cmake-args<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
-<span class="nb">source</span><span class="w"> </span>install/setup.bash
-</code></pre></div>
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p>Once the ROS build farm release is available, the ROS packages will also be installable via apt (e.g., <code>ros-jazzy-agnocast=2.3.5*</code>), and this source build step will no longer be necessary.</p>
-</div>
-<h3 id="4-load-the-kernel-module">4. Load the kernel module<a class="headerlink" href="#4-load-the-kernel-module" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>modprobe<span class="w"> </span>agnocast
-</code></pre></div>
-<p>The kernel module accepts parameters to customize the shared memory pool:</p>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>modprobe<span class="w"> </span>agnocast<span class="w"> </span><span class="nv">mempool_num</span><span class="o">=</span><span class="m">8192</span><span class="w"> </span><span class="nv">mempool_size_gb</span><span class="o">=</span><span class="m">32</span>
-</code></pre></div>
-<table>
-<thead>
-<tr>
-<th>Parameter</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>mempool_num</code></td>
-<td>Maximum number of memory pools (one per process)</td>
-<td>4096</td>
-</tr>
-<tr>
-<td><code>mempool_size_gb</code></td>
-<td>Size of each memory pool in GB</td>
-<td>16</td>
-</tr>
-<tr>
-<td><code>mempool_start_addr</code></td>
-<td>Virtual start address of the memory allocator</td>
-<td><code>0x40000000000</code></td>
-</tr>
-</tbody>
-</table>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>These parameters use virtual address space, not physical memory. Actual physical memory is allocated on demand as pages are touched.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Size the pool generously. When a process exhausts its memory pool, allocations simply fail (<code>malloc</code> returns <code>NULL</code>, <code>posix_memalign</code> returns <code>ENOMEM</code>), which typically crashes the application. The pool is not grown at runtime, so if a process may need more memory, increase <code>mempool_size_gb</code> in advance.</p>
-</div>
-<p>To persist parameters and auto-load at boot:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># /etc/modprobe.d/agnocast.conf</span>
-<span class="na">options agnocast mempool_num</span><span class="o">=</span><span class="s">8192 mempool_size_gb=32</span>
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;agnocast&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/modules-load.d/agnocast.conf
-</code></pre></div>
-<h3 id="5-verify-installation">5. Verify installation<a class="headerlink" href="#5-verify-installation" title="Permanent link">#</a></h3>
-<p>After building and sourcing the workspace, run the sample application:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Terminal 1</span>
-<span class="nb">source</span><span class="w"> </span>install/setup.bash
-ros2<span class="w"> </span>launch<span class="w"> </span>agnocast_sample_application<span class="w"> </span>talker.launch.xml
-
-<span class="c1"># Terminal 2</span>
-<span class="nb">source</span><span class="w"> </span>install/setup.bash
-ros2<span class="w"> </span>launch<span class="w"> </span>agnocast_sample_application<span class="w"> </span>listener.launch.xml
-</code></pre></div>
-<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">#</a></h2>
+<h2 id="behavior-to-be-aware-of">Behavior to be aware of<a class="headerlink" href="#behavior-to-be-aware-of" title="Permanent link">#</a></h2>
 <ul>
-<li><a href="configuration/">System Configuration</a> — required kernel parameters</li>
-<li><a href="../migration-guide/">Migration Guide</a> — how to integrate Agnocast into your application</li>
+<li><strong>QoS history window.</strong> When a rule is active, heavy publishing in the source domain can shrink the effective QoS history window seen within the destination domain, because both domains share one message stream.</li>
+<li><strong>Duplicate delivery across paths.</strong> If you also bridge the same topic across ECUs through the ROS 2 <code>domain_bridge</code>, a subscriber can receive the message twice — once from each path. Don't bridge the same topic by both mechanisms within the same namespace.</li>
+<li><strong>Shared endpoint capacity.</strong> The two bridged domains share one per-topic publisher / subscriber capacity limit, so their combined endpoint count counts against that single limit.</li>
 </ul>
 
 
@@ -1596,7 +1512,7 @@ ros2<span class="w"> </span>launch<span class="w"> </span>agnocast_sample_applic
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Home" rel="prev">
+          <a href="../configuration/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration" rel="prev">
             <div class="md-footer__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
             </div>
@@ -1605,20 +1521,20 @@ ros2<span class="w"> </span>launch<span class="w"> </span>agnocast_sample_applic
                 Previous
               </span>
               <div class="md-ellipsis">
-                Home
+                Configuration
               </div>
             </div>
           </a>
         
         
           
-          <a href="configuration/" class="md-footer__link md-footer__link--next" aria-label="Next: System Configuration" rel="next">
+          <a href="../../ros2-cli/" class="md-footer__link md-footer__link--next" aria-label="Next: ROS 2 CLI" rel="next">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                System Configuration
+                ROS 2 CLI
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1654,10 +1570,10 @@ ros2<span class="w"> </span>launch<span class="w"> </span>agnocast_sample_applic
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.expand", "navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.footer"], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.expand", "navigation.indexes", "navigation.instant", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.footer"], "search": "../../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.220ee61c.min.js"></script>
+      <script src="../../assets/javascripts/bundle.220ee61c.min.js"></script>
       
         
           <script src="https://unpkg.com/mermaid@8.13.10/dist/mermaid.min.js"></script>
