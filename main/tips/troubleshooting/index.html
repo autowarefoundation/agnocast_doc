@@ -1405,7 +1405,7 @@
 
 <h1 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">#</a></h1>
 <h2 id="cleaning-up-shared-memory">Cleaning up shared memory<a class="headerlink" href="#cleaning-up-shared-memory" title="Permanent link">#</a></h2>
-<p>Agnocast runs a daemon process that automatically cleans up shared memory, even when Agnocast participant processes crash. If the daemon itself is killed, these resources may persist. Clean them up manually:</p>
+<p>Agnocast runs a daemon process that automatically cleans up shared memory, even when Agnocast participant processes crash. If the daemon itself is killed, these resources persist until the next Agnocast process starts, which spawns a replacement that unlinks them. To clean them up without waiting for that:</p>
 <div class="highlight"><pre><span></span><code>rm<span class="w"> </span>-f<span class="w"> </span>/dev/shm/agnocast@*
 </code></pre></div>
 
