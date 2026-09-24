@@ -116,7 +116,7 @@ non_ros_threads:
     affinity: [3]
 ```
 
-The fields are the same as `callback_groups` except `name` is used instead of `id`. All scheduling policies including `SCHED_DEADLINE` are supported. See the [YAML Specification](yaml-specification.md#non_ros_threads) for details.
+The fields are the same as `callback_groups` except that `name` is used instead of `id` and there is no `domain_id`. All scheduling policies including `SCHED_DEADLINE` are supported. See the [YAML Specification](yaml-specification.md#non_ros_threads) for details.
 
 ## Prerun Mode
 
