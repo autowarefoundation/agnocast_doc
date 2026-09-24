@@ -93,7 +93,7 @@ If the value would not form a valid ROS 2 node name, it is ignored with a warnin
 
 ## Bridge Architecture
 
-The Bridge uses a single bridge manager process per IPC namespace and `ROS_DOMAIN_ID`. A bridge for a topic is created **lazily** — only when both an Agnocast endpoint and an external ROS 2 endpoint exist for that topic, or when the discovery agent requests one for an Agnocast endpoint in another IPC namespace or ECU — and destroyed when either endpoint disappears. A bridge the discovery agent requested is kept for up to 5 seconds after its last request.
+The Bridge uses a single bridge manager process per IPC namespace and `ROS_DOMAIN_ID`. A bridge for a topic is created **lazily** — only when both an Agnocast endpoint and an external ROS 2 endpoint exist for that topic, or when the discovery agent requests one for an Agnocast endpoint in another IPC namespace or ECU — and destroyed when either endpoint disappears. The discovery agent repeats its request every second, and the bridge manager honors a request for 5 seconds, so a bridge for a vanished remote endpoint stops being forced within about 5 seconds.
 
 ```mermaid
 graph TD
