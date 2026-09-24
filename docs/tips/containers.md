@@ -32,7 +32,7 @@ docker run --device /dev/agnocast ...
 
 ### Shared IPC namespace
 
-Agnocast uses POSIX shared memory (`/dev/shm`) for inter-process communication, and the kernel module scopes publishers and subscribers by the Linux IPC namespace. By default, each Docker container gets its own private IPC namespace, meaning **Agnocast processes in different containers cannot share messages through shared memory**. They still reach each other through the [Bridge](../migration-guide/bridge.md) over ROS 2 (DDS), with serialization, which the discovery agent sets up automatically.
+Agnocast uses POSIX shared memory (`/dev/shm`) for inter-process communication, and the kernel module scopes publishers and subscribers by the Linux IPC namespace (and `ROS_DOMAIN_ID`). By default, each Docker container gets its own private IPC namespace, meaning **Agnocast processes in different containers cannot share messages through shared memory**. They still reach each other automatically through the [Bridge](../migration-guide/bridge.md) over ROS 2 (DDS), with serialization. See [Limitations](../index.md#limitations) for what this requires.
 
 For zero-copy communication, all Agnocast containers must share the same IPC namespace.
 
@@ -49,7 +49,7 @@ The simplest approach — all containers use the host's IPC namespace:
 docker run --ipc=host --device /dev/agnocast ...
 ```
 
-This also allows communication between containerized Agnocast processes and processes running directly on the host.
+This also allows zero-copy communication between containerized Agnocast processes and processes running directly on the host.
 
 ### Option 2: Share an IPC namespace between containers
 
@@ -67,7 +67,7 @@ docker run --ipc=shareable --device /dev/agnocast --name agnocast_main ...
 docker run --ipc=container:agnocast_main --device /dev/agnocast ...
 ```
 
-All containers sharing the same IPC namespace can communicate via Agnocast.
+All containers sharing the same IPC namespace can communicate via Agnocast with zero copy.
 
 ## Docker Compose Example
 
