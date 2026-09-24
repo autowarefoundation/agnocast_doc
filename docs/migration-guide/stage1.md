@@ -94,6 +94,9 @@ Key changes:
 4. Publish with `std::move(msg)` (zero-copy handoff)
 5. Use free function `agnocast::create_publisher(this, ...)` instead of `this->create_publisher(...)`
 
+!!! note
+    As in rclcpp, keep callback groups as class members so that they outlive the entities that use them.
+
 ## Migrating a Subscription
 
 ### Before (rclcpp)
@@ -304,13 +307,6 @@ Add `LD_PRELOAD` for `libagnocast_heaphook.so` so that ROS message memory is all
     </composable_node>
 </node_container>
 ```
-
-## Supplementary Notes
-
-As the code is currently implemented, Agnocast retains callback groups as `shared_ptr` internally.
-This means that, technically speaking, you do not need to store callback groups as class members in
-your node. However, this behavior is not part of the API contract and may change in future versions.
-As in rclcpp, users must manage the lifetime of callback groups themselves.
 
 ## Next Step
 
