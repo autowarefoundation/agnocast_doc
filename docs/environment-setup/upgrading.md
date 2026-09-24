@@ -29,7 +29,7 @@ source install/setup.bash
 ```
 
 !!! info
-    Once the ROS build farm release is available, the ROS packages will also be installable via apt (e.g., `ros-jazzy-agnocast=2.3.5*`), and this source build step will no longer be necessary.
+    Once the ROS build farm release is available, the ROS packages will also be installable via apt (e.g., `ros-jazzy-agnocast=2.4.0*`), and this source build step will no longer be necessary.
 
 ## 3. Reload the kernel module
 
