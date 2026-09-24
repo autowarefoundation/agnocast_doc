@@ -1560,7 +1560,7 @@ sudo<span class="w"> </span>insmod<span class="w"> </span>agnocast.ko
 <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>--device<span class="w"> </span>/dev/agnocast<span class="w"> </span>...
 </code></pre></div>
 <h3 id="shared-ipc-namespace">Shared IPC namespace<a class="headerlink" href="#shared-ipc-namespace" title="Permanent link">#</a></h3>
-<p>Agnocast uses POSIX shared memory (<code>/dev/shm</code>) and POSIX message queues (<code>/dev/mqueue</code>) for inter-process communication. These resources are scoped by the Linux IPC namespace. By default, each Docker container gets its own private IPC namespace, meaning <strong>Agnocast processes in different containers cannot communicate with each other</strong>.</p>
+<p>Agnocast uses POSIX shared memory (<code>/dev/shm</code>) for inter-process communication, and the kernel module scopes publishers and subscribers by the Linux IPC namespace. By default, each Docker container gets its own private IPC namespace, meaning <strong>Agnocast processes in different containers cannot communicate with each other</strong>.</p>
 <p>To enable communication, all Agnocast containers must share the same IPC namespace.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>

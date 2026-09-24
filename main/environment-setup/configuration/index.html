@@ -489,46 +489,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#kernel-parameters" class="md-nav__link">
-    Kernel Parameters
-  </a>
-  
-    <nav class="md-nav" aria-label="Kernel Parameters">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#required" class="md-nav__link">
-    Required
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#optional-for-large-deployments" class="md-nav__link">
-    Optional (for large deployments)
-  </a>
-  
-    <nav class="md-nav" aria-label="Optional (for large deployments)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#per-user-posix-message-queue-memory-limit" class="md-nav__link">
-    Per-user POSIX message queue memory limit
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#rt-throttling-for-callbackisolatedexecutor" class="md-nav__link">
     RT Throttling (for CallbackIsolatedExecutor)
   </a>
@@ -1419,46 +1379,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#kernel-parameters" class="md-nav__link">
-    Kernel Parameters
-  </a>
-  
-    <nav class="md-nav" aria-label="Kernel Parameters">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#required" class="md-nav__link">
-    Required
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#optional-for-large-deployments" class="md-nav__link">
-    Optional (for large deployments)
-  </a>
-  
-    <nav class="md-nav" aria-label="Optional (for large deployments)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#per-user-posix-message-queue-memory-limit" class="md-nav__link">
-    Per-user POSIX message queue memory limit
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#rt-throttling-for-callbackisolatedexecutor" class="md-nav__link">
     RT Throttling (for CallbackIsolatedExecutor)
   </a>
@@ -1484,30 +1404,6 @@
 
 
 <h1 id="system-configuration">System Configuration<a class="headerlink" href="#system-configuration" title="Permanent link">#</a></h1>
-<h2 id="kernel-parameters">Kernel Parameters<a class="headerlink" href="#kernel-parameters" title="Permanent link">#</a></h2>
-<p>Agnocast uses POSIX message queues for inter-process notification. The default Linux limits are too low for typical robotics workloads.</p>
-<h3 id="required">Required<a class="headerlink" href="#required" title="Permanent link">#</a></h3>
-<p>Set the maximum number of messages per queue:</p>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>sysctl<span class="w"> </span>-w<span class="w"> </span>fs.mqueue.msg_max<span class="o">=</span><span class="m">256</span>
-</code></pre></div>
-<p>To persist across reboots, add to <code>/etc/sysctl.d/agnocast.conf</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="na">fs.mqueue.msg_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">256</span>
-</code></pre></div>
-<h3 id="optional-for-large-deployments">Optional (for large deployments)<a class="headerlink" href="#optional-for-large-deployments" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Maximum number of message queues system-wide</span>
-<span class="na">fs.mqueue.queues_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1024</span>
-</code></pre></div>
-<h4 id="per-user-posix-message-queue-memory-limit">Per-user POSIX message queue memory limit<a class="headerlink" href="#per-user-posix-message-queue-memory-limit" title="Permanent link">#</a></h4>
-<p>Each bridge manager message queue consumes memory proportional to the maximum message size and queue depth. When running many Agnocast processes simultaneously, the per-user POSIX message queue memory limit (<code>RLIMIT_MSGQUEUE</code>) may be exceeded, causing <code>mq_open</code> to fail.</p>
-<p>To increase the limit, either add the following line to <code>/etc/security/limits.conf</code>:</p>
-<div class="highlight"><pre><span></span><code>*<span class="w"> </span>-<span class="w"> </span>msgqueue<span class="w"> </span>unlimited
-</code></pre></div>
-<p>Or use <code>prlimit</code> to change the limit for the current shell:</p>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>prlimit<span class="w"> </span>--pid<span class="o">=</span><span class="nv">$$</span><span class="w"> </span>--msgqueue<span class="o">=</span>unlimited
-</code></pre></div>
-<p>You can verify the current limit with:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">ulimit</span><span class="w"> </span>-q
-</code></pre></div>
 <h2 id="rt-throttling-for-callbackisolatedexecutor">RT Throttling (for CallbackIsolatedExecutor)<a class="headerlink" href="#rt-throttling-for-callbackisolatedexecutor" title="Permanent link">#</a></h2>
 <p>If using real-time scheduling with the CallbackIsolatedExecutor, you may need to increase the RT throttling limit. The default allows RT tasks to use 95% of each period:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># /etc/sysctl.d/agnocast-rt.conf</span>

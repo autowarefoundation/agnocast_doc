@@ -1008,8 +1008,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#cleaning-up-shared-memory-and-message-queues" class="md-nav__link">
-    Cleaning up shared memory and message queues
+  <a href="#cleaning-up-shared-memory" class="md-nav__link">
+    Cleaning up shared memory
   </a>
   
 </li>
@@ -1379,8 +1379,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#cleaning-up-shared-memory-and-message-queues" class="md-nav__link">
-    Cleaning up shared memory and message queues
+  <a href="#cleaning-up-shared-memory" class="md-nav__link">
+    Cleaning up shared memory
   </a>
   
 </li>
@@ -1404,14 +1404,9 @@
 
 
 <h1 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">#</a></h1>
-<h2 id="cleaning-up-shared-memory-and-message-queues">Cleaning up shared memory and message queues<a class="headerlink" href="#cleaning-up-shared-memory-and-message-queues" title="Permanent link">#</a></h2>
-<p>Agnocast runs a daemon process that automatically cleans up shared memory and message queues, even when Agnocast participant processes crash. If the daemon itself is killed, these resources may persist. Clean them up manually:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Shared memory</span>
-rm<span class="w"> </span>/dev/shm/agnocast@*
-
-<span class="c1"># Message queues</span>
-rm<span class="w"> </span>/dev/mqueue/agnocast@*
-rm<span class="w"> </span>/dev/mqueue/agnocast_bridge_manager@*
+<h2 id="cleaning-up-shared-memory">Cleaning up shared memory<a class="headerlink" href="#cleaning-up-shared-memory" title="Permanent link">#</a></h2>
+<p>Agnocast runs a daemon process that automatically cleans up shared memory, even when Agnocast participant processes crash. If the daemon itself is killed, these resources may persist. Clean them up manually:</p>
+<div class="highlight"><pre><span></span><code>rm<span class="w"> </span>-f<span class="w"> </span>/dev/shm/agnocast@*
 </code></pre></div>
 
 
