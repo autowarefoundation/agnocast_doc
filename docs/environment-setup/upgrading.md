@@ -24,6 +24,7 @@ sudo apt install agnocast-kmod-v2.4.0 agnocast-heaphook-v2.4.0
 cd agnocast
 git fetch
 git checkout <NEW_VERSION>
+rosdep install --from-paths src --ignore-src -y
 colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 source install/setup.bash
 ```
