@@ -22,7 +22,7 @@ You should see interleaved log messages from the three callbacks.
 
 ## Step 2: Generate a template
 
-Start the prerun node **before** launching your application:
+While the application is running, start the prerun node:
 
 ```bash
 ros2 launch agnocast_cie_thread_configurator thread_configurator.launch.xml prerun:=true
@@ -80,7 +80,7 @@ irqs:
   # ... one entry per interrupt claimed by a device
 ```
 
-The first `callback_groups` entry is the node's default CallbackGroup, which holds the parameter services and the `/parameter_events` subscription. `domain_id` is the ROS domain the CallbackGroup was discovered in (`ROS_DOMAIN_ID`, or `0` if unset).
+The first `callback_groups` entry is the node's default CallbackGroup, which holds the parameter services and the `/parameter_events` subscription. The ID above is from Humble; on Jazzy it also contains `@Service(/cie_tutorial_node/get_type_description)`, between `get_parameters` and `list_parameters`. `domain_id` is the ROS domain the CallbackGroup was discovered in.
 
 The `kernel_threads` and `irqs` sections hold what the prerun mode observed on the machine. This tutorial does not change them, so the steps below leave them out.
 
