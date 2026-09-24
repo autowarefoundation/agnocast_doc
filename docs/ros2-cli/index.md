@@ -39,12 +39,12 @@ Columns used in the tables below:
 | `ros2 launch` | ✓ | ✗ | - | Launches processes; Agnocast executables are launched the same way. |
 | `ros2 lifecycle` | ✗ | ✗ | TBD | `agnocast::Node` does not support lifecycle (see [agnocast_node_interface_comparison.md](https://github.com/autowarefoundation/agnocast/blob/main/docs/agnocast_node_interface_comparison.md) §4.3). |
 | `ros2 multicast` | ✓ | ✗ | - | Exercises DDS multicast; unrelated to Agnocast. |
-| `ros2 node` | ⚠ | ✓ (`list_agnocast`, `info_agnocast`) | - | `as-is` does not see pure `agnocast::Node` instances at all — only `rclcpp::Node`-based nodes (including those that use Agnocast pub/sub) appear. Use the `_agnocast` verbs to include `agnocast::Node`. See §2. |
-| `ros2 param` | ✓ | ✗ | - | `agnocast::Node` now instantiates a `ParameterService` during construction, so the standard parameter verbs work against Agnocast nodes the same as against `rclcpp::Node`. |
+| `ros2 node` | ⚠ | ✓ (`list_agnocast`, `info_agnocast`) | - | `as-is` sees `rclcpp::Node`-based nodes (including those that use Agnocast pub/sub); a pure `agnocast::Node` appears at most as a shadow node. Use the `_agnocast` verbs to include `agnocast::Node`. See §2. |
+| `ros2 param` | ✓ | ✗ | - | Works against `agnocast::Node` while the bridge is on (the default). See §5. |
 | `ros2 pkg` | ✓ | ✗ | - | Package metadata operations (`create`, `list`, `prefix`, `executables`, `xml`) read from the colcon/ament install layout and `package.xml`. Transport-agnostic and works the same for Agnocast packages. |
 | `ros2 run` | ✓ | ✗ | - | Launches an executable; no Agnocast-specific behavior. |
 | `ros2 security` | N/A | ✗ | No | Manages SROS2 / DDS-Security artifacts (enclaves, keystores, permission/policy files) that authenticate and encrypt DDS traffic. **Has no effect on Agnocast pub/sub**: communication between Agnocast endpoints goes through shared memory, not DDS, so SROS2 policies neither authorize nor restrict it. The commands still run, but generated artifacts only protect the DDS side (including the Agnocast↔ROS 2 bridge). |
-| `ros2 service` | ✗ | ✗ | TBD | Agnocast services use internal shared-memory topics prefixed with `/AGNOCAST_SRV_*` and are not exposed via DDS. Agnocast services are marked experimental (see [agnocast_node_interface_comparison.md](https://github.com/autowarefoundation/agnocast/blob/main/docs/agnocast_node_interface_comparison.md) §2.6). |
+| `ros2 service` | ⚠ | ✗ | TBD | Agnocast services use internal shared-memory topics prefixed with `/AGNOCAST_SRV_*` and reach DDS only through the Agnocast-ROS 2 Bridge. See §4. |
 | `ros2 topic` | ⚠ | ✓ (`list_agnocast`, `info_agnocast`, `echo_agnocast`, `hz_agnocast`, `delay_agnocast`) | - | Standard `ros2 topic` verbs have limited visibility into Agnocast: pure Agnocast-only topics are invisible, and bridged topics are seen only from the DDS side. The `_agnocast` variants extend each verb with full Agnocast awareness. See §3. |
 | `ros2 agnocast` | N/A | ✓ (new top-level command) | - | Provided by `ros2agnocast` for Agnocast-specific operations (`version`, `generate-bridge-plugins`, `discovery-daemon-status`, `bridge-daemon-status`). See §10. |
 
@@ -52,8 +52,8 @@ Columns used in the tables below:
 
 | Verb | Works as-is | Agnocast version | Scope of Agnocast verb | Planned | Notes |
 |------|:-----------:|:----------------:|:----------------------:|:-------:|-------|
-| `ros2 node list` | ⚠ | ✓ `list_agnocast` | Cluster-wide | - | `as-is` lists only `rclcpp::Node`-based nodes, not pure `agnocast::Node` instances. `list_agnocast` also lists `agnocast::Node` instances, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise only the current IPC namespace. Supports `-a`, `-c`, and `-d`. Internal nodes — the domain bridge (`agnocast_bridge_node_*`), the [CIE (Callback Isolated Executor)](../callback-isolated-executor/index.md) thread configurator (`/agnocast_cie_thread_configurator/*`), and the discovery agent (`agnocast_discovery_agent_*`) — are hidden by default and shown by both `-d` and `--all`/`-a`. `-c` counts the currently displayed set (internal nodes included only with `-d` or `-a`). |
-| `ros2 node info` | ⚠ | ✓ `info_agnocast` | Cluster-wide | - | `as-is` cannot target a pure `agnocast::Node` (it is absent from `ros2 node list`), and does not label Agnocast publishers/subscribers on the nodes it can show. `info_agnocast` adds those Agnocast publishers/subscribers and bridge-status labels, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise only the current IPC namespace. |
+| `ros2 node list` | ⚠ | ✓ `list_agnocast` | Cluster-wide | - | `as-is` lists `rclcpp::Node`-based nodes; a pure `agnocast::Node` appears only as the endpoint-less shadow node that the bridge manager creates for its Agnocast services, and not at all with the bridge off. `list_agnocast` also lists `agnocast::Node` instances, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise only the current IPC namespace. Supports `-a`, `-c`, and `-d`. Internal nodes — the [Agnocast-ROS 2 Bridge](../migration-guide/bridge.md) manager node (`agnocast_bridge_node_*`), the [CIE (Callback Isolated Executor)](../callback-isolated-executor/index.md) thread configurator (`/agnocast_cie_thread_configurator/*`), and the discovery agent (`agnocast_discovery_agent_*`) — are hidden by default and shown by both `-d` and `--all`/`-a`. `-c` counts the currently displayed set (internal nodes included only with `-d` or `-a`). |
+| `ros2 node info` | ⚠ | ✓ `info_agnocast` | Cluster-wide | - | `as-is` shows nothing for a pure `agnocast::Node` (at most its shadow node is in the graph), and does not label Agnocast publishers/subscribers on the nodes it can show. `info_agnocast` adds those Agnocast publishers/subscribers and bridge-status labels, wherever a discovery agent runs (across IPC namespaces and ECUs); otherwise only the current IPC namespace. |
 
 ### 3. `ros2 topic` verbs
 
@@ -71,15 +71,17 @@ Columns used in the tables below:
 
 ### 4. `ros2 service` verbs
 
+Agnocast services reach DDS only through the [Agnocast-ROS 2 Bridge](../migration-guide/bridge.md), which is on by default. On Jazzy and later, the bridge exposes an Agnocast service on DDS only while a ROS 2 client for it exists; on Humble, it exposes every Agnocast service. With `AGNOCAST_BRIDGE_MODE=off`, Agnocast services are not visible on DDS.
+
 | Verb | Works as-is | Agnocast version | Planned | Notes |
 |------|:-----------:|:----------------:|:-------:|-------|
-| `ros2 service list` | ✗ | ✗ | TBD | |
-| `ros2 service call` | ✗ | ✗ | TBD | |
-| `ros2 service type` / `find` / `info` / `echo` | ✗ | ✗ | TBD | |
+| `ros2 service list` / `type` / `find` / `info` | ⚠ | ✗ | TBD | An Agnocast service is visible only while its bridge exists. |
+| `ros2 service call` | ✓ | ✗ | - | Works against an Agnocast service while the bridge is on (the default), the same way as `ros2 param`. |
+| `ros2 service echo` | ✗ | ✗ | TBD | |
 
 ### 5. `ros2 param` verbs
 
-`agnocast::Node` instantiates a `ParameterService` during construction, so the standard `ros2 param` verbs operate on `agnocast::Node` exactly as on `rclcpp::Node`. No Agnocast-specific verb is needed.
+`agnocast::Node` instantiates a `ParameterService` during construction. Its services are Agnocast services, which the [Agnocast-ROS 2 Bridge](../migration-guide/bridge.md) exposes to DDS on demand, so while the bridge is on (the default) the standard `ros2 param` verbs operate on `agnocast::Node` exactly as on `rclcpp::Node`. With `AGNOCAST_BRIDGE_MODE=off` they cannot reach an `agnocast::Node`. No Agnocast-specific verb is needed.
 
 | Verb | Works as-is | Agnocast version | Planned | Notes |
 |------|:-----------:|:----------------:|:-------:|-------|
@@ -148,8 +150,8 @@ Component containers can load `agnocast::Node` subclasses; the container itself 
 | `ros2 agnocast --version` / `-v` | Local host only | Print version information for Agnocast components installed on the host where the command is run (userland libraries and the loaded kernel module). |
 | `ros2 agnocast version` | Local host only | Same as `--version` (verb form). |
 | `ros2 agnocast generate-bridge-plugins` | Build-time | Generate a ROS 2 bridge plugin package for user message types. Operates on local source/install trees, not on any running system. |
-| `ros2 agnocast discovery-daemon-status` | Local IPC namespace | Check that the Agnocast discovery agent for the **current** IPC namespace is running and healthy. Exits non-zero if it is not. Add `-v` for per-check detail. |
-| `ros2 agnocast bridge-daemon-status` | Local IPC namespace | Check that the Agnocast bridge daemon process for the **current** IPC namespace is running and healthy. Exits non-zero if it is not. Add `-v` for per-check detail. |
+| `ros2 agnocast discovery-daemon-status` | Local IPC namespace | Check that the Agnocast discovery agent for the **current** IPC namespace and `ROS_DOMAIN_ID` is running and healthy. Exits non-zero if it is not. Add `-v` for per-check detail. |
+| `ros2 agnocast bridge-daemon-status` | Local IPC namespace | Check that the Agnocast bridge daemon process for the **current** IPC namespace is running and healthy. Exits non-zero if it is not. It counts the bridge daemons of every `ROS_DOMAIN_ID` in the namespace, so it reports `NG. Multiple bridge daemons are running.` when more than one domain has one. Add `-v` for per-check detail. |
 
 ---
 
@@ -191,7 +193,7 @@ $ ros2 topic list_agnocast | grep Agnocast
 /topic_name2 (Agnocast enabled)
 ```
 
-If an Agnocast topic is bridged to ROS 2 publishers or subscribers, it is shown with the "(Agnocast enabled, bridged)" suffix.
+If an Agnocast topic is bridged, it is shown with the "(Agnocast enabled, bridged)" suffix.
 
 ```bash
 $ ros2 topic list_agnocast
@@ -200,13 +202,7 @@ $ ros2 topic list_agnocast
 /topic_name3
 ```
 
-The `(Agnocast enabled, bridged)` suffix means **the topic has both Agnocast endpoints and ROS 2 endpoints, and a bridge process is forwarding between them**. All three conditions are required:
-
-- at least one Agnocast publisher or subscriber on the topic,
-- at least one ROS 2 (DDS-side) endpoint on the other direction (e.g. an Agnocast publisher with a ROS 2 subscriber, or vice versa), and
-- the bridge manager process is enabled (`AGNOCAST_BRIDGE_MODE=on`) and running.
-
-If any one of these is missing, the suffix is just `(Agnocast enabled)`. For example, a topic with only an Agnocast publisher and no ROS 2 subscriber is shown as `(Agnocast enabled)` regardless of whether the bridge process is running — there is simply no DDS-side counterpart to bridge to. Table 1 below enumerates every combination.
+The `(Agnocast enabled, bridged)` suffix means **the topic's Agnocast endpoints have a counterpart in the other direction that they cannot reach through shared memory — a ROS 2 endpoint, or an Agnocast endpoint in another IPC namespace — and every bridge needed for it is running**. Without such a counterpart, the suffix is just `(Agnocast enabled)`, whether or not the bridge is on. If a needed bridge is missing (e.g. with `AGNOCAST_BRIDGE_MODE=off`), the suffix is `(WARN: one or more necessary bridges are not running)`. Table 1 below enumerates the combinations within one IPC namespace.
 
 #### Table 1: Pub/Sub situations and display names
 
@@ -306,7 +302,7 @@ Type: agnocast_sample_interfaces/msg/DynamicSizeArray
 ROS 2 Publisher count: 1
 Agnocast Publisher count: 2
 
-Node name: agnocast_bridge_node_86050
+Node name: agnocast_bridge_node_4026531839_86050
 Node namespace: /
 Topic type: agnocast_sample_interfaces/msg/DynamicSizeArray
 Endpoint type: PUBLISHER
@@ -320,7 +316,7 @@ QoS profile:
   Liveliness: AUTOMATIC
   Liveliness lease duration: Infinite
 
-Node name: agnocast_bridge_node_86050
+Node name: agnocast_bridge_node_4026531839_86050
 Node namespace: /
 Topic type: agnocast_sample_interfaces/msg/DynamicSizeArray
 Endpoint type: PUBLISHER (Agnocast enabled)
@@ -339,7 +335,7 @@ QoS profile:
 ROS 2 Subscription count: 1
 Agnocast Subscription count: 2
 
-Node name: agnocast_bridge_node_86050
+Node name: agnocast_bridge_node_4026531839_86050
 Node namespace: /
 Topic type: agnocast_sample_interfaces/msg/DynamicSizeArray
 Endpoint type: SUBSCRIPTION
@@ -361,7 +357,7 @@ QoS profile:
   History (Depth): KEEP_LAST (1)
   Durability: VOLATILE
 
-Node name: agnocast_bridge_node_86050
+Node name: agnocast_bridge_node_4026531839_86050
 Node namespace: /
 Topic type: agnocast_sample_interfaces/msg/DynamicSizeArray
 Endpoint type: SUBSCRIPTION (Agnocast enabled)
@@ -511,21 +507,21 @@ Standard ROS 2 nodes are displayed normally, while `agnocast::Node` instances ar
 
 ```bash
 $ ros2 node list_agnocast
-/ros2_talker_node
 /agnocast_listener_node (Agnocast enabled)
+/ros2_talker_node
 ```
 
 #### Debug Mode
 
-By default, `ros2 node list_agnocast` hides internal nodes — the domain bridge (`agnocast_bridge_node_*`), the CIE thread configurator (`/agnocast_cie_thread_configurator/*`, one per process using CIE), and the discovery agent (`agnocast_discovery_agent_*`) — to provide a cleaner view. To include these internal details, use the `--debug` or `-d` flag. They are also shown by `--all`/`-a`.
+By default, `ros2 node list_agnocast` hides internal nodes — the Agnocast-ROS 2 Bridge manager node (`agnocast_bridge_node_*`), the CIE thread configurator (`/agnocast_cie_thread_configurator/*`, one per process using CIE), and the discovery agent (`agnocast_discovery_agent_*`) — to provide a cleaner view. To include these internal details, use the `--debug` or `-d` flag. They are also shown by `--all`/`-a`.
 
 ```bash
 $ ros2 node list_agnocast -d
-/ros2_talker_node
-/agnocast_bridge_node_86050
+/agnocast_bridge_node_4026531839_86050
 /agnocast_cie_thread_configurator/client_node_86123
 /agnocast_discovery_agent_25c9a78b_4026531839_d0
 /agnocast_listener_node (Agnocast enabled)
+/ros2_talker_node
 ```
 
 #### Notes
@@ -559,9 +555,7 @@ $ ros2 node info_agnocast /listener_node
   Action Clients:
 ```
 
-Similar to `ros2 topic list_agnocast`, the (Agnocast enabled, bridged) suffix in the node info indicates that communication has been successfully established between Agnocast and ROS 2 for that specific topic.
-
-If a topic is Agnocast-enabled but not currently bridged (e.g., there is no corresponding ROS 2 publisher/subscriber or the bridge process is not active), it will be displayed simply as (Agnocast enabled). This allows you to verify the connectivity status of each topic directly from the node's perspective.
+The suffixes mean the same as in [Topic List](#topic-list): `(Agnocast enabled, bridged)` when every bridge the topic needs is running, `(Agnocast enabled)` when it needs none, and `(WARN: one or more necessary bridges are not running)` when a needed bridge is missing. This lets you check each topic's connectivity from the node's perspective.
 
 ### Bag Record
 
