@@ -32,9 +32,9 @@ docker run --device /dev/agnocast ...
 
 ### Shared IPC namespace
 
-Agnocast uses POSIX shared memory (`/dev/shm`) for inter-process communication, and the kernel module scopes publishers and subscribers by the Linux IPC namespace. By default, each Docker container gets its own private IPC namespace, meaning **Agnocast processes in different containers cannot communicate with each other**.
+Agnocast uses POSIX shared memory (`/dev/shm`) for inter-process communication, and the kernel module scopes publishers and subscribers by the Linux IPC namespace. By default, each Docker container gets its own private IPC namespace, meaning **Agnocast processes in different containers cannot share messages through shared memory**. They still reach each other through the [Bridge](../migration-guide/bridge.md) over ROS 2 (DDS), with serialization, which the discovery agent sets up automatically.
 
-To enable communication, all Agnocast containers must share the same IPC namespace.
+For zero-copy communication, all Agnocast containers must share the same IPC namespace.
 
 !!! warning
     Sharing an IPC namespace is necessary but not sufficient. Agnocast does not serialize messages, so publisher and subscriber must agree on the exact in-memory layout of every message type. Containers built with different compilers, different `rosidl` generator versions, or different system libraries can produce mismatched layouts that silently corrupt data. Build all communicating containers from the same workspace and toolchain. See [Limitations](../index.md#limitations) for details.
