@@ -13,7 +13,7 @@ The Agnocast kernel module (`agnocast-kmod`) must be installed on the **host** s
 **Non-Ubuntu hosts** (or environments where `apt` is not available) — Build the kernel module from source:
 
 ```bash
-git clone --branch 2.3.5 https://github.com/autowarefoundation/agnocast.git
+git clone --branch 2.4.0 https://github.com/autowarefoundation/agnocast.git
 cd agnocast/agnocast_kmod
 make
 sudo insmod agnocast.ko
@@ -32,9 +32,9 @@ docker run --device /dev/agnocast ...
 
 ### Shared IPC namespace
 
-Agnocast uses POSIX shared memory (`/dev/shm`) for inter-process communication, and the kernel module scopes publishers and subscribers by the Linux IPC namespace. By default, each Docker container gets its own private IPC namespace, meaning **Agnocast processes in different containers cannot communicate with each other**.
+Agnocast uses POSIX shared memory (`/dev/shm`) for inter-process communication, and the kernel module scopes publishers and subscribers by the Linux IPC namespace (and `ROS_DOMAIN_ID`). By default, each Docker container gets its own private IPC namespace, meaning **Agnocast processes in different containers cannot share messages through shared memory**. They still reach each other automatically through the [Bridge](../migration-guide/bridge.md) over ROS 2 (DDS), with serialization. See [Limitations](../index.md#limitations) for what this requires.
 
-To enable communication, all Agnocast containers must share the same IPC namespace.
+For zero-copy communication, all Agnocast containers must share the same IPC namespace.
 
 !!! warning
     Sharing an IPC namespace is necessary but not sufficient. Agnocast does not serialize messages, so publisher and subscriber must agree on the exact in-memory layout of every message type. Containers built with different compilers, different `rosidl` generator versions, or different system libraries can produce mismatched layouts that silently corrupt data. Build all communicating containers from the same workspace and toolchain. See [Limitations](../index.md#limitations) for details.
@@ -49,7 +49,7 @@ The simplest approach — all containers use the host's IPC namespace:
 docker run --ipc=host --device /dev/agnocast ...
 ```
 
-This also allows communication between containerized Agnocast processes and processes running directly on the host.
+This also allows zero-copy communication between containerized Agnocast processes and processes running directly on the host.
 
 ### Option 2: Share an IPC namespace between containers
 
@@ -67,7 +67,7 @@ docker run --ipc=shareable --device /dev/agnocast --name agnocast_main ...
 docker run --ipc=container:agnocast_main --device /dev/agnocast ...
 ```
 
-All containers sharing the same IPC namespace can communicate via Agnocast.
+All containers sharing the same IPC namespace can communicate via Agnocast with zero copy.
 
 ## Docker Compose Example
 
@@ -119,7 +119,7 @@ The script unloads the current module, purges every installed `agnocast-kmod-v*`
     All Agnocast containers and ROS nodes must be stopped before running this script — the module cannot be unloaded while `/dev/agnocast` is held open.
 
 !!! warning
-    The kmod version on the host and the `libagnocast_heaphook.so` version inside the container must share the same ioctl ABI. Mismatched versions cause runtime errors. This script does not touch the container; it is the operator's responsibility to roll the container to a matching version.
+    The kmod version on the host must match the major and minor version of `agnocastlib` inside the container, and `libagnocast_heaphook.so` must match `agnocastlib` exactly. On a mismatch, Agnocast processes exit at startup. This script does not touch the container; it is the operator's responsibility to roll the container to a matching version.
 
 After the swap, verify that the host kmod, the in-container `libagnocast_heaphook.so`, and the in-container `agnocastlib` are on compatible versions by running
 
