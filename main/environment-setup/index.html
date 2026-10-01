@@ -1476,8 +1476,8 @@ sudo<span class="w"> </span>apt<span class="w"> </span>update
 <p>Install kernel headers (required for DKMS to build the kernel module) and the Agnocast packages:</p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>linux-headers-<span class="k">$(</span>uname<span class="w"> </span>-r<span class="k">)</span>
 sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>agnocast-kmod-v2.3.5<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>agnocast-heaphook-v2.3.5
+<span class="w">  </span>agnocast-kmod-v2.4.0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>agnocast-heaphook-v2.4.0
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1495,11 +1495,11 @@ sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> <
 <li><strong>minor</strong> — Incremented when the kmod syscall API changes. <code>agnocastlib</code> and <code>agnocast-kmod</code> with matching major and minor versions are guaranteed to work correctly together.</li>
 <li><strong>patch</strong> — Incremented for all other changes.</li>
 </ul>
-<p>Packages use version-pinned names (e.g., <code>agnocast-kmod-v2.3.5</code>) to ensure all components are at exactly the same version.</p>
+<p>Packages use version-pinned names (e.g., <code>agnocast-kmod-v2.4.0</code>) to ensure all components are at exactly the same version.</p>
 </div>
 <h3 id="3-build-the-ros-packages-from-source">3. Build the ROS packages from source<a class="headerlink" href="#3-build-the-ros-packages-from-source" title="Permanent link">#</a></h3>
 <p>Since the ROS packages are not yet distributed from the ROS build farm, build them from source:</p>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>--branch<span class="w"> </span><span class="m">2</span>.3.5<span class="w"> </span>https://github.com/autowarefoundation/agnocast.git
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>--branch<span class="w"> </span><span class="m">2</span>.4.0<span class="w"> </span>https://github.com/autowarefoundation/agnocast.git
 <span class="nb">cd</span><span class="w"> </span>agnocast
 rosdep<span class="w"> </span>install<span class="w"> </span>--from-paths<span class="w"> </span>src<span class="w"> </span>--ignore-src<span class="w"> </span>-y
 colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--cmake-args<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
@@ -1507,7 +1507,7 @@ colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<spa
 </code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p>Once the ROS build farm release is available, the ROS packages will also be installable via apt (e.g., <code>ros-jazzy-agnocast=2.3.5*</code>), and this source build step will no longer be necessary.</p>
+<p>Once the ROS build farm release is available, the ROS packages will also be installable via apt (e.g., <code>ros-jazzy-agnocast=2.4.0*</code>), and this source build step will no longer be necessary.</p>
 </div>
 <h3 id="4-load-the-kernel-module">4. Load the kernel module<a class="headerlink" href="#4-load-the-kernel-module" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>modprobe<span class="w"> </span>agnocast
