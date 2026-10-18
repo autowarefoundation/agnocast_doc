@@ -80,7 +80,7 @@ For multiple ROS domains, launch one container process per domain and set
 
 ### Grant capabilities
 
-Limit execution of the binary to its owner and your primary group, then grant the capabilities. Run `setcap` last, because `chgrp` clears file capabilities:
+These capabilities let the binary change the scheduling of any thread and bypass file permission checks, so limit execution to its owner and your primary group first. Run `setcap` last, because `chgrp` clears file capabilities.
 
 ```bash
 bin=$(readlink -f $(ros2 pkg prefix agnocast_cie_thread_configurator)/lib/agnocast_cie_thread_configurator/thread_configurator_node)
@@ -89,9 +89,9 @@ sudo chmod 0750 "$bin"
 sudo setcap cap_sys_nice,cap_dac_override=eip "$bin"
 ```
 
-`CAP_SYS_NICE` covers the scheduling syscalls. `CAP_DAC_OVERRIDE` covers writes to the root-owned `/proc/irq/<N>/smp_affinity_list`, which only the [`irqs`](yaml-specification.md#irqs) section needs. With these capabilities, the binary can change the scheduling of any thread and bypass file permission checks. That is why the commands above limit who can execute it.
+`CAP_SYS_NICE` covers the scheduling syscalls. `CAP_DAC_OVERRIDE` covers writes to the root-owned `/proc/irq/<N>/smp_affinity_list`, which only the [`irqs`](yaml-specification.md#irqs) section needs.
 
-If other accounts share your primary group (for example `users`), use a dedicated group that contains only the accounts that run the configurator. On a host that other people use, run the configurator as a systemd service with `AmbientCapabilities=CAP_SYS_NICE CAP_DAC_OVERRIDE` instead of `setcap`. Then the binary itself carries no capabilities.
+If other accounts share your primary group (for example `users`), use a dedicated group that contains only the accounts that run the configurator.
 
 !!! note
     `setcap` does not work on symlinks. `readlink -f` resolves to the actual binary, which is needed when using `colcon build --symlink-install`.
