@@ -80,11 +80,18 @@ For multiple ROS domains, launch one container process per domain and set
 
 ### Grant capabilities
 
+Limit execution of the binary to its owner and your primary group, then grant the capabilities. Run `setcap` last, because `chgrp` clears file capabilities:
+
 ```bash
-sudo setcap cap_sys_nice,cap_dac_override=eip $(readlink -f $(ros2 pkg prefix agnocast_cie_thread_configurator)/lib/agnocast_cie_thread_configurator/thread_configurator_node)
+bin=$(readlink -f $(ros2 pkg prefix agnocast_cie_thread_configurator)/lib/agnocast_cie_thread_configurator/thread_configurator_node)
+sudo chgrp "$(id -gn)" "$bin"
+sudo chmod 0750 "$bin"
+sudo setcap cap_sys_nice,cap_dac_override=eip "$bin"
 ```
 
-`CAP_SYS_NICE` covers the scheduling syscalls. `CAP_DAC_OVERRIDE` covers writes to the root-owned `/proc/irq/<N>/smp_affinity_list`, which only the [`irqs`](yaml-specification.md#irqs) section needs.
+`CAP_SYS_NICE` covers the scheduling syscalls. `CAP_DAC_OVERRIDE` covers writes to the root-owned `/proc/irq/<N>/smp_affinity_list`, which only the [`irqs`](yaml-specification.md#irqs) section needs. With these capabilities, the binary can change the scheduling of any thread and bypass file permission checks. That is why the commands above limit who can execute it.
+
+If other accounts share your primary group (for example `users`), use a dedicated group that contains only the accounts that run the configurator. On a host that other people use, run the configurator as a systemd service with `AmbientCapabilities=CAP_SYS_NICE CAP_DAC_OVERRIDE` instead of `setcap`. Then the binary itself carries no capabilities.
 
 !!! note
     `setcap` does not work on symlinks. `readlink -f` resolves to the actual binary, which is needed when using `colcon build --symlink-install`.
@@ -93,12 +100,13 @@ sudo setcap cap_sys_nice,cap_dac_override=eip $(readlink -f $(ros2 pkg prefix ag
 
 After `setcap`, the dynamic linker ignores `LD_LIBRARY_PATH` for security. Register the paths explicitly:
 
-Create `/etc/ld.so.conf.d/agnocast-cie.conf` with all directories that contain libraries needed by the thread configurator. For example:
+Create `/etc/ld.so.conf.d/agnocast-cie.conf` with all directories that contain libraries needed by the thread configurator. The binary links `libagnocast_thread_configurator.so` from its own package, so include that package's `lib` directory. List the workspace directories first, so that they take precedence over `/opt/ros`. For example:
 
 ```bash
-echo "/opt/ros/$ROS_DISTRO/lib
-/opt/ros/$ROS_DISTRO/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)
-$(ros2 pkg prefix agnocast_cie_config_msgs)/lib" | sudo tee /etc/ld.so.conf.d/agnocast-cie.conf
+echo "$(ros2 pkg prefix agnocast_cie_thread_configurator)/lib
+$(ros2 pkg prefix agnocast_cie_config_msgs)/lib
+/opt/ros/$ROS_DISTRO/lib
+/opt/ros/$ROS_DISTRO/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)" | sudo tee /etc/ld.so.conf.d/agnocast-cie.conf
 ```
 
 Apply:
