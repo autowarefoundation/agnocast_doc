@@ -91,6 +91,7 @@ callback_groups:
 
 !!! note
     `SCHED_DEADLINE` uses cgroup cpuset for CPU affinity, which requires cgroup v1. See [Kernel boot parameter](integration-guide.md#kernel-boot-parameter-sched_deadline-only) for setup.
+    See [Limitations of SCHED_DEADLINE with CPU affinity](integration-guide.md#limitations-of-sched_deadline-with-cpu-affinity) for what fails after a restart or a reapply.
 
 ## non_ros_threads
 

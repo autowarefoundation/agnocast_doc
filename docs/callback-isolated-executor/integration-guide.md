@@ -131,6 +131,16 @@ sudo reboot
 !!! note
     `SCHED_DEADLINE` cannot be set via capabilities alone — the configurator must be run as **root**.
 
+### Limitations of SCHED_DEADLINE with CPU affinity
+
+The configurator puts each `SCHED_DEADLINE` thread that has a non-empty `affinity` into its own cpuset, `/sys/fs/cgroup/cpuset/<number>`. The numbers start at 0 each time the configurator starts.
+
+- On exit, the configurator removes its cpusets. A cpuset that still holds threads cannot be removed, and a crash skips this step. After a restart, an apply whose number matches a leftover cpuset fails with `Failed to configure affinity`. The message tells you to disable cgroup v2, but cgroup v2 is not the cause.
+- Each failed apply uses up its number. A later call of the [`reapply_config` service](#step-6-tune-the-configuration-with-the-reload-service-optional) retries the failed threads with new numbers. To remove the leftover cpusets, stop the applications whose threads are in them, then run `sudo rmdir /sys/fs/cgroup/cpuset/<number>`.
+- If a reapply changes a thread from `SCHED_DEADLINE` to another policy, the thread stays in its cpuset. Its CPU affinity stays limited to the CPUs of that cpuset.
+- Admission control is on by default. In that state, if a reapply changes `runtime`, `period` or `deadline` of a running thread in a cpuset, the kernel rejects it with `EPERM`. To apply new values, restart the application.
+- Admission control checks the total `SCHED_DEADLINE` bandwidth against all CPUs of the root domain, which is normally the whole system. It does not check each cpuset. The threads in one cpuset can get more bandwidth than its CPUs provide, and no error is reported.
+
 ## Step 3: Generate a YAML Template
 
 Start the prerun node **before** launching your application:
@@ -184,6 +194,7 @@ The configurator re-reads the file at its `config_file` parameter and re-applies
 - **Added entries** take effect as soon as the corresponding thread announces itself.
 - **Removed entries** drop out of the configurator's in-memory state. Scheduling already applied to a running thread is not reverted.
 - **`hardware_info` and `rt_throttling` are not re-evaluated.** Changing those sections requires restarting the configurator.
+- For a `SCHED_DEADLINE` thread with a non-empty `affinity`, a reapply cannot change `runtime`, `period` or `deadline`. See [Limitations of SCHED_DEADLINE with CPU affinity](#limitations-of-sched_deadline-with-cpu-affinity).
 
 `kernel_threads` and `irqs` entries never wait for an announcement. Every call re-scans the system and matches the entries again.
 
