@@ -1655,19 +1655,25 @@
 </div>
 <h2 id="step-2-set-up-the-thread-configurator">Step 2: Set Up the Thread Configurator<a class="headerlink" href="#step-2-set-up-the-thread-configurator" title="Permanent link">#</a></h2>
 <h3 id="grant-capabilities">Grant capabilities<a class="headerlink" href="#grant-capabilities" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>setcap<span class="w"> </span>cap_sys_nice,cap_dac_override<span class="o">=</span>eip<span class="w"> </span><span class="k">$(</span>readlink<span class="w"> </span>-f<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>agnocast_cie_thread_configurator<span class="k">)</span>/lib/agnocast_cie_thread_configurator/thread_configurator_node<span class="k">)</span>
+<p>These capabilities let the binary change the scheduling of any thread and bypass file permission checks, so limit execution to its owner and your primary group first. Run <code>setcap</code> last, because <code>chgrp</code> clears file capabilities.</p>
+<div class="highlight"><pre><span></span><code><span class="nv">bin</span><span class="o">=</span><span class="k">$(</span>readlink<span class="w"> </span>-f<span class="w"> </span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>agnocast_cie_thread_configurator<span class="k">)</span>/lib/agnocast_cie_thread_configurator/thread_configurator_node<span class="k">)</span>
+sudo<span class="w"> </span>chgrp<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>id<span class="w"> </span>-gn<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$bin</span><span class="s2">&quot;</span>
+sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">0750</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$bin</span><span class="s2">&quot;</span>
+sudo<span class="w"> </span>setcap<span class="w"> </span>cap_sys_nice,cap_dac_override<span class="o">=</span>eip<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$bin</span><span class="s2">&quot;</span>
 </code></pre></div>
 <p><code>CAP_SYS_NICE</code> covers the scheduling syscalls. <code>CAP_DAC_OVERRIDE</code> covers writes to the root-owned <code>/proc/irq/&lt;N&gt;/smp_affinity_list</code>, which only the <a href="../yaml-specification/#irqs"><code>irqs</code></a> section needs.</p>
+<p>If other accounts share your primary group (for example <code>users</code>), use a dedicated group that contains only the accounts that run the configurator.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><code>setcap</code> does not work on symlinks. <code>readlink -f</code> resolves to the actual binary, which is needed when using <code>colcon build --symlink-install</code>.</p>
 </div>
 <h3 id="configure-library-paths">Configure library paths<a class="headerlink" href="#configure-library-paths" title="Permanent link">#</a></h3>
 <p>After <code>setcap</code>, the dynamic linker ignores <code>LD_LIBRARY_PATH</code> for security. Register the paths explicitly:</p>
-<p>Create <code>/etc/ld.so.conf.d/agnocast-cie.conf</code> with all directories that contain libraries needed by the thread configurator. For example:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;/opt/ros/</span><span class="nv">$ROS_DISTRO</span><span class="s2">/lib</span>
-<span class="s2">/opt/ros/</span><span class="nv">$ROS_DISTRO</span><span class="s2">/lib/</span><span class="k">$(</span>dpkg-architecture<span class="w"> </span>-qDEB_HOST_MULTIARCH<span class="k">)</span>
-<span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>agnocast_cie_config_msgs<span class="k">)</span><span class="s2">/lib&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/ld.so.conf.d/agnocast-cie.conf
+<p>Create <code>/etc/ld.so.conf.d/agnocast-cie.conf</code> with all directories that contain libraries needed by the thread configurator. The binary links <code>libagnocast_thread_configurator.so</code> from its own package, so include that package's <code>lib</code> directory. List the workspace directories first, so that they take precedence over <code>/opt/ros</code>. For example:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>agnocast_cie_thread_configurator<span class="k">)</span><span class="s2">/lib</span>
+<span class="k">$(</span>ros2<span class="w"> </span>pkg<span class="w"> </span>prefix<span class="w"> </span>agnocast_cie_config_msgs<span class="k">)</span><span class="s2">/lib</span>
+<span class="s2">/opt/ros/</span><span class="nv">$ROS_DISTRO</span><span class="s2">/lib</span>
+<span class="s2">/opt/ros/</span><span class="nv">$ROS_DISTRO</span><span class="s2">/lib/</span><span class="k">$(</span>dpkg-architecture<span class="w"> </span>-qDEB_HOST_MULTIARCH<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/etc/ld.so.conf.d/agnocast-cie.conf
 </code></pre></div>
 <p>Apply:</p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>ldconfig

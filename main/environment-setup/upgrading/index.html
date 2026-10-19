@@ -1463,6 +1463,7 @@ git<span class="w"> </span>checkout<span class="w"> </span>&lt;NEW_VERSION&gt;
 colcon<span class="w"> </span>build<span class="w"> </span>--symlink-install<span class="w"> </span>--cmake-args<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release
 <span class="nb">source</span><span class="w"> </span>install/setup.bash
 </code></pre></div>
+<p>If you use the thread configurator, set it up again after the rebuild. The rebuild replaces <code>thread_configurator_node</code>, and the new binary has no file capabilities. Repeat <a href="../../callback-isolated-executor/integration-guide/#grant-capabilities">Grant capabilities in the integration guide</a>, or run <code>scripts/setup_thread_configurator.bash</code>.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>Once the ROS build farm release is available, the ROS packages will also be installable via apt (e.g., <code>ros-jazzy-agnocast=2.3.5*</code>), and this source build step will no longer be necessary.</p>
