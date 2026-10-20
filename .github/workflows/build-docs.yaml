@@ -17,7 +17,7 @@ jobs:
     if: >-
       github.event.action == 'labeled' &&
       github.event.label.name == 'check-page'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,7 +47,7 @@ jobs:
 
   cleanup:
     if: github.event.action == 'closed'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
