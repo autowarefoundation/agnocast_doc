@@ -24,6 +24,7 @@ sudo apt install agnocast-kmod-v2.4.0 agnocast-heaphook-v2.4.0
 cd agnocast
 git fetch
 git checkout <NEW_VERSION>
+rosdep install --from-paths src --ignore-src -y
 colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 source install/setup.bash
 ```
@@ -31,7 +32,7 @@ source install/setup.bash
 If you use the thread configurator, set it up again after the rebuild. The rebuild replaces `thread_configurator_node`, and the new binary has no file capabilities. Repeat [Grant capabilities in the integration guide](../callback-isolated-executor/integration-guide.md#grant-capabilities), or run `scripts/setup_thread_configurator.bash`.
 
 !!! info
-    Once the ROS build farm release is available, the ROS packages will also be installable via apt (e.g., `ros-jazzy-agnocast=2.3.5*`), and this source build step will no longer be necessary.
+    Once the ROS build farm release is available, the ROS packages will also be installable via apt (e.g., `ros-jazzy-agnocast=2.4.0*`), and this source build step will no longer be necessary.
 
 ## 3. Reload the kernel module
 
