@@ -116,6 +116,15 @@ graph TD
     BM -->|shared memory| SB
 ```
 
+### File Descriptor Limit
+
+The bridge manager opens an eventfd and an epoll file descriptor for every Agnocast → ROS 2 (A2R) bridge. A ROS 2 tool that subscribes to many topics at once, such as `ros2 bag record`, can create hundreds of bridges in a burst and exceed the default soft limit of open files (`RLIMIT_NOFILE`, 1024 under systemd).
+
+The bridge manager therefore raises its own soft limit to the hard limit at startup ([agnocast#1699](https://github.com/autowarefoundation/agnocast/pull/1699)). Only the bridge manager process is affected; your Agnocast processes keep their own limits. Under systemd the default hard limit is 524288, so no extra configuration is needed. If the hard limit is lower in your environment, or if you use a version without this change, raise the limit for the processes that start Agnocast, for example with `LimitNOFILE=` in the systemd unit.
+
+!!! warning
+    Since the bridge manager can hold file descriptors numbered 1024 and above, those descriptors must not be passed to `select()`. CycloneDDS uses `select()` on its sockets. With the default UDP transport, the sockets are opened when the bridge manager creates its node, before any bridge exists, so they are not affected. With the TCP transport, sockets are opened at runtime and may get such numbers, which can abort the bridge manager.
+
 ### Bridge Plugins (Optional)
 
 The Bridge works out of the box — message types are resolved at runtime. For higher throughput, you can optionally provide pre-compiled bridge plugins via the `agnocast_bridge_plugins` package. When a plugin is available for a given message type, the Bridge uses it; otherwise, it falls back to runtime resolution automatically.
