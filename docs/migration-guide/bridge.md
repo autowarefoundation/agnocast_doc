@@ -118,7 +118,7 @@ graph TD
 
 ### File Descriptor Limit
 
-The bridge manager opens an eventfd and an epoll file descriptor for every Agnocast → ROS 2 (A2R) bridge. A ROS 2 tool that subscribes to many topics at once, such as `ros2 bag record`, can create hundreds of bridges in a burst and exceed the default soft limit of open files (`RLIMIT_NOFILE`, 1024 under systemd).
+The bridge manager opens file descriptors for its bridges, for example an eventfd and an epoll file descriptor for every Agnocast → ROS 2 (A2R) topic bridge. A ROS 2 tool that subscribes to many topics at once, such as `ros2 bag record`, can create hundreds of bridges in a burst and exceed the default soft limit of open files (`RLIMIT_NOFILE`, 1024 under systemd).
 
 The bridge manager therefore raises its own soft limit to the hard limit at startup ([agnocast#1699](https://github.com/autowarefoundation/agnocast/pull/1699)). Only the bridge manager process is affected; your Agnocast processes keep their own limits. Under systemd the default hard limit is 524288, so no extra configuration is needed. If the hard limit is lower in your environment, or if you use a version without this change, raise the limit for the processes that start Agnocast, for example with `LimitNOFILE=` in the systemd unit.
 
